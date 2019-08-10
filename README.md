@@ -3,6 +3,8 @@
 EOS is an educational operating system for x86 platform
 
 Current progress:
+----------------
+
 - GDT and IDT setup
 - Text terminal (80x25)
 - PS/2 keyboard support
@@ -11,6 +13,8 @@ Current progress:
 - Very simple kernel command shell (KSH)
 
 TODO:
+----
+
 - Virtual Memory Manager
 - Higher Half Kernel
 - Heap manager
