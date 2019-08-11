@@ -1,37 +1,38 @@
-ENTRY(_start)
+ENTRY(_loader)
 
 
-SECTIONS
-{
-	. = 1M;
-	kernel_phys_start = .;
+SECTIONS {
+  /* The kernel will live at 3GB + 1MB in the virtual
+     address space, which will be mapped to 1MB in the
+     physical address space. */
+  . = 0xC0100000;
 
-	.text BLOCK(4K) : ALIGN(4K)
-	{
-		*(.multiboot)
-		*(.text)
-	}
+  kernel_virt_start = .;
+  kernel_phys_start = . - 0xC0000000;
 
-	.rodata BLOCK(4K) : ALIGN(4K)
-	{
-		/* Read-only data */
-		*(.rodata)
-	}
+  .text : AT(ADDR(.text) - 0xC0000000) {
+    *(.multiboot)
+    *(.text)
+    . = ALIGN(0x1000);
+  }
 
-	.data BLOCK(4K) : ALIGN(4K)
-	{
-		/* Read-write data */
-		*(.rodata)
-	}
+  .rodata : AT(ADDR(.rodata) - 0xC0000000) {
+    *(.rodata*)
+    . = ALIGN(0x1000);
+  }
 
-	.bss BLOCK(4K) : ALIGN(4K)
-	{
-		/* "COMMON" is a specifier for all "uninitialized data" from all input files.
-		   Not clear on exactly what that means */
-		*(COMMON)
-		/* stack section -- see boot.s */
-		*(.bss)
-	}
-	kernel_phys_end = .;
+  .data : AT(ADDR(.data) - 0xC0000000) {
+    *(.data)
+    . = ALIGN(0x1000);
+  }
 
+  .bss : AT(ADDR(.bss) - 0xC0000000) {
+    *(COMMON)
+    *(.bss)
+    *(.bootstrap_stack)
+    . = ALIGN(0x1000);
+  }
+
+  kernel_virt_end = .;
+  kernel_phys_end = . - 0xC0000000;
 }

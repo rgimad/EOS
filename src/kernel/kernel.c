@@ -29,8 +29,16 @@ int kernel_init(struct multiboot_info *mboot_info)
 	//init terminal subsystem
 	tty_init();
 
+	int eip, esp;
+    //asm("movl %%ebx,%0" : "=r"(eip_val));
+    tty_printf("Hello from higher half! ");
+    asm volatile("1: lea 1b, %0;": "=a"(eip));
+    tty_printf("EIP = %x  ", eip);
+	asm("movl %%esp,%0" : "=r"(esp));
+	tty_printf("ESP = %x  ", esp);
+
 	//tty_printf("                  ");tty_printf(EOS_VERSION_STRING);tty_printf("\n\n");
-	tty_printf("\n                  ");tty_putstring_color(EOS_VERSION_STRING, VGA_COLOR_GREEN);tty_printf("\n\n");
+	tty_printf("\n                  ");tty_putstring_color(EOS_VERSION_STRING, VGA_COLOR_GREEN);tty_printf("\n");
 
 	tty_printf("Terminal is ready.\n");
 
@@ -39,12 +47,12 @@ int kernel_init(struct multiboot_info *mboot_info)
     gdt_install();
 
     //install Interrupt Descriptor Table
-    tty_printf("Installing IDT...\n");
+    tty_printf("Installing IDT...\n\n");
     idt_install();
 
     //tty_printf("Some multiboot info:\nMagic number = %x\n", magic_number);
     //tty_printf("\nRAM available = %d MB\n", (mboot_info->mem_lower + mboot_info->mem_upper)/1024);
-	tty_printf("\n");
+	//tty_printf("\n");
 	
     //parse_memory_map((memory_map_entry*)mboot_info->mmap_addr, mboot_info->mmap_length);
     phys_memory_init(mboot_info);

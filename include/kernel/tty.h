@@ -13,6 +13,7 @@
 extern volatile uint8_t tty_feedback;
 
 static uint16_t* const VGA_MEMORY = (uint16_t*)0xB8000;
+//#define VGA_MEMORY 0xC00B8000;
 
 size_t strlen(const char* str);
 int strcmp(const char *s1, const char *s2);
