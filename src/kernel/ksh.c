@@ -6,7 +6,7 @@
 #include <kernel/tty.h>
 #include <kernel/vga.h>
 #include <kernel/devices/keyboard.h>
-#include <kernel/cpu-detect.h>
+#include <kernel/cpu_detect.h>
 #include <kernel/devices/timer.h>
 
 #include <kernel/kernel.h>

@@ -13,7 +13,7 @@
 #include <kernel/gdt.h>
 #include <kernel/idt.h>
 #include <kernel/interrupts.h>
-#include <kernel/cpu-detect.h>
+#include <kernel/cpu_detect.h>
 
 //devices
 #include <kernel/devices/timer.h>
@@ -40,14 +40,14 @@ int kernel_init(struct multiboot_info *mboot_info)
 	//tty_printf("                  ");tty_printf(EOS_VERSION_STRING);tty_printf("\n\n");
 	tty_printf("\n                  ");tty_putstring_color(EOS_VERSION_STRING, VGA_COLOR_GREEN);tty_printf("\n");
 
-	tty_printf("Terminal is ready.\n");
+	//tty_printf("Terminal is ready.\n");
 
 	//install Global Descriptor Table
-	tty_printf("Installing GDT...\n");
+	//tty_printf("Installing GDT...\n");
     gdt_install();
 
     //install Interrupt Descriptor Table
-    tty_printf("Installing IDT...\n\n");
+    //tty_printf("Installing IDT...\n\n");
     idt_install();
 
     //tty_printf("Some multiboot info:\nMagic number = %x\n", magic_number);

@@ -26,7 +26,7 @@
  */
 
 /* You need to include a file with fairly(ish) compliant tty_printf prototype, Decimal and String support like %s and %d and this is truely all you need! */
-#include <kernel/cpu-detect.h>
+#include <kernel/cpu_detect.h>
 #include <kernel/tty.h>
 
 

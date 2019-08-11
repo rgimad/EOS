@@ -17,7 +17,7 @@ BASH = ubuntu1804 run
 LDFLAGS=-T linker.ld -ffreestanding -nostdlib -lgcc
 CCFLAGS=-std=gnu99 -ffreestanding -Wall -Wextra -I $(INCLUDE_DIR)
 
-OBJ=boot.o kernel.o ../libk/string.o ../libk/math.o ksh.o gdt.o gdt_asm.o idt.o idt_asm.o tty.o cpu-detect.o io/ports.o interrupts.o interrupts_asm.o devices/keyboard.o devices/timer.o mm/phys_memory.o
+OBJ=boot.o kernel.o ../libk/string.o ../libk/math.o ksh.o gdt.o gdt_asm.o idt.o idt_asm.o tty.o cpu_detect.o io/ports.o interrupts.o interrupts_asm.o devices/keyboard.o devices/timer.o mm/phys_memory.o
 	
 all: $(TARGET_ELF)
 
