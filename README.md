@@ -21,7 +21,6 @@ TODO:
 ----
 
 - Virtual Memory Manager
-- Higher Half Kernel
 - Heap manager
 - InitRD
 - File system
