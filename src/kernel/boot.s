@@ -53,11 +53,27 @@ _boot_page_directory:
     .fill (KERNEL_PAGE_NUMBER - 1), 4, 0x00000000
     .long 0x00000083
     .fill (1024 - KERNEL_PAGE_NUMBER - 1), 4, 0x00000000
+    #.fill (1024 - KERNEL_PAGE_NUMBER - 2), 4, 0x00000000
+    #.long (_boot_page_directory | 0x00000003) #store the page dir as the last entry in itself (fractal mapping)
+
+#Why 0x00000083
+# the first entry identity maps the first 4MB of memory
+# All bits are clear except the following:
+# bit 7: PS The kernel page is 4MB.
+# bit 1: RW The kernel page is read/write.
+# bit 0: P  The kernel page is present.
+# 0x00000083 in binary this is 10000011
+
 
 #Text section
 .section .text
 .global _loader
 _loader:
+  mov $(_boot_page_directory - KERNEL_VIRTUAL_BASE), %ecx
+  mov $(_boot_page_directory - KERNEL_VIRTUAL_BASE), %edx
+  or $0x00000003, %ecx
+  mov %ecx, 0xFFC(%edx) #bpd + 4092 i.e we write address of page_dir|0000003 to last pde
+
   # Load Page Directory Base Register. Until paging is set up, the code must
   # be position-independent and use physical addresses, not virtual ones
   mov $(_boot_page_directory - KERNEL_VIRTUAL_BASE), %ecx

@@ -4,7 +4,7 @@
 //#include <sys/constants.h>
 #include <stdint.h>
 
-#define EOS_VERSION_STRING "EOS v.0.0.0.3.3"
+#define EOS_VERSION_STRING "EOS v.0.0.0.3.4 (added virt mem (testing))"
 
 //#define KERNEL_FILENAME				"kernel.elf"
 

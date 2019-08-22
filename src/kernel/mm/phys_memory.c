@@ -30,7 +30,7 @@ inline static bool bitmap_test(int bit) {
 }
 
 
-void parse_memory_map(multiboot_memory_map_entry *mmap_addr, uint32_t length)
+void pmm_parse_memory_map(multiboot_memory_map_entry *mmap_addr, uint32_t length)
 {	
 	multiboot_memory_map_entry *mentry = 0;	
 
@@ -42,20 +42,20 @@ void parse_memory_map(multiboot_memory_map_entry *mmap_addr, uint32_t length)
 	mentry = mmap_addr;
 
 	/* Print info about physical memory allocation */
-	tty_printf("Physical memory map:\n");
+
+	//tty_printf("Physical memory map:\n");
 	for (i = 0; i < n; i++)
 	{
 		if ((mentry + i)->type == 1)
 		{
-			tty_printf("Available: |");
+			//tty_printf("Available: |");
 			phys_available_memory_size += (mentry + i)->len;
 		}
-		else
-			tty_printf("Reserved:  |");
+		//else tty_printf("Reserved:  |");
 
-		tty_printf(" addr: %x", (mentry + i)->addr);
+		//tty_printf(" addr: %x", (mentry + i)->addr);
 
-		tty_printf(" length: %x\n", (mentry + i)->len);
+		//tty_printf(" length: %x\n", (mentry + i)->len);
 
 		phys_installed_memory_size += (mentry + i)->len;
 	}
@@ -68,7 +68,7 @@ void parse_memory_map(multiboot_memory_map_entry *mmap_addr, uint32_t length)
 }
 
 
-int phys_find_free_block()
+int pmm_find_free_block()
 {
     for (uint32_t i = 0; i < phys_block_count / 32; i++)
     {
@@ -88,7 +88,7 @@ int phys_find_free_block()
     return -1;
 }
 
-int phys_find_free_blocks(uint32_t count)
+int pmm_find_free_blocks(uint32_t count)
 {
     int starting_block = -1;
     int starting_block_bit = -1;
@@ -124,17 +124,17 @@ int phys_find_free_blocks(uint32_t count)
 }
 
 // Functions to manage a single block in memory
-physical_addr phys_alloc_block()
+physical_addr pmm_alloc_block()
 {
     if (phys_block_count - phys_used_block_count <= 0)
     {
-        return 0;
+        return 0xFFFFFFFF;//old: return 0;
     }
 
-    int free_block = phys_find_free_block();
+    int free_block = pmm_find_free_block();
     if (free_block == -1)
     {
-        return 0;
+        return 0xFFFFFFFF;//old: return 0;
     }
 
     bitmap_set(free_block);
@@ -143,7 +143,7 @@ physical_addr phys_alloc_block()
     return addr;
 }
 
-void phys_free_block(physical_addr addr)
+void pmm_free_block(physical_addr addr)
 {
     int block = addr / PHYS_BLOCK_SIZE;
 
@@ -151,7 +151,7 @@ void phys_free_block(physical_addr addr)
     phys_used_block_count--;
 }
 
-bool phys_is_block_alloced(physical_addr addr)
+bool pmm_is_block_alloced(physical_addr addr)
 {
     int block = addr / PHYS_BLOCK_SIZE;
     return bitmap_test(block);
@@ -159,17 +159,17 @@ bool phys_is_block_alloced(physical_addr addr)
 
 // Functions to allocate multiple blocks of memory
 
-physical_addr phys_alloc_blocks(uint32_t count)
+physical_addr pmm_alloc_blocks(uint32_t count)
 {
     if (phys_block_count - phys_used_block_count <= 0)
     {
-        return 0;
+        return 0xFFFFFFFF;//old: return 0;
     }
 
-    int free_block = phys_find_free_blocks(count);
+    int free_block = pmm_find_free_blocks(count);
     if (free_block == -1)
     {
-        return 0;
+        return 0xFFFFFFFF;//old: return 0;
     }
 
     for (uint32_t i = 0; i < count; i++)
@@ -182,7 +182,7 @@ physical_addr phys_alloc_blocks(uint32_t count)
     return addr;
 }
 
-void phys_free_blocks(physical_addr addr, uint32_t count)
+void pmm_free_blocks(physical_addr addr, uint32_t count)
 {
     int block = addr / PHYS_BLOCK_SIZE;
 
@@ -193,9 +193,9 @@ void phys_free_blocks(physical_addr addr, uint32_t count)
 
 // Internal functions to allocate ranges of memory
 
-void phys_allocate_chunk(uint64_t base_addr, uint64_t length)
+void pmm_alloc_chunk(uint64_t base_addr, uint64_t length)
 {
-    //tty_printf("phys_allocate_chunk\n");
+    //tty_printf("pmm_alloc_chunk\n");
     int cur_block_addr = base_addr / PHYS_BLOCK_SIZE;
     int num_blocks = length / PHYS_BLOCK_SIZE;
     while (num_blocks-- >= 0)
@@ -205,7 +205,7 @@ void phys_allocate_chunk(uint64_t base_addr, uint64_t length)
     }
 }
 
-void phys_free_chunk(uint64_t base_addr, uint64_t length)
+void pmm_free_chunk(uint64_t base_addr, uint64_t length)
 {//int, int
     int cur_block_addr = base_addr / PHYS_BLOCK_SIZE;
     int num_blocks = length / PHYS_BLOCK_SIZE;
@@ -219,7 +219,7 @@ void phys_free_chunk(uint64_t base_addr, uint64_t length)
 
 // Functions to initialize the Physical Memory Manager
 
-void phys_free_available_memory(struct multiboot_info* mb)
+void pmm_free_available_memory(struct multiboot_info* mb)
 {
     multiboot_memory_map_entry* mm = (multiboot_memory_map_entry*)mb->mmap_addr;
     while ((unsigned int)mm < mb->mmap_addr + mb->mmap_length)
@@ -227,17 +227,17 @@ void phys_free_available_memory(struct multiboot_info* mb)
         //tty_printf("freed\n");
         if (mm->type == 1)//if == MULTIBOOT_MEMORY_AVAILABLE
         {
-            phys_free_chunk(mm->addr, mm->len);
+            pmm_free_chunk(mm->addr, mm->len);
         }
         mm = (multiboot_memory_map_entry*)((unsigned int)mm + mm->size + sizeof(mm->size));
     }
     bitmap_set(0);
 }
 
-void phys_memory_init(struct multiboot_info* mboot_info)
+void pmm_init(struct multiboot_info* mboot_info)
 {
 	multiboot_memory_map_entry* mmap = (multiboot_memory_map_entry*)mboot_info->mmap_addr;
-	parse_memory_map(mmap, mboot_info->mmap_length);//it also calculates the   phys_installed_memory_size
+	pmm_parse_memory_map(mmap, mboot_info->mmap_length);//it also calculates the   phys_installed_memory_size
 
     phys_block_count = (phys_installed_memory_size /** 1024*/) / PHYS_BLOCK_SIZE;//how many blocks will be
     phys_used_block_count = phys_block_count;//initially all blocks are used
@@ -246,27 +246,27 @@ void phys_memory_init(struct multiboot_info* mboot_info)
     tty_printf("\nTotal blocks: %d\n", phys_block_count);
 
     // Frees memory GRUB considers available
-    phys_free_available_memory(mboot_info);
+    pmm_free_available_memory(mboot_info);
 
     // From the freed memory, we need to allocate the ones used by the Kernel
-    phys_allocate_chunk(KERNEL_START_PADDR, KERNEL_SIZE);
+    pmm_alloc_chunk(KERNEL_START_PADDR, KERNEL_SIZE);
 
     tty_printf("KERNEL_START_PADDR = %x, KERNEL_END_PADDR = %x, KERNEL_SIZE = %d bytes\n", KERNEL_START_PADDR, KERNEL_END_PADDR, KERNEL_SIZE);
-
+    tty_printf("MemMap addr = %x\n", mboot_info->mmap_addr);
     // We also need to allocate the memory used by the Physical Map itself
-    phys_allocate_chunk(*phys_memory_bitmap, phys_block_count);
+    pmm_alloc_chunk(*phys_memory_bitmap, phys_block_count);
     kernel_phys_map_start = (uint32_t)phys_memory_bitmap;
     kernel_phys_map_end = kernel_phys_map_start + (phys_block_count / PHYS_BLOCKS_PER_BYTE);
     tty_printf("Physical memory manager installed. Physical memory bitmap start: %x, end: %x, size = %d bytes\n", kernel_phys_map_start, kernel_phys_map_end, kernel_phys_map_end - kernel_phys_map_start);
 
-    phys_memory_test();
+    pmm_test();
 }
 
 
-void phys_memory_test()
+void pmm_test()
 {
     tty_printf("TEST: ");
-    physical_addr myptr= phys_alloc_block();
+    physical_addr myptr= pmm_alloc_block();
     tty_printf("myptr = %x,  ", myptr);
     char *str = "Hello world!";
     memcpy(myptr, str, 13);
@@ -274,3 +274,5 @@ void phys_memory_test()
     memcpy(buf, myptr, 13);
     tty_printf("read from memory str = %s\n", buf);
 }
+
+void update_phys_memory_bitmap_addr(physical_addr addr) { phys_memory_bitmap = (uint32_t*)addr; }

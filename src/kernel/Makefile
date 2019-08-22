@@ -14,10 +14,13 @@ BASH = ubuntu1804 run
 
 #LDFLAGS=-T linker.ld -ffreestanding -O2 -nostdlib -lgcc
 #CCFLAGS=-std=gnu99 -ffreestanding -O2 -Wall -Wextra -I $(INCLUDE_DIR)
-LDFLAGS=-T linker.ld -ffreestanding -nostdlib -lgcc
-CCFLAGS=-std=gnu99 -ffreestanding -Wall -Wextra -I $(INCLUDE_DIR)
+#LDFLAGS=-T linker.ld -ffreestanding -nostdlib -lgcc
+#CCFLAGS=-std=gnu99 -ffreestanding -Wall -Wextra -I $(INCLUDE_DIR)
 
-OBJ=boot.o kernel.o ../libk/string.o ../libk/math.o ksh.o gdt.o gdt_asm.o idt.o idt_asm.o tty.o cpu_detect.o io/ports.o interrupts.o interrupts_asm.o devices/keyboard.o devices/timer.o mm/phys_memory.o
+LDFLAGS=-T linker.ld -ffreestanding -O1 -nostdlib -lgcc
+CCFLAGS=-std=gnu99 -ffreestanding -O1 -Wall -Wextra -I $(INCLUDE_DIR)
+
+OBJ=boot.o kernel.o ../libk/string.o ../libk/math.o ksh.o gdt.o gdt_asm.o idt.o idt_asm.o tty.o cpu_detect.o io/ports.o interrupts.o interrupts_asm.o devices/keyboard.o devices/timer.o mm/phys_memory.o paging.o mm/virt_memory.o
 	
 all: $(TARGET_ELF)
 
@@ -27,7 +30,8 @@ $(TARGET_ELF): $(OBJ)
 %.o: %.c
 	$(CC) $(CCFLAGS) -c -o $@ $<
 	
-%.o: %.asm
+#old was .asm
+%.o: %.s
 	$(AS) -o $@ $<
 
 run:

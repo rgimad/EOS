@@ -21,6 +21,7 @@
 
 //memory manager
 #include <kernel/mm/phys_memory.h>
+#include <kernel/mm/virt_memory.h>
 
 
 
@@ -55,7 +56,12 @@ int kernel_init(struct multiboot_info *mboot_info)
 	//tty_printf("\n");
 	
     //parse_memory_map((memory_map_entry*)mboot_info->mmap_addr, mboot_info->mmap_length);
-    phys_memory_init(mboot_info);
+    pmm_init(mboot_info);
+
+    tty_printf("pde0 = %u\n", *(page_dir_entry*)(0xFFFFF000));
+    tty_printf("pde_%d = %u\n", (0xC0000000 >> 22), *(page_dir_entry*)(0xFFFFF000 + (0xC0000000 >> 22)*4));
+    
+    vmm_init();
 
     //Detecting CPU
     //tty_printf("Detecting CPU...\n");
