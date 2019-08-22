@@ -11,6 +11,7 @@ Current progress:
 - Timer support
 - RAM detection and Physical Memory Manager
 - Higher Half Kernel
+- Virtual Memory Manager (now testing)
 
   The kernel starts at virtual address 0xC0100000
 
@@ -20,9 +21,18 @@ Current progress:
 TODO:
 ----
 
-- Virtual Memory Manager
 - Heap manager
 - InitRD
 - File system
 - Terminal with better fonts and higher resolution :D
+- etc.
+
+Thanks to:
+---------
+
+- Guilherme Samora (psamora)
+- Nikita Ivanov, Dmitrii Kychanov, etc. from u365
+- wiki.osdev.org
+- Arjun Sreedharan
+- Stephen Fewer (stephenfewer)
 - etc.
