@@ -13,6 +13,8 @@ void ksh_cmd_ticks();
 
 void ksh_cmd_about();
 void ksh_cmd_help();
+void ksh_kheap_test();
+void ksh_draw_demo();
 //void ksh_cmd_regdump();
 
 void ksh_cmd_unknown();

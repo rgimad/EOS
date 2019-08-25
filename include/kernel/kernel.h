@@ -2,9 +2,10 @@
 #define _KERNEL_KERNEL_H_
 
 //#include <sys/constants.h>
+#include <kernel/multiboot.h>
 #include <stdint.h>
 
-#define EOS_VERSION_STRING "EOS v.0.0.0.3.4 (added virt mem (testing))"
+#define EOS_VERSION_STRING "EOS v.0.0.0.4 (added hi-res vesa graphic terminal)"
 
 //#define KERNEL_FILENAME				"kernel.elf"
 
@@ -19,6 +20,11 @@
 //#define KERNEL_VGA_VADDRESS			(void *)0x000B8000
 
 //#define KERNEL_VGA_PADDRESS			(void *)0x000B8000
+
+int kernel_init(struct multiboot_info *mboot_info);
+void higher_half_test();
+
+void kernel_main(int magic_number, struct multiboot_info *mboot_info);
 
 #endif
 

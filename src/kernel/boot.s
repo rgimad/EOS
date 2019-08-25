@@ -4,7 +4,8 @@
 # Declare constants for the multiboot header
 .set ALIGN,		1<<0				# align loaded modules on page boundaries
 .set MEMINFO,	1<<1				# please provide us a memory map
-.set FLAGS,		ALIGN | MEMINFO		# multiboot "flag" field
+.set VBE_MODE, 1<<2       # VBE mode flag. GRUB will set it for us and provide info about it.
+.set FLAGS,		ALIGN | MEMINFO	| VBE_MODE	# multiboot "flag" field
 .set MAGIC,		0x1BADB002			# magic number to let the booloader find the header
 .set CHECKSUM,	-(MAGIC + FLAGS)	# Checksum of the above
 
@@ -18,7 +19,11 @@
 .align 4
 .long MAGIC
 .long FLAGS
-.long CHECKSUM
+.long CHECKSUM #if you dont need vbe comment longs after this line
+.long 0, 0, 0, 0, 0 # unused?
+.long 0 # 0 = set graphics mode
+.long 1024, 768, 32 # Width, height, depth
+
 
 # The multiboot standard does not define the value of the stack pointer
 # register esp, and it's up to the kernel to provide a stack.  The following

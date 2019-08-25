@@ -5,9 +5,12 @@
 #include <kernel/ksh.h>
 #include <kernel/tty.h>
 #include <kernel/vga.h>
+#include <kernel/graphics/vesafb.h>
 #include <kernel/devices/keyboard.h>
 #include <kernel/cpu_detect.h>
 #include <kernel/devices/timer.h>
+
+#include <kernel/mm/kheap.h>
 
 #include <kernel/kernel.h>
 
@@ -16,7 +19,7 @@
 
 void ksh_init()
 {
-	tty_putstring_color("                  EOS KSH (Kernel SHell):\n\n", VGA_COLOR_LIGHT_RED);
+	tty_putstring_color("                  EOS KSH (Kernel SHell):\n\n", VESA_LIGHT_RED);
 }
 
 void ksh_main()
@@ -26,7 +29,7 @@ void ksh_main()
 
 	while(1)
 	{
-		tty_putstring_color("kernel> ", VGA_COLOR_LIGHT_BLUE);
+		tty_putstring_color("kernel> ", VESA_LIGHT_BLUE);
 
 		//tty_setcolor(vga_entry_color(VGA_COLOR_BLUE, VGA_COLOR_BLACK));
 		//tty_printf("kernel> ");
@@ -46,9 +49,12 @@ void ksh_main()
 		} else if (strcmp(cmd, "ticks") == 0)
 		{
 			ksh_cmd_ticks();
-		} else if (strcmp(cmd, "regdump") == 0)
+		} else if (strcmp(cmd, "kheap_test") == 0)
 		{
-			//ksh_cmd_regdump();
+			ksh_kheap_test();
+		} else if (strcmp(cmd, "draw_demo") == 0)
+		{
+			ksh_draw_demo();
 		} else {//if...
 			ksh_cmd_unknown();
 		}
@@ -78,6 +84,26 @@ void ksh_cmd_ticks()
 	tty_printf("Timer ticks = %d\n", timer_get_ticks());
 }
 
+void ksh_kheap_test()
+{
+	kheap_test();
+}
+
+void ksh_draw_demo()
+{
+	draw_fill(0, 500, framebuffer_width, framebuffer_height - 500, 0x0000AA);
+    int arr[10] = {0x00AA00, 0x00AAAA, 0xAA0000, 0xAA00AA, 0xAA5500, 0xAAAAAA, 0x555555, 0x5555FF, 0x55FF55, 0x55FFFF};
+    int i;
+    for (i = 0; i < 30; i++)
+    	draw_square(30 + 7*i, 30 + 7*i, 200, 300, arr[i % 10]);
+
+    char chr;
+    for (chr = 32; chr <= '~'; chr++)
+    {
+    	draw_vga_character(chr, 500 + ((chr - 32) % 10)*20, 50 + ((chr - 32)/10)*20, 0x00AA00, 0x0000AA, 0);
+    }
+}
+
 void ksh_cmd_regdump()
 {
 	//uint32_t eax, ebx, ecx, edx, esi, edi, esp, ebp, cr0, cr2, cr3;
@@ -86,5 +112,5 @@ void ksh_cmd_regdump()
 
 void ksh_cmd_help()
 {
-	tty_printf("Available commands:\n cpuid - information about processor\n ticks - get number of ticks\n about\n help\n");
+	tty_printf("Available commands:\n cpuid - information about processor\n ticks - get number of ticks\n kheap_test - test kernel heap\n draw_demo - demo super effects\n about\n help\n");
 }

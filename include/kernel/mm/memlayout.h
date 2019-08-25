@@ -26,7 +26,8 @@
 #define PAGE_SIZE 4096
 #define PAGE_ENTRIES 1024
 
-//heap...
+// Constants for Kernel heap manager
+#define KHEAP_START_VADDR 0xC0500000  // if kernel size > 4MB, change
 
 // Functions to
 #define ALIGN_BLOCK(addr) (addr) - ((addr) % PHYS_BLOCK_SIZE);

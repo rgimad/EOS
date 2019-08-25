@@ -99,7 +99,8 @@ void idt_install()
     idtp.limit = (sizeof(struct idt_entry) * IDT_NUM_ENTRIES) - 1;
     idtp.base = (uint32_t)&idt;
 
-    tty_printf("idtp.base = %x, idtp.limit = %x\n", idtp.base, idtp.limit);
+    //tty_printf("idtp.base = %x, idtp.limit = %x\n", idtp.base, idtp.limit); //!!!!
+
     // Clear out the entire IDT, initializing it to zeros
     //memset(&idt, 0, sizeof(struct idt_entry) * IDT_NUM_ENTRIES);
     int i;

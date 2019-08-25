@@ -100,8 +100,6 @@ void vmm_init()
 
 	vmm_create_kernel_page_dir();
 
-	tty_printf("kernel_page_dir = %x\n\n", (physical_addr)kernel_page_dir);
-
 	page_table* table1 = (page_table*)pmm_alloc_block();
     page_table* table2 = (page_table*)pmm_alloc_block();
 
@@ -146,6 +144,13 @@ void vmm_init()
 
 	enable_paging((physical_addr)kernel_page_dir);
 
+	//tty_printf("Virtual memory manager initialized!\n");
+}
+
+void vmm_test()
+{
+	tty_printf("kernel_page_dir = %x\n", (physical_addr)kernel_page_dir);
+
 	physical_addr padr1 = 0xC0500000;
 	virtual_addr vadr1 = vmm_temp_map_page(padr1);
 	*(uint8_t*)vadr1 = 77;
@@ -158,6 +163,45 @@ void vmm_init()
 	int eip;
 	asm volatile("1: lea 1b, %0;": "=a"(eip));
     tty_printf("EIP = %x  ", eip);
-
-	tty_printf("Virtual memory manager initialized!\n");
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+void page_table_entry_add_attrib(page_table_entry* entry, uint32_t attrib) {*entry |= attrib;} //add attribute to pte
+void page_table_entry_del_attrib(page_table_entry* entry, uint32_t attrib) {*entry &= ~attrib;} //delete attribute to pte
+void page_table_entry_set_frame(page_table_entry* entry, physical_addr addr) {*entry = (*entry & ~I86_PTE_FRAME) | addr;}//map pte to physical frame
+bool page_table_entry_is_present(page_table_entry entry) {return entry & I86_PTE_PRESENT;}
+bool page_table_entry_is_writable(page_table_entry entry) {return entry & I86_PTE_WRITABLE;}
+physical_addr page_table_entry_frame(page_table_entry entry) {return entry & I86_PTE_FRAME;}//return the address of physical frame which pte refers to
+
+//--------------------------------------------------------------------
+//functions for Page Directory Entries
+
+void page_dir_entry_add_attrib(page_dir_entry* entry, uint32_t attrib) {*entry |= attrib;}//add attribute to pde
+void page_dir_entry_del_attrib(page_dir_entry* entry, uint32_t attrib) {*entry &= ~attrib;}//old: was without ~ !! //delete attribute to pde
+void page_dir_entry_set_frame(page_dir_entry* entry, physical_addr addr) {*entry = (*entry & ~I86_PDE_FRAME) | addr;}//map pde to physical frame (where the appropriate page table stores)
+bool page_dir_entry_is_present(page_dir_entry entry) {return entry & I86_PDE_PRESENT;}
+bool page_dir_entry_is_user(page_dir_entry entry) { return entry & I86_PDE_USER; }
+bool page_dir_entry_is_4mb(page_dir_entry entry) { return entry & I86_PDE_4MB; }
+bool page_dir_entry_is_writable(page_dir_entry entry) {return entry & I86_PDE_WRITABLE;}
+physical_addr page_dir_entry_frame(page_dir_entry entry) {return entry & I86_PDE_FRAME;}//return the address of physical frame which pde refers to
+
+void flush_tlb_entry(virtual_addr addr) { asm volatile("invlpg (%0)" : : "b"(addr) : "memory"); }//???

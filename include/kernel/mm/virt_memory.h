@@ -75,51 +75,30 @@ page_directory *kernel_page_dir;//pointer (physical) to kernel page dircetory st
 //TODO: rewrite all these functions so that they will work using recursive pd techinque
 //functions for Page Table Entries
 
-//add attribute to pte
-inline void page_table_entry_add_attrib(page_table_entry* entry, uint32_t attrib) {*entry |= attrib;}
-
-//delete attribute to pte
-inline void page_table_entry_del_attrib(page_table_entry* entry, uint32_t attrib) {*entry &= ~attrib;}
-
-//map pte to physical frame
-inline void page_table_entry_set_frame(page_table_entry* entry, physical_addr addr) {*entry = (*entry & ~I86_PTE_FRAME) | addr;}
-
-inline bool page_table_entry_is_present(page_table_entry entry) {return entry & I86_PTE_PRESENT;}
-
-inline bool page_table_entry_is_writable(page_table_entry entry) {return entry & I86_PTE_WRITABLE;}
-
-//return the address of physical frame which pte refers to
-inline physical_addr page_table_entry_frame(page_table_entry entry) {return entry & I86_PTE_FRAME;}
+void page_table_entry_add_attrib(page_table_entry* entry, uint32_t attrib); //add attribute to pte
+void page_table_entry_del_attrib(page_table_entry* entry, uint32_t attrib); //delete attribute to pte
+void page_table_entry_set_frame(page_table_entry* entry, physical_addr addr);//map pte to physical frame
+bool page_table_entry_is_present(page_table_entry entry);
+bool page_table_entry_is_writable(page_table_entry entry);
+physical_addr page_table_entry_frame(page_table_entry entry);//return the address of physical frame which pte refers to
 
 //--------------------------------------------------------------------
 //functions for Page Directory Entries
 
-//add attribute to pde
-inline void page_dir_entry_add_attrib(page_dir_entry* entry, uint32_t attrib) {*entry |= attrib;}
+void page_dir_entry_add_attrib(page_dir_entry* entry, uint32_t attrib);//add attribute to pde
+void page_dir_entry_del_attrib(page_dir_entry* entry, uint32_t attrib);//old: was without ~ !! //delete attribute to pde
+void page_dir_entry_set_frame(page_dir_entry* entry, physical_addr addr);//map pde to physical frame (where the appropriate page table stores)
+bool page_dir_entry_is_present(page_dir_entry entry);
+bool page_dir_entry_is_user(page_dir_entry entry);
+bool page_dir_entry_is_4mb(page_dir_entry entry);
+bool page_dir_entry_is_writable(page_dir_entry entry);
+physical_addr page_dir_entry_frame(page_dir_entry entry);//return the address of physical frame which pde refers to
 
-//delete attribute to pde
-inline void page_dir_entry_del_attrib(page_dir_entry* entry, uint32_t attrib) {*entry &= ~attrib;}//old: was without ~ !!
+void flush_tlb_entry(virtual_addr addr);//???
+/*void flush_tlb_all() {asm volatile("movl %%cr3, %%eax\n"
+	"movl %%eax, %%cr3" : : : "%eax");}*/
 
-//map pde to physical frame (where the appropriate page table stores)
-inline void page_dir_entry_set_frame(page_dir_entry* entry, physical_addr addr) {*entry = (*entry & ~I86_PDE_FRAME) | addr;}
-
-inline bool page_dir_entry_is_present(page_dir_entry entry) {return entry & I86_PDE_PRESENT;}
-
-inline bool page_dir_entry_is_user(page_dir_entry entry) { return entry & I86_PDE_USER; }
-
-inline bool page_dir_entry_is_4mb(page_dir_entry entry) { return entry & I86_PDE_4MB; }
-
-inline bool page_dir_entry_is_writable(page_dir_entry entry) {return entry & I86_PDE_WRITABLE;}
-
-//return the address of physical frame which pde refers to
-inline physical_addr page_dir_entry_frame(page_dir_entry entry) {return entry & I86_PDE_FRAME;}
-
-//inline void page_dir_entry_enable_global(page_dir_entry entry) {}
-
-inline void flush_tlb_entry(virtual_addr addr) { asm volatile("invlpg (%0)" : : "b"(addr) : "memory"); }//???
-inline void flush_tlb_all() {asm volatile("movl %%cr3, %%eax\n"
-	"movl %%eax, %%cr3" : : : "%eax");}
-
+//void page_dir_entry_enable_global(page_dir_entry entry) {}
 //----------------------------------------------------------------------------------
 
 extern enable_paging(physical_addr page_dir);
@@ -131,6 +110,8 @@ bool vmm_alloc_page(virtual_addr vaddr);
 void vmm_free_page(virtual_addr vaddr);
 void vmm_map_page(physical_addr paddr, virtual_addr vaddr);
 virtual_addr vmm_temp_map_page(physical_addr paddr);
+
+void vmm_test();
 
 
 #endif /* _VIRT_MEMORY_H_ */

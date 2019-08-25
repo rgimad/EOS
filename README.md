@@ -2,29 +2,31 @@
 
 EOS is an educational operating system for x86 platform. More information on official page https://vk.com/eos_developer_notes
 
-Current progress:
+Current progress: (v.0.0.0.4)
 ----------------
 
 - GDT and IDT setup
-- Text terminal (80x25)
+- VESA framebuffer based terminal :D
 - PS/2 keyboard support
 - Timer support
 - RAM detection and Physical Memory Manager
 - Higher Half Kernel
-- Virtual Memory Manager (now testing)
 
   The kernel starts at virtual address 0xC0100000
 
   0xC0000000-0xC0400000 and 0x00000000-0x00400000 vitual addresses are mapped to one physical range - to 0x00000000-0x00400000
 - Very simple kernel command shell (KSH)
+- Virtual Memory Manager
+- Entry based kernel heap manager
+
 
 TODO:
 ----
 
-- Heap manager
 - InitRD
 - File system
-- Terminal with better fonts and higher resolution :D
+- PCI
+- ELF loader
 - etc.
 
 Thanks to:
