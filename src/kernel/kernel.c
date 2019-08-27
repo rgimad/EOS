@@ -63,6 +63,11 @@ int kernel_init(struct multiboot_info *mboot_info)
     init_vbe(mboot_info);
 	tty_init();
 
+	tty_printf("framebuffer_addr = %x\n", framebuffer_addr);
+	tty_printf("framebuffer_size = %x\n", framebuffer_size);
+	//tty_printf("x = %x\n", (framebuffer_pitch * VESA_HEIGHT));
+	tty_printf("VESA_HEIGHT = %d\n", VESA_HEIGHT);
+
     kheap_init();
     //kheap_test();
 

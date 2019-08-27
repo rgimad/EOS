@@ -27,6 +27,7 @@ void tty_init() {
 
 void draw_vga_character(uint8_t c, int x, int y, int fg, int bg, bool bgon)
 {
+    //if (tty_pos_x + 7 > 1024 /*|| tty_pos_y + 15 > 768*/) draw_fill(50, 50, 100, 100, 0x0000AA);
     int cx,cy;
     int mask[8]={128,64,32,16,8,4,2,1};
     unsigned char *glyph=(uint8_t*)vgafnt+(int)c*16;
@@ -38,9 +39,9 @@ void draw_vga_character(uint8_t c, int x, int y, int fg, int bg, bool bgon)
     }
 }
 
-void tty_backspace() {
-    if (tty_pos_x == 0) {
-        if (tty_pos_y > 0) {
+void tty_backspace() {//!!!!!!!!!!!
+    if (tty_pos_x < 8) { //old: == 0
+        if (tty_pos_y >= 17) {
             tty_pos_y -= 17;
         }
         tty_pos_x = tty_line_fill[tty_pos_y];
@@ -54,19 +55,47 @@ void tty_backspace() {
 void tty_setcolor(uint32_t color) { tty_text_color = color; }
 
 void tty_putchar(char c) {
+    //draw_fill(50, 50, 100, 100, 0x0000AA);
+    if ((tty_pos_x + 8) >= VESA_WIDTH || c == '\n') { // old == ==
+        tty_line_fill[tty_pos_y] = tty_pos_x;
+        tty_pos_x = 0;
+        if ((tty_pos_y + 17) >= VESA_HEIGHT) { //old ==
+            //draw_fill(50, 50, 100, 100, 0x0000AA);
+            tty_scroll();
+        } else
+        {
+            tty_pos_y += 17;
+        }
+    } else
+    {
+        //if (tty_pos_x + 7 > 1024 || tty_pos_y + 15 > 768) draw_fill(50, 50, 100, 100, 0x0000AA);
+        if ((tty_pos_y + 17) >= VESA_HEIGHT) {
+            tty_scroll();
+        }
+        draw_vga_character(c, tty_pos_x, tty_pos_y, tty_text_color, 0x000000, 0);
+        tty_pos_x += 8;
+    }
+    //update_cursor(tty_pos_y, tty_pos_x);
+}
+
+/*
+void tty_putchar(char c) {
+    draw_fill(50, 50, 100, 100, 0x0000AA);
     if (c != '\n') {
         draw_vga_character(c, tty_pos_x, tty_pos_y, tty_text_color, 0x000000, 0);
     }
 
-    if ((tty_pos_x += 8) == VESA_WIDTH || c == '\n') {
+    if ((tty_pos_x += 8) >= VESA_WIDTH || c == '\n') { // old == ==
         tty_line_fill[tty_pos_y] = tty_pos_x -= 8;
         tty_pos_x = 0;
-        if ((tty_pos_y += 17) == VESA_HEIGHT) {
-            //tty_scroll();
+        if ((tty_pos_y += 17) >= VESA_HEIGHT) { //old ==
+            tty_scroll();
         }
     }
     //update_cursor(tty_pos_y, tty_pos_x);
 }
+
+*/
 
 /*void tty_scroll() {
   tty_pos_y--;
@@ -87,19 +116,20 @@ void tty_putchar(char c) {
 
 
 //Scrolls the display up number of rows
-/*void tty_scroll() {
-    // charheight = 16
+void tty_scroll() {
+    // charheight = 16???
     unsigned int num_rows = 1;
+    tty_pos_y -= 17*num_rows;
     // Copy rows upwards
-    uint8_t *read_ptr = (uint8_t *) framebuffer_addr + ((num_rows * 16) * framebuffer_pitch);
+    uint8_t *read_ptr = (uint8_t *) framebuffer_addr + ((num_rows * 17) * framebuffer_pitch);
     uint8_t *write_ptr = (uint8_t *) framebuffer_addr;
-    unsigned int num_bytes = (framebuffer_pitch * VESA_HEIGHT) - (framebuffer_pitch * (num_rows * 16));
+    uint32_t num_bytes = (framebuffer_pitch * VESA_HEIGHT) - (framebuffer_pitch * (num_rows * 17));//old: unsigned old
     memcpy(write_ptr, read_ptr, num_bytes);
 
     // Clear the rows at the end
-    read_ptr = (uint8_t *) framebuffer_addr + (framebuffer_pitch * VESA_HEIGHT) - (framebuffer_pitch * (num_rows * 16));
-    memset(read_ptr, 0, framebuffer_pitch * (num_rows * 16));
-}*/
+    read_ptr = (uint8_t *) framebuffer_addr + (framebuffer_pitch * VESA_HEIGHT) - (framebuffer_pitch * (num_rows * 17));
+    memset(read_ptr, 0, framebuffer_pitch * (num_rows * 17));
+}
 
 
 void tty_write(const char* data, size_t size) {

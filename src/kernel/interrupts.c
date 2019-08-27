@@ -28,6 +28,11 @@ bool register_interrupt_handler(uint32_t idt_index, interrupt_handler_t handler)
 
 void fault_handler(struct regs *r)
 {
+    //void * linearAddress;
+    // retrieve the linear address of the page fault stored in CR2
+    //ASM( "movl %%cr2, %0" : "=r" (linearAddress) );
+    //asm volatile( "movl %cr2, %eax");
+    //for (;;);
     tty_printf("System Exception. System Halted!\n");
     for (;;);
 }

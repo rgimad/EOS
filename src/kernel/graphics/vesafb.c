@@ -31,10 +31,11 @@ void init_vbe(multiboot_info *mboot)
 	framebuffer_width = svga_mode->screen_width;
     framebuffer_height = svga_mode->screen_height;
     framebuffer_size = framebuffer_width*framebuffer_height*(framebuffer_bpp/8);
+    //framebuffer_size = 0x00400000;
 
     physical_addr frame;
 	virtual_addr virt;
-    for (frame = framebuffer_addr, virt = framebuffer_addr; frame < (framebuffer_addr + framebuffer_size/*0x002C0000 0x000F0000*/); frame += PAGE_SIZE, virt += PAGE_SIZE)
+    for (frame = framebuffer_addr, virt = framebuffer_addr; frame < (framebuffer_addr + framebuffer_size/*0x00400000*//*0x002C0000 0x000F0000*/); frame += PAGE_SIZE, virt += PAGE_SIZE)
     {
         vmm_map_page(frame, virt);
     }
