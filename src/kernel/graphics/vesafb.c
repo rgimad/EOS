@@ -4,7 +4,10 @@
 */
 #include <kernel/graphics/vesafb.h>
 #include <kernel/mm/virt_memory.h>
-//#include <kernel/tty.h>
+#include <kernel/mm/kheap.h>
+#include <kernel/tty.h>
+
+#include <libk/string.h>
 
 void init_vbe(multiboot_info *mboot)
 {
@@ -30,8 +33,8 @@ void init_vbe(multiboot_info *mboot)
     framebuffer_bpp = svga_mode->bpp;
 	framebuffer_width = svga_mode->screen_width;
     framebuffer_height = svga_mode->screen_height;
-    framebuffer_size = framebuffer_width*framebuffer_height*(framebuffer_bpp/8);
-    //framebuffer_size = 0x00400000;
+    //framebuffer_size = framebuffer_width*framebuffer_height*(framebuffer_bpp/8);
+    framebuffer_size = framebuffer_height*framebuffer_pitch;
 
     physical_addr frame;
 	virtual_addr virt;
@@ -40,8 +43,26 @@ void init_vbe(multiboot_info *mboot)
         vmm_map_page(frame, virt);
     }
 
+    create_back_framebuffer();
+
+	//tty_printf("xxx = %x\n", *(uint8_t *)0xC0800000);
+    /*size_t i;
+	for(i = 0; i < framebuffer_size; ++i)
+	{
+		((uint8_t*)(back_framebuffer_addr))[i] = 0;
+	}*/
+	//back_framebuffer_addr = framebuffer_addr;
+
     //asm volatile( "movl %0, %%ecx" :: "r" (framebuffer_pitch));
 	//for(;;) asm("hlt");
+}
+
+void create_back_framebuffer()
+{
+	back_framebuffer_addr = kheap_malloc(framebuffer_size);
+	tty_printf("back_framebuffer_addr = %x\n", back_framebuffer_addr);
+	//tty_printf("init_vbe: [c0800000]->%x\n", page_table_entry_is_writable(GET_PTE(0xC0800000)));
+    memset(back_framebuffer_addr, 0, framebuffer_size); //causes page fault at c0800000 when this line is placed in the end of init_vbe
 }
 
 
@@ -52,6 +73,18 @@ void set_pixel(int x, int y, uint32_t color)
 	framebuffer_addr[where] = color;
 	framebuffer_addr[where + 1] = color >> 8;
 	framebuffer_addr[where + 2] = color >> 16;
+
+	//asm("movl %0, %%ecx" : : "r"(where));
+	//for(;;);
+	//double buffering
+	back_framebuffer_addr[where] = color & 255;
+	back_framebuffer_addr[where + 1] = (color >> 8) & 255;
+	back_framebuffer_addr[where + 2] = (color >> 16) & 255;
+
+	//memcpy(framebuffer_addr + where, back_framebuffer_addr + where, 3);
+	//framebuffer_addr[where] = back_framebuffer_addr[where];
+	//framebuffer_addr[where + 1] = back_framebuffer_addr[where + 1];
+	//framebuffer_addr[where + 2] = back_framebuffer_addr[where + 2];
 }
 
 void set_pixel_alpha(int x, int y, rgba_color color)

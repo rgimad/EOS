@@ -21,6 +21,8 @@ uint32_t framebuffer_width;
 uint32_t framebuffer_height;
 uint32_t framebuffer_size;
 
+uint8_t* back_framebuffer_addr;
+
 
 typedef struct rgba_struct
 {
@@ -42,7 +44,7 @@ void draw_vertical_line(int x, int y,int length, uint32_t color);
 void draw_square(int x, int y, int width, int height, uint32_t color);
 void draw_fill(int start_x, int start_y, int length_across, int length_down, uint32_t color);
 
-
+void create_back_framebuffer();
 
 
 typedef struct svga_mode_info {

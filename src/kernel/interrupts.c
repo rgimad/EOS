@@ -33,7 +33,9 @@ void fault_handler(struct regs *r)
     //ASM( "movl %%cr2, %0" : "=r" (linearAddress) );
     //asm volatile( "movl %cr2, %eax");
     //for (;;);
-    tty_printf("System Exception. System Halted!\n");
+    uint32_t adr;
+    asm volatile( "movl %%cr2, %0" : "=r" (adr) );
+    tty_printf("System Exception. System Halted! cr2 = %x\n", adr);
     for (;;);
 }
 

@@ -60,18 +60,26 @@ int kernel_init(struct multiboot_info *mboot_info)
     vmm_init();
     //vmm_test();
 
+    kheap_init();
+    //kheap_test();
+
+
+    tty_init();
     init_vbe(mboot_info);
-	tty_init();
+
+   	/*back_framebuffer_addr = kheap_malloc(framebuffer_size);
+	tty_printf("back_framebuffer_addr = %x\n", back_framebuffer_addr);
+	tty_printf("init_vbe: [c0800000]->%x\n", page_table_entry_is_writable(GET_PTE(0xC0800000)));
+    memset(back_framebuffer_addr, 0, framebuffer_size); //causes page fault at c0800000*/
+
 
 	tty_printf("framebuffer_addr = %x\n", framebuffer_addr);
 	tty_printf("framebuffer_size = %x\n", framebuffer_size);
 	//tty_printf("x = %x\n", (framebuffer_pitch * VESA_HEIGHT));
-	tty_printf("VESA_HEIGHT = %d\n", VESA_HEIGHT);
+	//tty_printf("VESA_HEIGHT = %d\n", VESA_HEIGHT);
+    //tty_printf("\n\n");
 
-    kheap_init();
-    //kheap_test();
-
-    tty_printf("\n\n");
+    //memcpy(framebuffer_addr, back_framebuffer_addr, framebuffer_size);
 
     //draw_vertical_line(50, 50, 100, 0xFFFFFF);
     //draw_fill(50, 50, 100, 100, 0x0000AA);

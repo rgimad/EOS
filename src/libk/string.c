@@ -186,7 +186,7 @@ int memcmp(const void *s1, const void *s2, size_t n)                    /* Lengt
 }
 void* memcpy(void* dst, const void* src, size_t n)
 {
-	size_t i;
+	/*size_t i;
 	if((uint8_t*)(dst) < (uint8_t*)(src))
 	{
 		for(i = 0; i < n; ++i)
@@ -201,17 +201,48 @@ void* memcpy(void* dst, const void* src, size_t n)
 			((uint8_t*)(dst))[n - i - 1] = ((uint8_t*)(src))[n - i - 1];
 		}
 	}
-	return dst;
+	return dst;*/
+	uint32_t num_dwords = n/4;
+  	uint32_t num_bytes = n%4;
+  	uint32_t *dst32 = (uint32_t*)dst;
+  	uint32_t *src32 = (uint32_t*)src;
+  	uint8_t *dst8 = ((uint8_t*)dst)+num_dwords*4;
+  	uint8_t *src8 = ((uint8_t*)src)+num_dwords*4;
+  	uint32_t i;
+
+  	for (i=0;i<num_dwords;i++) {
+    	dst32[i] = src32[i];
+  	}
+  	for (i=0;i<num_bytes;i++) {
+    	dst8[i] = src8[i];
+  	}
+	//asm volatile("cld ; rep movsb" :: "S"(src), "D"(dst), "c"(n) : "flags", "memory");
+  	return dst;
 }
 
-void* memset(void* ptr, uint8_t val, size_t n)
+void* memset(void* ptr, uint8_t val, size_t n)//val is uint8_t ???????????? 
 {
-	size_t i;
+	/*size_t i;
 	for(i = 0; i < n; ++i)
 	{
 		((uint8_t*)(ptr))[i] = val;
 	}
-	return ptr;
+	return ptr;*/
+	uint32_t num_dwords = n/4;
+  	uint32_t num_bytes = n%4;
+  	uint32_t *dst32 = (uint32_t*)ptr;
+  	uint8_t *dst8 = ((uint8_t*)ptr)+num_dwords*4;
+  	uint8_t val8 = (uint8_t)val;
+  	uint32_t val32 = val|(val<<8)|(val<<16)|(val<<24);
+  	uint32_t i;
+
+  	for (i=0;i<num_dwords;i++) {
+    	dst32[i] = val32;
+  	}
+  	for (i=0;i<num_bytes;i++) {
+    	dst8[i] = val8;
+  	}
+  	return ptr;
 }
 
 void* memmove(void* dst, void* src, size_t n)

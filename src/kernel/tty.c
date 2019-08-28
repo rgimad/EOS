@@ -116,19 +116,22 @@ void tty_putchar(char c) {
 
 
 //Scrolls the display up number of rows
-void tty_scroll() {
+void tty_scroll() {//??????
     // charheight = 16???
     unsigned int num_rows = 1;
     tty_pos_y -= 17*num_rows;
     // Copy rows upwards
-    uint8_t *read_ptr = (uint8_t *) framebuffer_addr + ((num_rows * 17) * framebuffer_pitch);
-    uint8_t *write_ptr = (uint8_t *) framebuffer_addr;
+    uint8_t *read_ptr = (uint8_t *) back_framebuffer_addr + ((num_rows * 17) * framebuffer_pitch);
+    uint8_t *write_ptr = (uint8_t *) back_framebuffer_addr;
     uint32_t num_bytes = (framebuffer_pitch * VESA_HEIGHT) - (framebuffer_pitch * (num_rows * 17));//old: unsigned old
     memcpy(write_ptr, read_ptr, num_bytes);
 
     // Clear the rows at the end
-    read_ptr = (uint8_t *) framebuffer_addr + (framebuffer_pitch * VESA_HEIGHT) - (framebuffer_pitch * (num_rows * 17));
-    memset(read_ptr, 0, framebuffer_pitch * (num_rows * 17));
+    write_ptr = (uint8_t *) back_framebuffer_addr + (framebuffer_pitch * VESA_HEIGHT) - (framebuffer_pitch * (num_rows * 17));
+    memset(write_ptr, 0, framebuffer_pitch * (num_rows * 17));
+
+    //swap buffers
+    memcpy(framebuffer_addr, back_framebuffer_addr, framebuffer_size);
 }
 
 

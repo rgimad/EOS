@@ -24,16 +24,16 @@ void kheap_init()
 	kheap_allocs_num = 0;
 	kheap_memory_used = 0;
 
-	tty_printf("Kernel heap manager initialised!\n");
+	//tty_printf("Kernel heap manager initialised!\n");
 }
 
 
-// increase the processes heap by some amount, this will be rounded up by the page size 
+// increase kernel heap by some amount, this will be rounded up by the page size 
 void *kheap_morecore(uint32_t size)
 {
 	// calculate how many pages we will need
 	int pages = (size / PAGE_SIZE) + 1;
-	// when process->heap.heap_top == NULL we must create the initial heap
+	// when kheap_end == NULL we must create the initial heap
 	if (kheap_end == NULL)
 		kheap_end = kheap_begin;
 	// set the address to return
@@ -45,7 +45,7 @@ void *kheap_morecore(uint32_t size)
 		memset(kheap_end, 0x00, PAGE_SIZE);
 	}
 	// return the start address of the memory we allocated to the heap
-	tty_printf("(prev_kheap_end) = %x\n", prev_kheap_end);
+	//tty_printf("(prev_kheap_end) = %x\n", prev_kheap_end);
 	return prev_kheap_end;
 }
 
@@ -156,6 +156,17 @@ void kheap_print_stat()
 
 void kheap_test()
 {
+
+	uint32_t sz = 1024*768*4;
+	uint8_t *mas = kheap_malloc(sz);
+    //mas[0x003FFFFF] = 17;
+    memset(mas, 5, sz);
+    tty_printf("mas[sz-1] = %d\n", mas[sz - 1]);
+    tty_printf("mas_addr = %x\n", mas);
+
+    kheap_print_stat();
+
+
 	int cnt = 12;
     int *arr = (int*)kheap_malloc(cnt*sizeof(int));
     int i;
