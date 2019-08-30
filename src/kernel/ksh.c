@@ -12,6 +12,9 @@
 
 #include <kernel/mm/kheap.h>
 
+#include <kernel/fs/vfs.h>
+#include <kernel/fs/initrd.h>
+
 #include <kernel/kernel.h>
 
 #include <libk/string.h>
@@ -55,6 +58,14 @@ void ksh_main()
 		} else if (strcmp(cmd, "draw_demo") == 0)
 		{
 			ksh_draw_demo();
+		} else if (strcmp(cmd, "vfs") == 0)
+		{
+			//initrd test
+			//tty_printf("x = %x%x%x%x", );
+			initrd_list(0, 0);
+			char *arr = (char*)kheap_malloc(1000);
+			initrd_read("about_eos.txt", 0, initrd_get_filesize("about_eos.txt"), 0, arr);
+			tty_printf("%s\n", arr);
 		} else {//if...
 			ksh_cmd_unknown();
 		}

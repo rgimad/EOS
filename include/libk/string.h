@@ -14,6 +14,7 @@ const char* strchr (const char*, char);
 char*       strrev (      char*);
 long        strtol (      char*, char**, int);
 size_t      strlen (const char*);
+size_t      str_bksp(char* str, char c);
 //size_t utf8_strlen (const uint32_t*);
 
 int   atoi(const char*);

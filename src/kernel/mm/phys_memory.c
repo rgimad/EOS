@@ -259,6 +259,12 @@ void pmm_init(struct multiboot_info* mboot_info)
     pmm_alloc_chunk(*phys_memory_bitmap, phys_block_count);
     kernel_phys_map_start = (uint32_t)phys_memory_bitmap;
     kernel_phys_map_end = kernel_phys_map_start + (phys_block_count / PHYS_BLOCKS_PER_BYTE);
+
+
+
+    uint32_t initrd_beg = *(uint32_t*)(mboot_info->mods_addr);
+    uint32_t initrd_end = *(uint32_t*)(mboot_info->mods_addr + 4);
+    pmm_alloc_chunk(initrd_beg, initrd_end);
     
     //tty_printf("Physical memory manager installed. Physical memory bitmap start: %x, end: %x, size = %d bytes\n", kernel_phys_map_start, kernel_phys_map_end, kernel_phys_map_end - kernel_phys_map_start);
 }

@@ -111,7 +111,7 @@ void vmm_init()
     // Maps first MB to 3GB
     physical_addr frame;
 	virtual_addr virt;
-    for (frame = 0x0, virt = 0xC0000000; frame < 0x100000; frame += PAGE_SIZE, virt += PAGE_SIZE)
+    for (frame = 0x0, virt = 0xC0000000; frame < 0x100000/*0x100000*/; frame += PAGE_SIZE, virt += PAGE_SIZE)
     {
         page_table_entry page = 0;
         page_table_entry_add_attrib(&page, I86_PTE_PRESENT);

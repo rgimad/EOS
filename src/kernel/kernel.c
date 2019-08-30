@@ -23,8 +23,37 @@
 #include <kernel/mm/virt_memory.h>
 #include <kernel/mm/kheap.h>
 
+//file system
+#include <kernel/fs/vfs.h>
+#include <kernel/fs/initrd.h>
+
 //graphics
 #include <kernel/graphics/vesafb.h>
+
+
+
+//struct multiboot_mod_list {
+  /* the memory used goes from bytes 'mod_start' to 'mod_end-1' inclusive */
+   // uint32_t type;
+   // uint32_t size;
+ // uint32_t mod_start;
+ // uint32_t mod_end;
+
+  /* Module command line */
+ // uint32_t cmdline;
+
+  /* padding to take it to 16 bytes (must be zero) */
+  //uint32_t pad;
+//};
+//typedef struct multiboot_mod_list multiboot_module_t;
+
+/*struct mboot_mod_list_struct
+{
+    uint32_t mod_start;
+    uint32_t mod_end;
+    uint32_t cmdline;
+    uint32_t pad;
+};*/
 
 
 
@@ -45,6 +74,9 @@ int kernel_init(struct multiboot_info *mboot_info)
     //install Interrupt Descriptor Table
     //tty_printf("Installing IDT...\n\n");
     idt_install();
+
+    uint32_t initrd_beg = *(uint32_t*)(mboot_info->mods_addr);
+    uint32_t initrd_end = *(uint32_t*)(mboot_info->mods_addr + 4);
 
     //tty_printf("Some multiboot info:\nMagic number = %x\n", magic_number);
     //tty_printf("\nRAM available = %d MB\n", (mboot_info->mem_lower + mboot_info->mem_upper)/1024);
@@ -95,6 +127,19 @@ int kernel_init(struct multiboot_info *mboot_info)
     {
     	draw_vga_character(chr, 500 + ((chr - 32) % 10)*20, 50 + ((chr - 32)/10)*20, 0x00AA00, 0x0000AA, 0);
     }*/
+
+    vfs_init();
+
+    //struct mboot_mod_list_struct *mod = (struct mboot_mod_list_struct*)mboot_info->mods_addr;
+    //tty_printf("mods_count = %x\n", mboot_info->mods_count);
+    //tty_printf("mods_addr = %x\n", mboot_info->mods_addr);
+    //tty_printf("cmdline = %s\n", (char*)(mod->cmdline));
+    //tty_printf("mod_size = %x\n", *(uint32_t*)(mboot_info->mods_addr + 4));
+    
+    //if we read initrd_beg and end here oni 0 tk ih kto to zater!
+
+    initrd_init(initrd_beg, initrd_end);
+    //initrd_init(mod->mod_start, mod->mod_end);
 
 
     //tty_printf("mboot_info = %x\n", mboot_info);
