@@ -2,7 +2,7 @@
 
 EOS is an educational operating system for x86 platform. More information on official page https://vk.com/eos_developer_notes
 
-Current progress: (v.0.0.0.4)
+Current progress: (v.0.0.0.4.x)
 ----------------
 
 - GDT and IDT setup
@@ -18,15 +18,19 @@ Current progress: (v.0.0.0.4)
 - Very simple kernel command shell (KSH)
 - Virtual Memory Manager
 - Entry based kernel heap manager
+- VFS (in progress)
+- InitRD (in progress)
 
 
 TODO:
 ----
 
-- InitRD
-- File system
-- PCI
 - ELF loader
+- Multitasking
+- GUI
+- FAT32
+- HDD reading
+- PCI
 - etc.
 
 Thanks to:

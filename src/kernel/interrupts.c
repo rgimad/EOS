@@ -31,8 +31,8 @@ void fault_handler(struct regs *r)
     //void * linearAddress;
     // retrieve the linear address of the page fault stored in CR2
     //ASM( "movl %%cr2, %0" : "=r" (linearAddress) );
-    //asm volatile( "movl %cr2, %eax");
-    //for (;;);
+    asm volatile( "movl %cr2, %eax");
+    for (;;);
     uint32_t adr;
     asm volatile( "movl %%cr2, %0" : "=r" (adr) );
     tty_printf("System Exception. System Halted! cr2 = %x\n", adr);

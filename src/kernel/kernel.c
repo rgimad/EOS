@@ -60,6 +60,19 @@
 int kernel_init(struct multiboot_info *mboot_info)
 {
 
+    tty_init();
+    svga_mode_info_t *svga_mode = (svga_mode_info_t*)mboot_info->vbe_mode_info;
+    framebuffer_addr = svga_mode->physbase;// vmm_temp_map_page(svga_mode->physbase);
+    framebuffer_pitch = svga_mode->pitch;
+    framebuffer_bpp = svga_mode->bpp;
+    framebuffer_width = svga_mode->screen_width;
+    framebuffer_height = svga_mode->screen_height;
+    //framebuffer_size = framebuffer_width*framebuffer_height*(framebuffer_bpp/8);
+    framebuffer_size = framebuffer_height*framebuffer_pitch;
+    back_framebuffer_addr = framebuffer_addr;
+
+    //tty_printf("Hello ");
+
 	//higher_half_test();
 
 	//tty_printf("                  ");tty_printf(EOS_VERSION_STRING);tty_printf("\n\n");
@@ -75,8 +88,8 @@ int kernel_init(struct multiboot_info *mboot_info)
     //tty_printf("Installing IDT...\n\n");
     idt_install();
 
-    uint32_t initrd_beg = *(uint32_t*)(mboot_info->mods_addr);
-    uint32_t initrd_end = *(uint32_t*)(mboot_info->mods_addr + 4);
+    //uint32_t initrd_beg = *(uint32_t*)(mboot_info->mods_addr);
+    //uint32_t initrd_end = *(uint32_t*)(mboot_info->mods_addr + 4);
 
     //tty_printf("Some multiboot info:\nMagic number = %x\n", magic_number);
     //tty_printf("\nRAM available = %d MB\n", (mboot_info->mem_lower + mboot_info->mem_upper)/1024);
@@ -86,9 +99,14 @@ int kernel_init(struct multiboot_info *mboot_info)
     pmm_init(mboot_info);
     //pmm_test();
 
+    uint32_t initrd_beg = *(uint32_t*)(mboot_info->mods_addr);
+    uint32_t initrd_end = *(uint32_t*)(mboot_info->mods_addr + 4);
+
     //tty_printf("pde0 = %u\n", *(page_dir_entry*)(0xFFFFF000));
     //tty_printf("pde_%d = %u\n", (0xC0000000 >> 22), *(page_dir_entry*)(0xFFFFF000 + (0xC0000000 >> 22)*4));
     
+    //uint32_t x = *(uint32_t*)(0xF0FFF000); //doenst cause page fault if in boot.s was identity mapped all the ram :D
+
     vmm_init();
     //vmm_test();
 
@@ -96,8 +114,9 @@ int kernel_init(struct multiboot_info *mboot_info)
     //kheap_test();
 
 
-    tty_init();
+    //tty_init();
     init_vbe(mboot_info);
+    //uint32_t x = *(uint32_t*)(0xF0FFF000); //page fault example
 
    	/*back_framebuffer_addr = kheap_malloc(framebuffer_size);
 	tty_printf("back_framebuffer_addr = %x\n", back_framebuffer_addr);

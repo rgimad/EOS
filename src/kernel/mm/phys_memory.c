@@ -16,6 +16,12 @@ uint32_t kernel_phys_map_end;
 
 uint64_t phys_installed_memory_size = 0, phys_available_memory_size = 0;
 
+//for initrd
+uint64_t initrd_mmap_entry_addr = -1;
+uint32_t mmap_avail_entries_count = 0;
+multiboot_memory_map_entry mmap_avail_entries_array[100];
+
+
 
 inline static void bitmap_set(int bit) {
   phys_memory_bitmap[bit / 32] |= (1 << (bit % 32));
@@ -227,17 +233,73 @@ void pmm_free_available_memory(struct multiboot_info* mb)
         //tty_printf("freed\n");
         if (mm->type == 1)//if == MULTIBOOT_MEMORY_AVAILABLE
         {
-            pmm_free_chunk(mm->addr, mm->len);
+            if (mm->addr != initrd_mmap_entry_addr)//ADDED BECAUSE INITRD RELOCATION
+            {
+                pmm_free_chunk(mm->addr, mm->len);
+            } else
+            {
+                uint32_t initrd_beg = *(uint32_t*)(mb->mods_addr);
+                uint32_t initrd_end = *(uint32_t*)(mb->mods_addr + 4);
+                uint32_t initrd_size = initrd_end - initrd_end;
+                pmm_alloc_chunk(initrd_beg, initrd_size);
+                pmm_free_chunk(mm->addr, mm->len - initrd_size - 2);//why -2????
+            }
         }
         mm = (multiboot_memory_map_entry*)((unsigned int)mm + mm->size + sizeof(mm->size));
     }
     bitmap_set(0);
 }
 
+
+void pmm_relocate_initrd_to_high_mem(struct multiboot_info* mb)
+{
+    //tty_printf("test");
+    uint32_t initrd_beg = *(uint32_t*)(mb->mods_addr);
+    uint32_t initrd_end = *(uint32_t*)(mb->mods_addr + 4);
+    uint32_t initrd_size = initrd_end - initrd_beg;
+
+    multiboot_memory_map_entry* mm = (multiboot_memory_map_entry*)mb->mmap_addr;
+    mmap_avail_entries_count = 0;
+    while ((unsigned int)mm < mb->mmap_addr + mb->mmap_length)
+    {
+        if (mm->type == 1)//if == MULTIBOOT_MEMORY_AVAILABLE
+        {
+            mmap_avail_entries_array[mmap_avail_entries_count] = *mm;
+            mmap_avail_entries_count++;
+        }
+        mm = (multiboot_memory_map_entry*)((unsigned int)mm + mm->size + sizeof(mm->size));
+    }
+    int i;
+    //tty_printf("mmap_avail_entries_count = %x \n\n", mmap_avail_entries_count);
+    for (i = mmap_avail_entries_count - 1; i >= 0; i--)
+    {
+        //tty_printf("addr = %x  | len = %x \n", mmap_avail_entries_array[i].addr, mmap_avail_entries_array[i].len);
+        if (mmap_avail_entries_array[i].len >= initrd_size)
+        {
+            //tty_printf("addr = %x\n", mmap_avail_entries_array[i].addr);
+            initrd_mmap_entry_addr = mmap_avail_entries_array[i].addr;
+            memcpy(initrd_mmap_entry_addr + mmap_avail_entries_array[i].len - initrd_size - 1, initrd_beg, initrd_size);
+            initrd_beg = initrd_mmap_entry_addr + mmap_avail_entries_array[i].len - initrd_size - 1;
+            initrd_end = initrd_beg + initrd_size;
+            //pmm_free_chunk(initrd_end + 1, mmap_avail_entries_array[i].len - initrd_size);
+            break;
+        }
+    }
+    *(uint32_t*)(mb->mods_addr) = initrd_beg;
+    *(uint32_t*)(mb->mods_addr + 4) = initrd_end;
+    //tty_printf("initrd_beg = %x, initrd_end = %x", initrd_beg, initrd_end);
+}
+
+
+
 void pmm_init(struct multiboot_info* mboot_info)
 {
 	multiboot_memory_map_entry* mmap = (multiboot_memory_map_entry*)mboot_info->mmap_addr;
 	pmm_parse_memory_map(mmap, mboot_info->mmap_length);//it also calculates the   phys_installed_memory_size
+
+    //uint32_t x = *(uint32_t*)(0xF0FFF000); //this example line doenst cause page fault when in boot.s its identiny mapped all the ram. So it means that we can identity map all the ram by 4 mb pages in boot.s
+    
+    pmm_relocate_initrd_to_high_mem(mboot_info);
 
     phys_block_count = (phys_installed_memory_size /** 1024*/) / PHYS_BLOCK_SIZE;//how many blocks will be
     phys_used_block_count = phys_block_count;//initially all blocks are used
@@ -256,16 +318,16 @@ void pmm_init(struct multiboot_info* mboot_info)
     //tty_printf("MemMap addr = %x\n", mboot_info->mmap_addr);
     
     // We also need to allocate the memory used by the Physical Map itself
-    pmm_alloc_chunk(*phys_memory_bitmap, phys_block_count);
+    pmm_alloc_chunk(*phys_memory_bitmap, phys_block_count); //WHY first argument *phys_memory_bitmap ???????????????????????????????????????????????????
     kernel_phys_map_start = (uint32_t)phys_memory_bitmap;
     kernel_phys_map_end = kernel_phys_map_start + (phys_block_count / PHYS_BLOCKS_PER_BYTE);
 
 
-
-    uint32_t initrd_beg = *(uint32_t*)(mboot_info->mods_addr);
-    uint32_t initrd_end = *(uint32_t*)(mboot_info->mods_addr + 4);
-    pmm_alloc_chunk(initrd_beg, initrd_end);
+    //uint32_t initrd_beg = *(uint32_t*)(mboot_info->mods_addr);
+    //uint32_t initrd_end = *(uint32_t*)(mboot_info->mods_addr + 4);
+    //pmm_alloc_chunk(initrd_beg, initrd_end);
     
+
     //tty_printf("Physical memory manager installed. Physical memory bitmap start: %x, end: %x, size = %d bytes\n", kernel_phys_map_start, kernel_phys_map_end, kernel_phys_map_end - kernel_phys_map_start);
 }
 
