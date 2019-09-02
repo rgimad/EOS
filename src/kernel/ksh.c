@@ -19,10 +19,14 @@
 
 #include <libk/string.h>
 
+char ksh_working_directory[256];
+
 
 void ksh_init()
 {
 	tty_putstring_color("                  EOS KSH (Kernel SHell):\n\n", VESA_LIGHT_RED);
+
+	strcpy(ksh_working_directory, "/initrd/");
 }
 
 void ksh_main()
@@ -32,14 +36,19 @@ void ksh_main()
 
 	while(1)
 	{
-		tty_putstring_color("kernel> ", VESA_LIGHT_BLUE);
+		tty_setcolor(VESA_LIGHT_GREEN);
+		tty_printf("kernel ");
+		tty_setcolor(VESA_LIGHT_BLUE);
+		tty_printf("%s $ ", ksh_working_directory);
+		tty_setcolor(VESA_LIGHT_CYAN);
+		//tty_putstring_color("kernel>", VESA_LIGHT_BLUE);
+		// %s $ 
 
 		//tty_setcolor(vga_entry_color(VGA_COLOR_BLUE, VGA_COLOR_BLACK));
 		//tty_printf("kernel> ");
 		//tty_setcolor(vga_entry_color(VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK));
 
 		keyboard_gets(cmd, 256);
-		//tty_printf("(%s)\n", cmd);//
 		if (strlen(cmd) > 0) if (strcmp(cmd, "cpuid") == 0)
 		{
 			ksh_cmd_cpuid();
@@ -58,15 +67,37 @@ void ksh_main()
 		} else if (strcmp(cmd, "draw_demo") == 0)
 		{
 			ksh_draw_demo();
+		} else if (strcmp(cmd, "pwd") == 0)
+		{
+			ksh_cmd_pwd();
+		} else if (strlen(cmd) > 4 && strncmp(cmd, "cat ", 4) == 0)
+		{
+			char fname[100];
+			char *tok = strtok(cmd, " ");
+			tok = strtok(0, " ");//tok - now is filename
+			if (fname != 0)
+			{
+				ksh_cmd_cat(tok);
+			} else
+			{
+				tty_printf("cat: incorrect argument\n");
+			}
+		} else if (strlen(cmd) > 3 && strncmp(cmd, "cd ", 3) == 0)
+		{
+			char dname[100];
+			char *tok = strtok(cmd, " ");
+			tok = strtok(0, " ");//tok - now is dirname
+			if (dname != 0)
+			{
+				ksh_cmd_cd(tok);
+			} else
+			{
+				tty_printf("cd: incorrect argument\n");
+			}
 		} else if (strcmp(cmd, "ls") == 0)
 		{
-			//initrd test
-			//tty_printf("x = %x%x%x%x", );
-			initrd_list(0, 0);
-			char *arr = (char*)kheap_malloc(1000);
-			initrd_read("about_eos.txt", 0, initrd_get_filesize("about_eos.txt"), 0, arr);
-			tty_printf("\n%s\n", arr);
-		} else {//if...
+			ksh_cmd_ls();
+		}  else {//if...
 			ksh_cmd_unknown();
 		}
 	}
@@ -115,6 +146,67 @@ void ksh_draw_demo()
     }
 }
 
+
+
+void ksh_cmd_pwd()
+{
+	tty_printf("%s\n", ksh_working_directory);
+}
+
+void ksh_cmd_cat(char *fname)
+{
+	if (fname[0] != '/')//TODO: make function
+	{
+		char temp[256];
+		strcpy(temp, ksh_working_directory);
+		strcat(temp, fname);
+		strcpy(fname, temp);
+	}
+	char *buf = (char*)kheap_malloc(1000);
+	
+	if (!vfs_exists(fname))
+	{
+		tty_printf("cat: error file not found\n");
+	} else
+	{
+		uint32_t fsize = vfs_get_size(fname);
+		int res = vfs_read(fname, 0, fsize, buf);
+		buf[fsize] = '\0';
+		tty_printf("cat: file %s:\n\n%s\n", fname, buf);
+		kheap_free(buf);
+	}
+}
+
+void ksh_cmd_cd(char *dname)
+{
+	if (dname[0] != '/')
+	{
+		char temp[256];
+		strcpy(temp, ksh_working_directory);
+		strcat(temp, dname);
+		strcpy(dname, temp);
+	}
+	//tty_printf("%s\n", dname);
+	//tty_printf("e = %x d = %d\n", vfs_exists(dname), vfs_is_dir(dname));
+	if (dname[strlen(dname) - 1] != '/') //very important, otherwise vfs won't see the dir
+	{
+		strcat(dname, "/");
+	}
+	if (vfs_exists(dname) && vfs_is_dir(dname))
+	{
+		strcpy(ksh_working_directory, dname);
+	} else
+	{
+		tty_printf("cd: no such directory\n");
+	}
+}
+
+void ksh_cmd_ls()
+{
+	initrd_list(0, 0);
+	tty_printf("\n");
+}
+
 void ksh_cmd_regdump()
 {
 	//uint32_t eax, ebx, ecx, edx, esi, edi, esp, ebp, cr0, cr2, cr3;
@@ -123,5 +215,5 @@ void ksh_cmd_regdump()
 
 void ksh_cmd_help()
 {
-	tty_printf("Available commands:\n cpuid - information about processor\n ticks - get number of ticks\n kheap_test - test kernel heap\n draw_demo - demo super effects\n about\n help\n");
+	tty_printf("Available commands:\n cpuid - information about processor\n ticks - get number of ticks\n kheap_test - test kernel heap\n draw_demo - demo super effects\n ls - list of files and dirs\n cd - set current directory\n pwd - print working directory\n cat - print contents of specified file\n about\n help\n");
 }

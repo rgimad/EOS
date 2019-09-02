@@ -44,6 +44,7 @@ int      tar_lookup(unsigned char *archive, char *filename);
 uint32_t initrd_read(char *filename, int offset, int size, vfs_filesystem_t* u, void *buffer);
 uint32_t initrd_file_exists(char *filename, vfs_filesystem_t* u);
 uint32_t initrd_get_filesize(char *filename);
+uint32_t initrd_is_dir(char *filename);//addded
 void     initrd_list(int argc, char** arg);
 void     initrd_init(uint32_t begin, uint32_t end);
 

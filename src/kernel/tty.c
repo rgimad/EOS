@@ -21,7 +21,7 @@ void tty_init() {
     tty_pos_y = 0;
     tty_pos_x = 0;
 
-    tty_text_color = 0x55FFFF;
+    tty_text_color = VESA_LIGHT_CYAN;
 }
 
 

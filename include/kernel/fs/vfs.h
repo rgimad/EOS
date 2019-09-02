@@ -41,6 +41,7 @@ typedef struct vfs_filesystem_handles_t //structure that contains pointers to so
 	uint32_t (*rm)     (char *fn, vfs_filesystem_t*);
 	uint32_t (*get_size)  (char *fn, vfs_filesystem_t*);
 	uint32_t (*exists)  (char *fn, vfs_filesystem_t*);
+	uint32_t (*is_dir)  (char *fn, vfs_filesystem_t*);//added
 } vfs_filesystem_handles_t;
 
 
@@ -67,6 +68,7 @@ int vfs_mkfile(char* filename, char* path, uint16_t perms);
 int vfs_list(char* path, void* buf);
 int vfs_rm(char* filename);
 int vfs_exists(char* filename);
+int vfs_is_dir(char* filename);//added
 
 
 #endif  // _VFS_H

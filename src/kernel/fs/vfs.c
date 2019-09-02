@@ -130,6 +130,20 @@ int vfs_get_size(char* filename)
 	return vfs_mount_points[mntn]->fs_handles->get_size(filename, vfs_mount_points[mntn]->fs);
 } 
 
+int vfs_is_dir(char* filename)
+{
+	int a = 0;
+	int mntn = vfs_mount_find(filename, &a);
+	filename += a + 1;
+
+	if(vfs_mount_points[mntn]->fs_handles->is_dir == 0)
+	{
+		return 0;
+	}
+ 
+	return vfs_mount_points[mntn]->fs_handles->is_dir(filename, vfs_mount_points[mntn]->fs);
+}
+
 
 int vfs_write(char* filename, int offset, int size, void* buf)
 {

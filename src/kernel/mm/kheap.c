@@ -61,7 +61,7 @@ void kheap_free(void *address)
 	// find it
 	for (tmp_item = kheap_begin; tmp_item != NULL; tmp_item = tmp_item->next)
 	{
-		tty_printf("tmp_item = %x\n", tmp_item);
+		//tty_printf("tmp_item = %x\n", tmp_item);
 		if (tmp_item == item)
 		{
 			// free it

@@ -132,6 +132,24 @@ uint32_t initrd_get_filesize(char *filename)
 	}
 }
 
+uint32_t initrd_is_dir(char *filename)
+{
+	if(!filename)
+		return 0;
+	
+	int file_addr = tar_lookup(initrd_begin, filename);
+	
+	if(!file_addr) // file not found
+    {
+		return 0;
+	}
+    else
+    {
+    	ustar_file_t* file = (struct ustar_file_t*)file_addr;
+		return file->type;//(file->type == USTAR_DIRECTORY); //TODO why this comparison doenst work?? why for files file->type is 0 and for dirs id 48 aka '0' ????
+	}
+}
+
 void initrd_list(int argc, char** arg)
 {
 	int addr = initrd_begin;
@@ -182,8 +200,8 @@ void initrd_init(uint32_t phys_begin, uint32_t phys_end)
     initrd_begin = PAGE_ALIGN_DOWN(initrd_begin) + PAGE_SIZE + phys_begin % PAGE_SIZE;
     initrd_end = initrd_begin + initrd_size;
 
-    int i;
-    for (i = 0; i < 100; i++) tty_printf("%c", *(char*)(initrd_begin + i));
+    //int i;
+    //for (i = 0; i < 100; i++) tty_printf("%c", *(char*)(initrd_begin + i));
 
     //uint32_t v1 = vmm_temp_map_page(phys_begin);
     //for (i = 0; i < 4096; i++) tty_printf("%c", *(char*)(v1 + i));
@@ -196,6 +214,7 @@ void initrd_init(uint32_t phys_begin, uint32_t phys_end)
 	fs_handles->read = &initrd_read;
 	fs_handles->exists = &initrd_file_exists;
 	fs_handles->get_size = &initrd_get_filesize;
+	fs_handles->is_dir = &initrd_is_dir;//added
 	fs_handles->write	= 0;
 	fs_handles->readdir = 0;
 	fs_handles->mkfile 	= 0;

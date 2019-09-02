@@ -15,6 +15,11 @@ void ksh_cmd_about();
 void ksh_cmd_help();
 void ksh_kheap_test();
 void ksh_draw_demo();
+
+void ksh_cmd_pwd();
+void ksh_cmd_cat();
+void ksh_cmd_cd();
+void ksh_cmd_ls();
 //void ksh_cmd_regdump();
 
 void ksh_cmd_unknown();
