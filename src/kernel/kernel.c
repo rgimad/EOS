@@ -17,6 +17,7 @@
 //devices
 #include <kernel/devices/timer.h>
 #include <kernel/devices/keyboard.h>
+#include <kernel/devices/mouse.h>
 
 //memory manager
 #include <kernel/mm/phys_memory.h>
@@ -177,6 +178,8 @@ int kernel_init(struct multiboot_info *mboot_info)
 
 	//tty_printf("Installing keyboard...\n");
 	keyboard_install();
+
+    mouse_install();
 
 	//enable interrutps
 	//tty_printf("Enabling all interrupts...\n\n");

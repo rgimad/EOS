@@ -41,6 +41,7 @@ void fault_handler(struct regs *r)
 
 void irq_handler(struct regs *r)
 {
+    //if (r->idt_index != 32) tty_printf("idt_index = %d\n", r->idt_index);
     // Blank function pointer
     void (*handler)(struct regs * r);
 

@@ -63,7 +63,22 @@ error_code_handler 17
 no_error_code_handler 18
 no_error_code_handler 19
 
-# IRQs
+no_error_code_handler 20
+no_error_code_handler 21
+no_error_code_handler 22
+no_error_code_handler 23
+no_error_code_handler 24
+no_error_code_handler 25
+no_error_code_handler 26
+no_error_code_handler 27
+no_error_code_handler 28
+no_error_code_handler 29
+no_error_code_handler 30
+no_error_code_handler 31
+
+
+
+# IRQs why starts not from 0??
 no_error_code_handler 32
 no_error_code_handler 33
 no_error_code_handler 34

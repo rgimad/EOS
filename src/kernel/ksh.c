@@ -67,6 +67,9 @@ void ksh_main()
 		} else if (strcmp(cmd, "draw_demo") == 0)
 		{
 			ksh_draw_demo();
+		} else if (strcmp(cmd, "gui_test") == 0)
+		{
+			ksh_gui_test();
 		} else if (strcmp(cmd, "pwd") == 0)
 		{
 			ksh_cmd_pwd();
@@ -147,6 +150,17 @@ void ksh_draw_demo()
 }
 
 
+void ksh_gui_test()
+{
+	int wnd_x = 400, wnd_y = 200, wnd_width = 500, wnd_height = 300,  wnd_border = 4, wnd_hdr_height = 30;
+	uint32_t wnd_frame_color = VESA_LIGHT_BLUE, wnd_background_color = VESA_LIGHT_GREY;
+	draw_fill(wnd_x, wnd_y, wnd_width, wnd_height, wnd_frame_color);
+	//draw_square(wnd_x, wnd_y, wnd_width, wnd_height, VESA_WHITE);
+	draw_fill(wnd_x + wnd_border, wnd_y + wnd_hdr_height, wnd_width - 2*wnd_border, wnd_height - wnd_hdr_height - wnd_border, wnd_background_color);
+	draw_fill(wnd_x + wnd_width - wnd_hdr_height, wnd_y + wnd_border, wnd_hdr_height - 2*wnd_border, wnd_hdr_height - 2*wnd_border, VESA_RED);
+	draw_square(wnd_x + wnd_width - wnd_hdr_height, wnd_y + wnd_border, wnd_hdr_height - 2*wnd_border, wnd_hdr_height - 2*wnd_border, VESA_WHITE);
+}
+
 
 void ksh_cmd_pwd()
 {
@@ -215,5 +229,5 @@ void ksh_cmd_regdump()
 
 void ksh_cmd_help()
 {
-	tty_printf("Available commands:\n cpuid - information about processor\n ticks - get number of ticks\n kheap_test - test kernel heap\n draw_demo - demo super effects\n ls - list of files and dirs\n cd - set current directory\n pwd - print working directory\n cat - print contents of specified file\n about\n help\n");
+	tty_printf("Available commands:\n cpuid - information about processor\n ticks - get number of ticks\n kheap_test - test kernel heap\n draw_demo - demo super effects\n ls - list of files and dirs\n cd - set current directory\n pwd - print working directory\n cat - print contents of specified file\n gui_test - draw test window\n about\n help\n");
 }

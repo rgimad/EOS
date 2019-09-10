@@ -69,6 +69,8 @@ void create_back_framebuffer()
 
 void set_pixel(int x, int y, uint32_t color)
 {
+	if (x < 0 || y < 0 || x >= (int)VESA_WIDTH || y >= (int)VESA_HEIGHT) return;
+
 	unsigned where = x*(framebuffer_bpp/8) + y*framebuffer_pitch;
 	
 	framebuffer_addr[where] = color;
@@ -116,9 +118,11 @@ void set_pixel_alpha(int x, int y, rgba_color color)
 
 uint32_t get_pixel(int x, int y)//return color of the pixel
 {
+	if (x < 0 || y < 0 || x >= (int)VESA_WIDTH || y >= (int)VESA_HEIGHT) return 0;
+
 	unsigned where = x*(framebuffer_bpp/8) + y*framebuffer_pitch;
     uint32_t color = 0;
-    color = framebuffer_addr[where + 0] + (framebuffer_addr[where + 1] << 8) + (framebuffer_addr[where + 1] << 16);
+    color = framebuffer_addr[where + 0] + (framebuffer_addr[where + 1] << 8) + (framebuffer_addr[where + 2] << 16);
     return color;
 }
 

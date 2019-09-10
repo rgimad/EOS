@@ -7,12 +7,29 @@
 #include <kernel/tty.h>
 #include <kernel/io/ports.h>
 
+#include <libk/string.h>
+
 #define SET_IDT_ENTRY(idx) \
     set_idt_entry(idx, (uint32_t) &interrupt_handler_##idx,\
                   0x08, 0x8E);
 
 //....{}
 #define DECLARE_INTERRUPT_HANDLER(i) void interrupt_handler_##i(void)
+
+
+
+
+
+#define ICW1         0x11
+#define ICW4         0x01
+#define PIC1         0x20 /* IO base address for master PIC */
+#define PIC2         0xA0 /* IO base address for slave  PIC */
+#define PIC1_COMMAND PIC1
+#define PIC1_DATA    (PIC1+1)
+#define PIC2_COMMAND PIC2
+#define PIC2_DATA    (PIC2+1)
+
+
 
 void interrupt_enable_all() { asm volatile("sti"); }
 void interrupt_disable_all() { asm volatile("cli"); }
@@ -65,6 +82,19 @@ DECLARE_INTERRUPT_HANDLER(17);
 DECLARE_INTERRUPT_HANDLER(18);
 DECLARE_INTERRUPT_HANDLER(19);
 
+DECLARE_INTERRUPT_HANDLER(20);
+DECLARE_INTERRUPT_HANDLER(21);
+DECLARE_INTERRUPT_HANDLER(22);
+DECLARE_INTERRUPT_HANDLER(23);
+DECLARE_INTERRUPT_HANDLER(24);
+DECLARE_INTERRUPT_HANDLER(25);
+DECLARE_INTERRUPT_HANDLER(26);
+DECLARE_INTERRUPT_HANDLER(27);
+DECLARE_INTERRUPT_HANDLER(28);
+DECLARE_INTERRUPT_HANDLER(29);
+DECLARE_INTERRUPT_HANDLER(30);
+DECLARE_INTERRUPT_HANDLER(31);
+
 /* IRQs */
 DECLARE_INTERRUPT_HANDLER(32);
 DECLARE_INTERRUPT_HANDLER(33);
@@ -92,9 +122,66 @@ void set_idt_entry(uint8_t num, uint64_t handler, uint16_t sel, uint8_t flags)
     idt[num].sel = sel;
 }
 
+
+void IRQ_set_mask(unsigned char IRQline)
+{
+    uint16_t port;
+    uint8_t value;
+
+    if(IRQline < 8)
+    {
+        port = PIC1_DATA;
+    }
+    else
+    {
+        port = PIC2_DATA;
+        IRQline -= 8;
+    }
+    value = inb(port) | (1 << IRQline);
+    outb(port, value);
+}
+
+void IRQ_clear_mask(unsigned char IRQline)
+{
+    uint16_t port;
+    uint8_t value;
+
+    if(IRQline < 8)
+    {
+        port = PIC1_DATA;
+    }
+    else
+    {
+        port = PIC2_DATA;
+        IRQline -= 8;
+    }
+    value = inb(port) & ~(1 << IRQline);
+    outb(port, value);
+}
+
+
+
+void init_pics(int pic1, int pic2)
+{
+    outb(PIC1, ICW1);
+    outb(PIC2, ICW1);
+    outb(PIC1 + 1, pic1);
+    outb(PIC2 + 1, pic2);
+    outb(PIC1 + 1, 4);
+    outb(PIC2 + 1, 2);
+    outb(PIC1 + 1, ICW4);
+    outb(PIC2 + 1, ICW4);
+    outb(PIC1 + 1, 0xFF);
+}
+
 // Installs the IDT
 void idt_install()
 {
+    outb(0x21,0xfd);
+    outb(0xa1,0xff);
+    init_pics(0x20,0x28);
+
+
     // Sets the special IDT pointer up
     idtp.limit = (sizeof(struct idt_entry) * IDT_NUM_ENTRIES) - 1;
     idtp.base = (uint32_t)&idt;
@@ -102,7 +189,14 @@ void idt_install()
     //tty_printf("idtp.base = %x, idtp.limit = %x\n", idtp.base, idtp.limit); //!!!!
 
     // Clear out the entire IDT, initializing it to zeros
-    //memset(&idt, 0, sizeof(struct idt_entry) * IDT_NUM_ENTRIES);
+    memset(&idt, 0, sizeof(struct idt_entry) * IDT_NUM_ENTRIES);
+
+    idt_load(&idtp);
+
+
+
+
+
     int i;
     for (i = 0; i < IDT_NUM_ENTRIES; i++)
     {
@@ -135,8 +229,33 @@ void idt_install()
     SET_IDT_ENTRY(17);
     SET_IDT_ENTRY(18);
     SET_IDT_ENTRY(19);
+    SET_IDT_ENTRY(20);
+    SET_IDT_ENTRY(21);
+    SET_IDT_ENTRY(22);
+    SET_IDT_ENTRY(23);
+    SET_IDT_ENTRY(24);
+    SET_IDT_ENTRY(25);
+    SET_IDT_ENTRY(26);
+    SET_IDT_ENTRY(27);
+    SET_IDT_ENTRY(28);
+    SET_IDT_ENTRY(29);
+    SET_IDT_ENTRY(30);
+    SET_IDT_ENTRY(31);
+
+
 
     /* IRQs */
+    outb(0x20, 0x11);
+    outb(0xA0, 0x11);
+    outb(0x21, 0x20);
+    outb(0xA1, 0x28);
+    outb(0x21, 0x04);
+    outb(0xA1, 0x02);
+    outb(0x21, 0x01);
+    outb(0xA1, 0x01);
+    outb(0x21, 0x0);
+    outb(0xA1, 0x0);
+
     SET_IDT_ENTRY(32);
     SET_IDT_ENTRY(33);
     SET_IDT_ENTRY(34);
@@ -154,8 +273,14 @@ void idt_install()
     SET_IDT_ENTRY(46);
     SET_IDT_ENTRY(47);
 
+
+    for(int i = 0; i < 16; ++i)
+    {
+        IRQ_clear_mask(i);
+    }
+
     // Remap PICs. Maybe move this somewhere else in the future.
-    outb(0x20, 0x10);
+    /*outb(0x20, 0x10);
     outb(0xA0, 0x10);
     outb(0x21, 0x20);
     outb(0xA1, 0x28);
@@ -164,9 +289,26 @@ void idt_install()
     outb(0x21, 0x01);
     outb(0xA1, 0x01);
     outb(0x21, 0x0);
-    outb(0xA1, 0x0);
+    outb(0xA1, 0x0);*/
+
+    //--------
+
+    /*outb(0x20, 0x11);
+    outb(0xA0, 0x11);
+
+    outb(0x21, 0x20);
+    outb(0xA1, 0x28);
+
+    outb(0x21, 0x04);
+    outb(0xA1, 0x02);
+
+    outb(0x21, 0x01);
+    outb(0xA1, 0x01);
+    
+    outb(0x21, 0x0);
+    outb(0xA1, 0x0);*/
 
     // Points the processor's internal register to the new IDT
-    idt_load(&idtp);
+    //idt_load(&idtp);
     //tty_printf("IDT installed.\n");
 }

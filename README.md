@@ -7,7 +7,7 @@ Current progress: (v.0.0.0.4.x)
 
 - GDT and IDT setup
 - VESA framebuffer based terminal :D
-- PS/2 keyboard support
+- PS/2 keyboard and mouse support
 - Timer support
 - RAM detection and Physical Memory Manager
 - Higher Half Kernel
