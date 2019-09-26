@@ -18,19 +18,19 @@ Current progress: (v.0.0.0.4.x)
 - Very simple kernel command shell (KSH)
 - Virtual Memory Manager
 - Entry based kernel heap manager
-- VFS (in progress)
-- InitRD (in progress)
+- VFS
+- InitRD
+- ELF loader (in progress)
 
 
 TODO:
 ----
 
-- ELF loader
-- Multitasking
-- GUI
-- FAT32
-- HDD reading
-- PCI
+- Multitasking (processes and threads)
+- GUI (window system)
+- FAT32 driver
+- HDD driver
+- PCI driver
 - etc.
 
 Thanks to:

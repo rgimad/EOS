@@ -15,6 +15,8 @@
 #include <kernel/fs/vfs.h>
 #include <kernel/fs/initrd.h>
 
+#include <kernel/pm/elf.h>
+
 #include <kernel/kernel.h>
 
 #include <libk/string.h>
@@ -100,6 +102,18 @@ void ksh_main()
 		} else if (strcmp(cmd, "ls") == 0)
 		{
 			ksh_cmd_ls();
+		} else if (strlen(cmd) > 9 && strncmp(cmd, "elf_info ", 9) == 0)
+		{
+			char fname[100];
+			char *tok = strtok(cmd, " ");
+			tok = strtok(0, " ");//tok - now is filename
+			if (fname != 0)
+			{
+				ksh_cmd_elf_info(tok);
+			} else
+			{
+				tty_printf("elf_info: incorrect argument\n");
+			}
 		}  else {//if...
 			ksh_cmd_unknown();
 		}
@@ -221,6 +235,19 @@ void ksh_cmd_ls()
 	tty_printf("\n");
 }
 
+void ksh_cmd_elf_info(char *fname)
+{
+	if (fname[0] != '/')//TODO: make function
+	{
+		char temp[256];
+		strcpy(temp, ksh_working_directory);
+		strcat(temp, fname);
+		strcpy(fname, temp);
+	}
+	tty_printf("elf fname = %s\n", fname);
+	elf_info_short(fname);
+}
+
 void ksh_cmd_regdump()
 {
 	//uint32_t eax, ebx, ecx, edx, esi, edi, esp, ebp, cr0, cr2, cr3;
@@ -229,5 +256,5 @@ void ksh_cmd_regdump()
 
 void ksh_cmd_help()
 {
-	tty_printf("Available commands:\n cpuid - information about processor\n ticks - get number of ticks\n kheap_test - test kernel heap\n draw_demo - demo super effects\n ls - list of files and dirs\n cd - set current directory\n pwd - print working directory\n cat - print contents of specified file\n gui_test - draw test window\n about\n help\n");
+	tty_printf("Available commands:\n cpuid - information about processor\n ticks - get number of ticks\n kheap_test - test kernel heap\n draw_demo - demo super effects\n ls - list of files and dirs\n cd - set current directory\n pwd - print working directory\n cat - print contents of specified file\n gui_test - draw test window\n elf_info - information about elf file\n about\n help\n");
 }

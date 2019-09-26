@@ -21,6 +21,8 @@ void ksh_cmd_pwd();
 void ksh_cmd_cat();
 void ksh_cmd_cd();
 void ksh_cmd_ls();
+
+void ksh_cmd_elf_info(char *fname);
 //void ksh_cmd_regdump();
 
 void ksh_cmd_unknown();
