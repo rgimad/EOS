@@ -16,6 +16,7 @@ void ksh_cmd_help();
 void ksh_kheap_test();
 void ksh_draw_demo();
 void ksh_gui_test();
+void ksh_syscall_test();
 
 void ksh_cmd_pwd();
 void ksh_cmd_cat();

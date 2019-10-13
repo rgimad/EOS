@@ -21,6 +21,7 @@ Current progress: (v.0.0.0.4.x)
 - VFS
 - InitRD
 - ELF loader (in progress)
+- System calls (in progress)
 
 
 TODO:

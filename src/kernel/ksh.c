@@ -72,6 +72,9 @@ void ksh_main()
 		} else if (strcmp(cmd, "gui_test") == 0)
 		{
 			ksh_gui_test();
+		}  else if (strcmp(cmd, "syscall_test") == 0)
+		{
+			ksh_syscall_test();
 		} else if (strcmp(cmd, "pwd") == 0)
 		{
 			ksh_cmd_pwd();
@@ -248,6 +251,15 @@ void ksh_cmd_elf_info(char *fname)
 	elf_info_short(fname);
 }
 
+void ksh_syscall_test()
+{
+	uint32_t sc_code = 0; uint32_t res = 0;
+	char *str = "Hello i'm system call !\n";
+	
+	asm volatile("mov %%eax, %0;" : "=a"(res) : "a"(sc_code), "b"(&str));
+	asm volatile("int $0x80;");
+}
+
 void ksh_cmd_regdump()
 {
 	//uint32_t eax, ebx, ecx, edx, esi, edi, esp, ebp, cr0, cr2, cr3;
@@ -256,5 +268,5 @@ void ksh_cmd_regdump()
 
 void ksh_cmd_help()
 {
-	tty_printf("Available commands:\n cpuid - information about processor\n ticks - get number of ticks\n kheap_test - test kernel heap\n draw_demo - demo super effects\n ls - list of files and dirs\n cd - set current directory\n pwd - print working directory\n cat - print contents of specified file\n gui_test - draw test window\n elf_info - information about elf file\n about\n help\n");
+	tty_printf("Available commands:\n cpuid - information about processor\n ticks - get number of ticks\n kheap_test - test kernel heap\n draw_demo - demo super effects\n syscall_test - test system calls work\n ls - list of files and dirs\n cd - set current directory\n pwd - print working directory\n cat - print contents of specified file\n gui_test - draw test window\n elf_info - information about elf file\n about\n help\n");
 }

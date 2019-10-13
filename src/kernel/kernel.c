@@ -28,6 +28,9 @@
 #include <kernel/fs/vfs.h>
 #include <kernel/fs/initrd.h>
 
+//syscalls
+#include <kernel/syscall.h>
+
 //graphics
 #include <kernel/graphics/vesafb.h>
 
@@ -180,6 +183,8 @@ int kernel_init(struct multiboot_info *mboot_info)
 	keyboard_install();
 
     mouse_install();
+
+    syscall_init();
 
 	//enable interrutps
 	//tty_printf("Enabling all interrupts...\n\n");

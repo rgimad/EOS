@@ -10,7 +10,7 @@
 
 #define TIMER_IDT_INDEX 32// - 32
 #define KEYBOARD_IDT_INDEX 33// - 32
-#define SYSCALL_IDT_INDEX 128
+#define SYSCALL_IDT_INDEX 0x80 //128
 #define MOUSE_IDT_INDEX 44// - 32
 
 // Holds the registers at the time of the interrupt

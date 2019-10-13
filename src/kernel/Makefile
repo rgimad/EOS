@@ -20,7 +20,7 @@ CCFLAGS=-std=gnu99 -ffreestanding -Wall -Wextra -I $(INCLUDE_DIR)
 #LDFLAGS=-T linker.ld -ffreestanding -O1 -nostdlib -lgcc
 #CCFLAGS=-std=gnu99 -ffreestanding -O1 -Wall -Wextra -I $(INCLUDE_DIR)
 
-OBJ=boot.o kernel.o ../libk/string.o ../libk/math.o ksh.o gdt.o gdt_asm.o idt.o idt_asm.o tty.o graphics/vesafb.o graphics/vgafnt.o cpu_detect.o io/ports.o interrupts.o interrupts_asm.o devices/keyboard.o devices/timer.o devices/mouse.o mm/phys_memory.o paging.o mm/virt_memory.o mm/kheap.o fs/vfs.o fs/initrd.o pm/elf.o
+OBJ=boot.o kernel.o ../libk/string.o ../libk/math.o ksh.o gdt.o gdt_asm.o idt.o idt_asm.o tty.o graphics/vesafb.o graphics/vgafnt.o cpu_detect.o io/ports.o interrupts.o interrupts_asm.o devices/keyboard.o devices/timer.o devices/mouse.o mm/phys_memory.o paging.o mm/virt_memory.o mm/kheap.o fs/vfs.o fs/initrd.o syscall.o pm/elf.o
 	
 all: $(TARGET_ELF)
 
