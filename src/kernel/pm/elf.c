@@ -4,6 +4,7 @@
 */
 #include <kernel/pm/elf.h>
 #include <kernel/fs/vfs.h>
+#include <kernel/mm/virt_memory.h>
 #include <kernel/mm/kheap.h>
 #include <kernel/tty.h>
 
@@ -80,7 +81,7 @@ void elf_hdr_info(struct elf_hdr *hdr)
 	tty_printf("\t\tELF file version: %u\n", hdr->elf_ver);
 	tty_printf("\t\tELF file type: %s\n", (hdr->file_type==ELF_REL) ? "relocatable" : (hdr->file_type==ELF_EXEC) ? "executable" : "unknown");
 	tty_printf("\t\tTarget machine: %s\n", (hdr->machine==ELF_386_MACHINE) ? "i386" : "unknown");
-	tty_printf("\t\tEntry point: 0x%08X\n", hdr->entry);
+	tty_printf("\t\tEntry point: %x\n", hdr->entry);
 	tty_printf("\t\tProgram header offset: %u\n", hdr->phoff);
 	tty_printf("\t\tSection header offset: %u\n", hdr->shoff);
 	tty_printf("\t\tFile flags: %u\n", hdr->flags);
@@ -130,4 +131,76 @@ void elf_info(const char* name)
 		tty_printf("\t\t\t\tSection name: %s\n", elf_get_section_name(elf_file, i));
 	}
 	//kheap_free(elf_file);  //!!!!!!
+}
+
+
+
+
+
+
+int run_elf_file(const char* name/*, char **argv, char** env __attribute__((unused)), int argc*/)
+{
+    void *elf_file = elf_open(name);
+	if (elf_file == NULL)
+		return -1; 
+
+	struct elf_hdr *hdr = (struct elf_hdr *)elf_file;
+
+	tty_printf("loading segments:\n");
+	int i;
+	for (i = 0; i < hdr->ph_ent_cnt; i++)
+	{
+		//printf("Segment [%i/%i]: ", i, hdr->ph_ent_cnt);
+		struct elf_program_header *phdr = elf_get_program_header(elf_file, i);
+		if (phdr->type != SEGTYPE_LOAD)
+		{
+			continue; //We only can load segments to the memory, so just skip it.
+		}
+		tty_printf("Loading %x bytes to %x\n", phdr->size_in_mem, phdr->load_to);
+		//alloc needed amount of pages
+		uint32_t alloc_addr;
+		for (alloc_addr = phdr->load_to; alloc_addr < phdr->load_to + phdr->size_in_mem; alloc_addr += PAGE_SIZE)
+		{
+			vmm_alloc_page(alloc_addr);
+		}
+		memset((void*)phdr->load_to, 0, phdr->size_in_mem); //Null segment memory.
+		memcpy((void*)phdr->load_to, elf_file+phdr->data_offset, phdr->size_in_file);
+		tty_printf("Loaded\n");
+	}
+	tty_printf("\n");
+	/*tty_printf("loading sections:\n");
+	for(i=0; i<hdr->sh_ent_cnt; i++)
+	{
+		struct elf_section_header *shdr = (struct elf_section_header *)((uint8_t*)(elf_file) + hdr->shoff + hdr->sh_ent_size * i);
+
+		if(shdr->addr)
+		{
+			tty_printf("Loading %x bytes to %x\n", shdr->size > 0x1000 ? 0x1000 : shdr->size, shdr->addr);
+			//because of condition shdr->size > 0x1000 ? 0x1000 : shdr->size allocationg only one page of virtual memory will be enough
+			vmm_alloc_page(shdr->addr);
+			memcpy((void*)shdr->addr, elf_file + shdr->offset, shdr->size > 0x1000 ? 0x1000 : shdr->size);
+			if(!strcmp(elf_get_section_name(elf_file, i), ".bss"))
+			{
+				;
+			}
+			tty_printf("Loaded\n");
+		}
+	}*/
+
+    void(*entry_point)() = (void*)(hdr->entry);
+	tty_printf("ELF entry point: %x\n", hdr->entry);
+
+	//tty_printf("%x %x", *(char*)hdr->entry);
+	/*char *b;
+	for (b = (char*)hdr->entry; b <  (char*)hdr->entry + 0x60; b++)
+	{
+		tty_printf("%x ", *b);
+		if ((b - (char*)hdr->entry) % 20 == 0) tty_printf("\n");
+	}*/
+
+    /*int result = */
+    entry_point();
+    //tty_printf("[%s] Return value was %i\n", name, result);
+
+	return 0; 
 }

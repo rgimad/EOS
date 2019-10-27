@@ -74,7 +74,7 @@ struct elf_program_header
 void *elf_open(const char*);
 void elf_info(const char*);
 void elf_info_short(const char*);
-//int run_elf_file(const char*, char**, char**, int argc);
+int run_elf_file(const char*);//, char**, char**, int argc);
 
 
 

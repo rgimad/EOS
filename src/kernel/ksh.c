@@ -117,6 +117,18 @@ void ksh_main()
 			{
 				tty_printf("elf_info: incorrect argument\n");
 			}
+		}  else if (strlen(cmd) > 4 && strncmp(cmd, "run ", 4) == 0)
+		{
+			char fname[100];
+			char *tok = strtok(cmd, " ");
+			tok = strtok(0, " ");//tok - now is filename
+			if (fname != 0)
+			{
+				ksh_cmd_run(tok);
+			} else
+			{
+				tty_printf("run: incorrect argument\n");
+			}
 		}  else {//if...
 			ksh_cmd_unknown();
 		}
@@ -249,6 +261,20 @@ void ksh_cmd_elf_info(char *fname)
 	}
 	tty_printf("elf fname = %s\n", fname);
 	elf_info_short(fname);
+
+	//run_elf_file(fname);
+}
+
+void ksh_cmd_run(char *fname)
+{
+	if (fname[0] != '/')//TODO: make function
+	{
+		char temp[256];
+		strcpy(temp, ksh_working_directory);
+		strcat(temp, fname);
+		strcpy(fname, temp);
+	}
+	run_elf_file(fname);
 }
 
 void ksh_syscall_test()
@@ -268,5 +294,5 @@ void ksh_cmd_regdump()
 
 void ksh_cmd_help()
 {
-	tty_printf("Available commands:\n cpuid - information about processor\n ticks - get number of ticks\n kheap_test - test kernel heap\n draw_demo - demo super effects\n syscall_test - test system calls work\n ls - list of files and dirs\n cd - set current directory\n pwd - print working directory\n cat - print contents of specified file\n gui_test - draw test window\n elf_info - information about elf file\n about\n help\n");
+	tty_printf("Available commands:\n cpuid - information about processor\n ticks - get number of ticks\n kheap_test - test kernel heap\n draw_demo - demo super effects\n syscall_test - test system calls work\n ls - list of files and dirs\n cd - set current directory\n pwd - print working directory\n cat - print contents of specified file\n gui_test - draw test window\n elf_info - information about elf file\n run - run program (for example - run first_program_gas.elf)\n about\n help\n");
 }

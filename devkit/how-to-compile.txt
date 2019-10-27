@@ -1,0 +1,3 @@
+C:\i686-elf-tools\bin\i686-elf-gcc.exe first_program_gas.s -o first_program_gas.elf -T app_gas.ld -ffreestanding -nostdlib -lgcc
+
+C:\i686-elf-tools\bin\i686-elf-gcc.exe reverse.c -o reverse.elf -T app_c.ld -ffreestanding -nostdlib -lgcc
