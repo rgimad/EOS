@@ -23,16 +23,16 @@ Current progress: (v.0.0.0.4.x)
 - ELF loader (in progress)
 - System calls (in progress)
 - ELF running (in progress)
-
+- GUI (window system) (Console window system in progress)
 
 TODO:
 ----
 
 - Multitasking (processes and threads, user stack, user heap, user-mode)
-- GUI (window system)
 - FAT32 driver
 - HDD driver
 - PCI driver
+- ACPI driver
 - etc.
 
 Thanks to:

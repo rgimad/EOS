@@ -21,6 +21,8 @@
 
 #include <libk/string.h>
 
+#include <kernel/gui/consolewindow.h>
+
 char ksh_working_directory[256];
 
 
@@ -129,6 +131,25 @@ void ksh_main()
 			{
 				tty_printf("run: incorrect argument\n");
 			}
+		}  else if (strcmp(cmd, "cwnd_test") == 0)
+		{
+			consolewindow_t *cwnd1 = consolewindow_create("Test window 1", 450, 200, 7, 45);
+			consolewindow_draw(cwnd1);
+			consolewindow_printf(cwnd1, "Hello world = %d", 1337);
+			consolewindow_backspace(cwnd1);
+			consolewindow_printf(cwnd1, "\nPrivet mir!Privet mir!Privet mir!Privet mir!Privet mir!Privet mir!Privet mir!");
+
+			consolewindow_t *cwnd2 = consolewindow_create("Window 2", 400, 450, 5, 35);
+			consolewindow_draw(cwnd2);
+			int a = 0, b = 1, c;
+			for (int i = 0; i < 19; i++)
+			{
+				consolewindow_printf(cwnd2, "%d, ", a);
+				c = a + b;
+				a = b;
+				b = c;
+			}
+
 		}  else {//if...
 			ksh_cmd_unknown();
 		}

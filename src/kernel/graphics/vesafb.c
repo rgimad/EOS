@@ -173,3 +173,31 @@ void draw_fill(int start_x, int start_y, int length_across, int length_down, uin
 	   }
     }
 }
+
+void draw_vga_character(uint8_t c, int x, int y, int fg, int bg, bool bgon)
+{
+    //if (tty_pos_x + 7 > 1024 /*|| tty_pos_y + 15 > 768*/) draw_fill(50, 50, 100, 100, 0x0000AA);
+    int cx,cy;
+    int mask[8]={128,64,32,16,8,4,2,1};
+    unsigned char *glyph=(uint8_t*)vgafnt+(int)c*16;
+    for(cy=0;cy<16;cy++){
+        for(cx=0;cx<8;cx++){
+            if(glyph[cy]&mask[cx]) set_pixel(x+cx,y+cy,fg);
+            else if(bgon == true) set_pixel(x+cx,y+cy,bg);
+        }
+    }
+}
+
+void draw_text_string(const char* text, int x, int y, int fg, int bg, bool bgon)
+{
+	int len = strlen(text);
+	int i;
+	for (int i = 0; i < len; i++)
+	{
+		if (x + 8 <= 1024)
+		{
+			draw_vga_character(text[i], x, y, fg, bg, bgon);
+			x += 8;
+		} else break;
+	}
+}

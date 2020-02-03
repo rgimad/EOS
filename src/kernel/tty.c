@@ -4,7 +4,7 @@
 */
 #include <kernel/tty.h>
 #include <kernel/graphics/vesafb.h>
-#include <kernel/graphics/vgafnt.h>
+//#include <kernel/graphics/vgafnt.h>
 
 #include <libk/string.h>
 
@@ -22,21 +22,6 @@ void tty_init() {
     tty_pos_x = 0;
 
     tty_text_color = VESA_LIGHT_CYAN;
-}
-
-
-void draw_vga_character(uint8_t c, int x, int y, int fg, int bg, bool bgon)
-{
-    //if (tty_pos_x + 7 > 1024 /*|| tty_pos_y + 15 > 768*/) draw_fill(50, 50, 100, 100, 0x0000AA);
-    int cx,cy;
-    int mask[8]={128,64,32,16,8,4,2,1};
-    unsigned char *glyph=(uint8_t*)vgafnt+(int)c*16;
-    for(cy=0;cy<16;cy++){
-        for(cx=0;cx<8;cx++){
-            if(glyph[cy]&mask[cx]) set_pixel(x+cx,y+cy,fg);
-            else if(bgon == true) set_pixel(x+cx,y+cy,bg);
-        }
-    }
 }
 
 void tty_backspace() {//!!!!!!!!!!!
