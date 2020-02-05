@@ -49,5 +49,14 @@ inline uint64_t rdtsc()
 
 inline void insl(unsigned short port, unsigned int buffer, unsigned long count)
 {
-asm("cld; rep; insl" :: "D" (buffer), "d" (port), "c" (count));
+	asm("cld; rep; insl" :: "D" (buffer), "d" (port), "c" (count));
+}
+
+int com1_is_transmit_empty() {
+   return inb(PORT_COM1 + 5) & 0x20;
+}
+
+void com1_write_char(char a) {
+   while (com1_is_transmit_empty() == 0);
+   outb(PORT_COM1, a);
 }

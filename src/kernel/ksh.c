@@ -45,12 +45,6 @@ void ksh_main()
 		tty_setcolor(VESA_LIGHT_BLUE);
 		tty_printf("%s $ ", ksh_working_directory);
 		tty_setcolor(VESA_LIGHT_CYAN);
-		//tty_putstring_color("kernel>", VESA_LIGHT_BLUE);
-		// %s $ 
-
-		//tty_setcolor(vga_entry_color(VGA_COLOR_BLUE, VGA_COLOR_BLACK));
-		//tty_printf("kernel> ");
-		//tty_setcolor(vga_entry_color(VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK));
 
 		keyboard_gets(cmd, 256);
 		if (strlen(cmd) > 0) if (strcmp(cmd, "cpuid") == 0)
@@ -150,7 +144,23 @@ void ksh_main()
 				b = c;
 			}
 
-		}  else {//if...
+		} else if (strcmp(cmd, "qemu_log_test") == 0) {
+			    qemu_printf("Hello world = %x + %s", 0x779, "privet");
+				//int PORT_COM1 = 0x3f8;
+				/*outb(PORT_COM1 + 1, 0x00);
+			    outb(PORT_COM1 + 3, 0x80);
+			    outb(PORT_COM1 + 0, 0x03);
+			    outb(PORT_COM1 + 1, 0x00);
+			    outb(PORT_COM1 + 3, 0x03);
+			    outb(PORT_COM1 + 2, 0xC7);
+			    outb(PORT_COM1 + 4, 0x0B);*/
+			    /*char *str = "Hello world to qemu log!\n";
+			    for (int i = 0; i < strlen(str); i++)
+			    {
+			    	while (inb(PORT_COM1 + 5) & 0x20 == 0);
+   					outb(PORT_COM1, str[i]);
+			    }*/
+		} else {//if...
 			ksh_cmd_unknown();
 		}
 	}
@@ -315,5 +325,5 @@ void ksh_cmd_regdump()
 
 void ksh_cmd_help()
 {
-	tty_printf("Available commands:\n cpuid - information about processor\n ticks - get number of ticks\n kheap_test - test kernel heap\n draw_demo - demo super effects\n syscall_test - test system calls work\n ls - list of files and dirs\n cd - set current directory\n pwd - print working directory\n cat - print contents of specified file\n gui_test - draw test window\n elf_info - information about elf file\n run - run program (for example - run first_program_gas.elf)\n about\n help\n");
+	tty_printf("Available commands:\n cpuid - information about processor\n ticks - get number of ticks\n kheap_test - test kernel heap\n draw_demo - demo super effects\n syscall_test - test system calls work\n ls - list of files and dirs\n cd - set current directory\n pwd - print working directory\n cat - print contents of specified file\n gui_test - draw test window\n elf_info - information about elf file\n run - run program (for example - run first_program_gas.elf)\n cwnd_test\n qemu_log_test\n about\n help\n");
 }
