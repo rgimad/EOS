@@ -1,3 +1,7 @@
+/*
+*    EOS - Experimental Operating System
+*    Process methods
+*/
 #include <kernel/pm/process.h>
 
 #include <kernel/pm/thread.h>
@@ -93,7 +97,7 @@ process_t* create_process(char *filename)
 
 	//TODO: proc->name = filename or ???
 
-	asm("sti");//pravilno napisal??
+	asm("sti;");
 
 	//TODO: add proc to system process list/queue
 

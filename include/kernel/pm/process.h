@@ -27,12 +27,12 @@ typedef	struct process_t
 	char name[256];
 	char *cmdline;
 
-	listnode_t *self_item;// pointer to this process's list node
+	listnode_t *self_item; // pointer to this process's list node
 
 	size_t threads_count;
 	list_t *thread_list;
 
-	void *page_dir;// virtual address of page directory structure that was created in kernel heap
+	void *page_dir; // virtual address of page directory structure that was created in kernel heap
 
 	void *heap_begin;
 	void *heap_end;

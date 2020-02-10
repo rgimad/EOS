@@ -2,9 +2,15 @@
 *    EOS - Experimental Operating System
 *    Scheduler header
 */
-#ifndef SCHEDULER_H
-#define SCHEDULER_H
+#ifndef _SCHEDULER_H
+#define _SCHEDULER_H
 
+#include <libk/list.h>
 
+extern uint32_t pid_counter;
+extern uint32_t tid_counter;
+extern bool scheduler_enabled;
 
-#endif //SCHEDULER_H
+void scheduler_init();
+
+#endif // _SCHEDULER_H

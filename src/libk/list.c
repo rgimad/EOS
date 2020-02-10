@@ -8,7 +8,10 @@
 //Create a list and set head, tail to NULL, and size to 0
 list_t * list_create()
 {
-	list_t * list = kheap_alloc(sizeof(list_t));
+	list_t *list = (list_t*)kheap_malloc(sizeof(list_t));
+	list->head = NULL;
+	list->tail = NULL;
+	list->size = 0;
 	return list;
 }
 
