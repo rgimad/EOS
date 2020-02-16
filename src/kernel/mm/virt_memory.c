@@ -7,6 +7,7 @@
 
 #include <libk/string.h>
 
+page_directory *kernel_page_dir;//pointer (physical) to kernel page dircetory structure
 
 bool vmm_alloc_page(virtual_addr vaddr)
 {

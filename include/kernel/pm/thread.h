@@ -9,14 +9,17 @@
 #include <stdint.h>
 
 //Limits
-#define THREAD_KSTACK_SIZE 1024
-#define THREAD_USTACK_SIZE (4 * 1024)
+#define THREAD_KSTACK_SIZE 4096
+#define THREAD_USTACK_SIZE (4 * 4096)
 
 // Possible thread states
 #define THREAD_READY       0
 #define THREAD_BLOCKED     1
 #define THREAD_RUNNING     2
 #define THREAD_TERMINATED  4
+
+#define THREAD_KERNEL_MODE 11
+#define THREAD_USER_MODE   12
 
 
 typedef struct context {
@@ -39,6 +42,7 @@ typedef struct thread_t
 	uint32_t tid; // thread id
 	uint32_t state; // thread's state
 	context_t regs; //thread's context
+    uint32_t privileges; // kernel mode or user mode
 
 	listnode_t *self_item;// pointer to this thread's list node
 	process_t *process; // process which this thread belongs to

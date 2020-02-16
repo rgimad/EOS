@@ -28,7 +28,7 @@ uint32_t list_size(list_t * list);
 
 listnode_t * list_insert_front(list_t * list, void * val);
 
-void list_insert_back(list_t * list, void * val);
+listnode_t *  list_insert_back(list_t * list, void * val);
 
 void * list_remove_node(list_t * list, listnode_t * node);
 
@@ -36,7 +36,7 @@ void * list_remove_front(list_t * list);
 
 void * list_remove_back(list_t * list);
 
-void list_push(list_t * list, void * val);
+listnode_t *  list_push(list_t * list, void * val);
 
 listnode_t * list_pop(list_t * list);
 

@@ -13,8 +13,8 @@
 //#define PROCESS_MSG_BUFF_SIZE 16
 
 // Possible process states
-#define PROCESS_UNINTERRUPTABLE 1
-#define PROCESS_INTERRUPTABLE 2
+#define PROCESS_UNINTERRUPTIBLE 1
+#define PROCESS_INTERRUPTIBLE 2
 #define PROCESS_RUNNING 3
 #define PROCESS_KILLING 4
 //maybe need more states?
@@ -32,14 +32,14 @@ typedef	struct process_t
 	size_t threads_count;
 	list_t *thread_list;
 
-	void *page_dir; // virtual address of page directory structure that was created in kernel heap
+	void *page_dir; // physical address of page directory structure that was created in kernel heap
 
 	void *heap_begin;
 	void *heap_end;
 	//uint32_t heap_size;
 
-	void *stack_begin;
-	void *stack_end;
+	//void *stack_begin;
+	//void *stack_end;
 
 	thread_t *parent_proc_thread;
 

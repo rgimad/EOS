@@ -69,7 +69,7 @@ enum PAGE_PDE_FLAGS {
 #define GET_PTE(v)		(page_table_entry*)(0xFFC00000 + (v >> 12) * 4)
 //-------------------------------------------------------------------------------------
 
-page_directory *kernel_page_dir;//pointer (physical) to kernel page dircetory structure
+extern page_directory *kernel_page_dir;//pointer (physical) to kernel page dircetory structure
 
 
 //TODO: rewrite all these functions so that they will work using recursive pd techinque

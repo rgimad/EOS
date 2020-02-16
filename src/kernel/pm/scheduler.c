@@ -10,13 +10,13 @@ uint32_t pid_counter = 0; // last process id value. New process will be pid_coun
 uint32_t tid_counter = 0; // last thread id value. New thread will be tid_counter++
 bool scheduler_enabled = false; // enable or disable the scheduler
 
-procces_t *kernel_process; // pointer to kernel process structure
+process_t *kernel_process; // pointer to kernel process structure
 thread_t *kernel_main_thread; // pointer to kernel's main thread structure
 
 list_t *process_list; // this list contains all the processes runned in the system
 // we dont need to have a global thread list beacuse each process already has its own thread list
 
-procces_t *current_process; // pointer to current running process structure
+process_t *current_process; // pointer to current running process structure
 thread_t *current_thread; // pointer to current running thread structure
 
 
@@ -28,17 +28,29 @@ void scheduler_init()
 
     process_list = list_create();
 
-    kernel_process = (procces_t*)kheap_malloc(sizeof(procces_t));
+    kernel_process = (process_t*)kheap_malloc(sizeof(process_t));
     memset(kernel_process, 0, sizeof(process_t));
 
     kernel_process->pid = pid_counter++;
-    //kernel_process->state = ??????;
+    kernel_process->state = PROCESS_INTERRUPTIBLE; // ????????
     strcpy(kernel_process->name, "kernel.elf");
-    kernel_process->self_item = kernel_process;
     kernel_process->threads_count = 1;
     kernel_process->thread_list = list_create();
-    //kernel_process->page_dir = ????????????????????;
-    
+    kernel_process->page_dir = kernel_page_dir; // kernel_page_dir - pointer (physical) to kernel page dircetory structure it will be used for context switch (move its value to cr3)
+    kernel_process->self_item = list_push(process_list, kernel_process);
+    kernel_process->parent_proc_thread = NULL;
 
 
+    //kernel_process created, now we create main kernel thread structure
+    thread_t *kernel_main_thread = (thread_t*)kheap_malloc(sizeof(thread_t));
+    memset(kernel_main_thread, 0, sizeof(thread_t));
+
+    kernel_main_thread->tid = tid_counter++;
+    kernel_main_thread->state = THREAD_READY; // thread is ready, not blocked beacuse thread become blocked only if it waits for some resource like file or infut etc.
+    kernel_main_thread->privileges = THREAD_KERNEL_MODE;
+    kernel_main_thread->process = kernel_process; // parent process is kernel
+    // TODO: fill the kernel_main_thread structure
+    kernel_main_thread->self_item = list_push(kernel_process->thread_list, kernel_main_thread);
+
+    asm volatile ("sti");
 }

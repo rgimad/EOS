@@ -58,7 +58,7 @@ listnode_t * list_insert_front(list_t * list, void * val)
 }
 
 //Insert a value at the back of list
-void list_insert_back(list_t * list, void * val)
+listnode_t * list_insert_back(list_t * list, void * val)
 {
 	listnode_t * t = kheap_alloc(sizeof(listnode_t));
 	t->prev = list->tail;
@@ -71,6 +71,7 @@ void list_insert_back(list_t * list, void * val)
 
 	list->tail = t;
 	list->size++;
+	return t;
 }
 
 //Remove a value at the front of list
@@ -102,9 +103,9 @@ void * list_remove_back(list_t * list)
 }
 
 //Insert after tail of list(same as insert back)
-void list_push(list_t * list, void * val)
+listnode_t * list_push(list_t * list, void * val)
 {
-	list_insert_back(list, val);
+	return list_insert_back(list, val);
 }
 
 //Remove and return tail of list(user is responsible for freeing the returned node and the value)
