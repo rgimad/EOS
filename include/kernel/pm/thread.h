@@ -50,6 +50,9 @@ typedef struct thread_t
 	void *kernel_stack; // thread's kernel stack top
 	void *user_stack; // thread's user stack top
 
+    uint32_t kernel_stack_size;
+    uint32_t user_stack_size;
+
 	void* entry_point; // thread's code entry point
 
 	uint32_t time;// time of execution

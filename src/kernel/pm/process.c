@@ -5,20 +5,17 @@
 #include <kernel/pm/process.h>
 
 #include <kernel/pm/thread.h>
+#include <kernel/pm/scheduler.h>
 #include <kernel/pm/elf.h>
 #include <kernel/mm/phys_memory.h>
 #include <kernel/mm/virt_memory.h>
-//#include <kernel/mm/kheap.h>
-//#include <kernel/fs/vfs.h>
+#include <kernel/mm/kheap.h>
+#include <kernel/fs/vfs.h>
 
-process_t* create_process(char *filename)
+process_t* create_process(char *filepath)
 {
-	void *file_buffer = elf_open(filename);
-
-	if (file_buffer == 0)
-	{
-		return 0;
-	}
+	void *file_buffer = elf_open(filepath);
+	if (file_buffer == 0) { return 0; }
 
 	struct elf_hdr *hdr = (struct elf_hdr*)file_buffer;
 	if (elf_check_header(hdr) != 0)//if elf header is not valid quit
@@ -45,13 +42,14 @@ process_t* create_process(char *filename)
 	memcpy(proc_page_dir_tmp_vaddr, (void*)pdbuf, PAGE_SIZE);
 	kheap_free(pdbuf);//free temporary buffer
 
+	//TODO: make 40-46 code review maybe its totally incorrect
+
+	process_t *proc = kheap_alloc(sizeof(process_t));
+	memset(proc, 0, sizeof(process_t));
+
 	//proc->page_dir = ;
 
 	//TODO: switch to proc_page_dir
-
-
-	process_t *proc = kheap_alloc(sizeof(process_t));//or sizeof + ... ?
-	memset(proc, 0, sizeof(process_t));
 
 	// loading elf sections (from program header) to memory. There is code does the same in run_elf_file
 	int i;
@@ -75,15 +73,28 @@ process_t* create_process(char *filename)
 		//tty_printf("Loaded\n");
 	}
 
-	proc->pid = last_pid_value++;
-	//TODO:
-	//proc->state = ;
-	//proc->priviliges = ;
-	//proc->thread_list = ;
+	//TODO: switch back to kernel page dir
 
-	//TODO: creating main thread
+	proc->pid = pid_counter++;
+	proc->state = PROCESS_INTERRUPTIBLE;
+	proc->threads_count = 1;
+	proc->thread_list = list_create();
 
-	//TODO: allocating user stack
+	thread_t *proc_main_thread = (thread_t*)kheap_malloc(sizeof(thread_t));
+    memset(proc_main_thread, 0, sizeof(thread_t));
+
+	// allocate and set the top of the kernel stack of new process'es main thread
+	void *proc_main_thread_kernel_stack = kheap_malloc(THREAD_KSTACK_SIZE);
+	memset(proc_main_thread_kernel_stack, 0, THREAD_KSTACK_SIZE);
+	proc_main_thread->kernel_stack = proc_main_thread_kernel_stack;
+
+	// the user-stack for proc's main thread must be allocated using user-heap manager
+	// otherwise user-stack allcated with kheap_alloc will become unaccessible from user-mode cause kheap_alloc uses kheap_morecore which uses vmm_alloc page which doesnt set up the User bit for allocated PTE's
+	// How to solve this problem:
+	// 1) make vmm_alloc_page receive one more argument - User-bit of page being allocated
+	// 2) make user heap manager which will call vmm_alloc_page with argument userbit = 1
+	// 3) so difference between kernel heap manager and user heap manager is that first doesnt set user bit but second does
+	// 4) before using user heap manager you need switch to proc->page_dir and after using user heap manager switch back to kernel page directory
 
 	//TODO: allocating heap for process
 
@@ -93,13 +104,12 @@ process_t* create_process(char *filename)
 
 	kheap_free(file_buffer);
 
-	//TODO: switch back to kernel page dir
+	// name of process is the name of executable file
+	proc->name = vfs_get_file_name_from_path(filepath);
 
-	//TODO: proc->name = filename or ???
+	// now add to scheduler's process_list
+	proc->self_item = list_push(process_list, proc);
 
 	asm("sti;");
-
-	//TODO: add proc to system process list/queue
-
 	return proc;
 }

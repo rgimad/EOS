@@ -45,4 +45,8 @@ typedef	struct process_t
 
 } __attribute__((packed)) process_t;
 
+// Process methods
+
+process_t* create_process(char *filepath);
+
 #endif //_PROCESS_H
