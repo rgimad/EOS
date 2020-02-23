@@ -38,7 +38,7 @@
 //graphics
 #include <kernel/graphics/vesafb.h>
 
-
+uint32_t kernel_stack_top_vaddr;
 
 //struct multiboot_mod_list {
   /* the memory used goes from bytes 'mod_start' to 'mod_end-1' inclusive */
@@ -210,6 +210,7 @@ void higher_half_test()
 
 void kernel_main(int magic_number, struct multiboot_info *mboot_info) //Arguments are passed by _start in boot.s
 {
+    asm("movl %%esp,%0" : "=r"(kernel_stack_top_vaddr));
 	//initilize the kernel
 	multiboot_info mboot_info_copy = *mboot_info;
 	kernel_init(&mboot_info_copy);

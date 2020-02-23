@@ -17,6 +17,16 @@ bool vmm_alloc_page(virtual_addr vaddr)
 	return true;
 }
 
+bool vmm_alloc_page_with_userbit(virtual_addr vaddr)
+{
+	physical_addr paddr = pmm_alloc_block();
+ 	if (!paddr) return false;
+	vmm_map_page(paddr, vaddr);
+	page_table_entry *pte = GET_PTE(vaddr);
+	page_table_entry_add_attrib(pte, I86_PTE_USER);
+	return true;
+}
+
 
 void vmm_free_page(virtual_addr vaddr)
 {
@@ -93,6 +103,12 @@ virtual_addr vmm_temp_map_page(physical_addr paddr)
 	asm volatile("invlpg %0" :: "m" (*(uint32_t *)TEMP_PAGE_ADDR) : "memory" );
 	//flush_tlb_all();
 	return TEMP_PAGE_ADDR;
+}
+
+//switch page directory, reveives physical address
+void vmm_switch_page_directory(page_directory *page_dir_phys_addr)
+{
+    asm volatile("mov %0, %%cr3" :: "r"((uint32_t)page_dir_phys_addr));
 }
 
 void vmm_init()

@@ -43,7 +43,7 @@ void * list_remove_node(list_t * list, listnode_t * node)
 //Insert a value at the front of list
 listnode_t * list_insert_front(list_t * list, void * val)
 {
-	listnode_t * t = kheap_alloc(sizeof(listnode_t));
+	listnode_t * t = kheap_malloc(sizeof(listnode_t));
 	list->head->prev = t;
     t->next = list->head;
 	t->val = val;
@@ -60,7 +60,7 @@ listnode_t * list_insert_front(list_t * list, void * val)
 //Insert a value at the back of list
 listnode_t * list_insert_back(list_t * list, void * val)
 {
-	listnode_t * t = kheap_alloc(sizeof(listnode_t));
+	listnode_t * t = kheap_malloc(sizeof(listnode_t));
 	t->prev = list->tail;
     if(list->tail)
         list->tail->next = t;

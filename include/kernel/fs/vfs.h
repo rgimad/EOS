@@ -56,7 +56,7 @@ typedef struct vfs_mount_info_t //vfs mount point
 
 void vfs_init();
 
-//TODO correct them!
+//TODO correct them! corrected
 void vfs_mount_list();
 int vfs_mount(vfs_storage_dev_t *dev, vfs_filesystem_handles_t* fs_handles, int type, char* location, int block_size);
 int vfs_mount_find(char* path, int *filename_add);
@@ -69,6 +69,7 @@ int vfs_list(char* path, void* buf);
 int vfs_rm(char* filename);
 int vfs_exists(char* filename);
 int vfs_is_dir(char* filename);//added
+void vfs_get_file_name_from_path(char *fpath, char *buf); // get file name from full path to the file
 
 
 #endif  // _VFS_H

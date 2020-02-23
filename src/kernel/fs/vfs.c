@@ -254,6 +254,40 @@ int vfs_exists(char* filename)
 	return vfs_mount_points[mntn]->fs_handles->exists(filename, vfs_mount_points[mntn]->fs);
 }
 
+void vfs_get_file_name_from_path(char *fpath, char *buf)
+{
+    int len = strlen(fpath), last_slash, was_slash = 0, p1, i;
+    last_slash = len - 1;
+    for (i = len - 1; i >= 0; i--)
+    {
+        if (fpath[i] == '/')
+        {
+            last_slash = i;
+            was_slash = 1;
+            break;
+        }
+    }
+    if (!was_slash)
+    {
+        p1 = 0;
+    } else
+    {
+        if (last_slash == len - 1)
+        {
+            buf[0] = '\0';
+            return;
+        } else
+        {
+            p1 = last_slash + 1;   
+        }
+    }
+    for (i = p1; i < len; i++)
+    {
+        buf[i - p1] = fpath[i];
+    }
+	buf[len - p1] = '\0';
+}
+
 
 void vfs_init()
 {

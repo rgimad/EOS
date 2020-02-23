@@ -1,3 +1,7 @@
+/*
+*    EOS - Experimental Operating System
+*    Memory map constatnts
+*/
 #ifndef _MEMLAYOUT_H_
 #define _MEMLAYOUT_H_
 
@@ -27,7 +31,10 @@
 #define PAGE_ENTRIES 1024
 
 // Constants for Kernel heap manager
-#define KHEAP_START_VADDR 0xC0500000  // if kernel size > 4MB, change
+#define KHEAP_START_VADDR 0xC0500000 // if kernel size > 4MB, change
+
+// Constants for User heap manager
+#define UHEAP_START_VADDR 0x20000000 // virtual address where user heap in each process page dir begins
 
 // Functions to
 #define ALIGN_BLOCK(addr) (addr) - ((addr) % PHYS_BLOCK_SIZE);

@@ -36,12 +36,13 @@ typedef	struct process_t
 
 	void *heap_begin;
 	void *heap_end;
-	//uint32_t heap_size;
+	uint32_t heap_memory_used; // how many memory was used
+	int heap_allocs_num; // how many allocations now
 
 	//void *stack_begin;
 	//void *stack_end;
 
-	thread_t *parent_proc_thread;
+	void *parent_proc_thread;
 
 } __attribute__((packed)) process_t;
 

@@ -107,9 +107,11 @@ void vmm_init();
 void vmm_create_kernel_page_dir();
 
 bool vmm_alloc_page(virtual_addr vaddr);
+bool vmm_alloc_page_with_userbit(virtual_addr vaddr);
 void vmm_free_page(virtual_addr vaddr);
 void vmm_map_page(physical_addr paddr, virtual_addr vaddr);
 virtual_addr vmm_temp_map_page(physical_addr paddr);
+void vmm_switch_page_directory(page_directory *page_dir_phys_addr);
 
 void vmm_test();
 

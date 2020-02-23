@@ -8,7 +8,7 @@
 
 #include <libk/string.h>
 
-bool kheap_is_init; // was kheap manager initialised or not
+bool kheap_is_init; // was kheap manager initialised or not.         TODO: is it unused?
 //virtual_addr kheap_last_alloc_addr; // address of last allocation
 virtual_addr kheap_begin; // address where kheap begins
 virtual_addr kheap_end; // address where kheap ends

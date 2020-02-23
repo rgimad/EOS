@@ -7,6 +7,7 @@
 
 #include <stddef.h>
 #include <stdint.h>
+#include <kernel/pm/process.h>
 
 //Limits
 #define THREAD_KSTACK_SIZE 4096
@@ -58,6 +59,11 @@ typedef struct thread_t
 	uint32_t time;// time of execution
 
 } __attribute__((packed)) thread_t;
+
+// Thread functions
+
+thread_t* create_user_thread(process_t *parent_proc, void *entry_point); // create a new thread within a usermode process
+thread_t* create_kernel_thread(void *entry_point); // create a new thread within kernel_process
 
 
 #endif //_THREAD_H
