@@ -11,6 +11,7 @@
 #include <kernel/ksh.h>
 #include <kernel/gdt.h>
 #include <kernel/idt.h>
+#include <kernel/tss.h>
 #include <kernel/interrupts.h>
 #include <kernel/cpu_detect.h>
 
@@ -40,31 +41,6 @@
 
 uint32_t kernel_stack_top_vaddr;
 
-//struct multiboot_mod_list {
-  /* the memory used goes from bytes 'mod_start' to 'mod_end-1' inclusive */
-   // uint32_t type;
-   // uint32_t size;
- // uint32_t mod_start;
- // uint32_t mod_end;
-
-  /* Module command line */
- // uint32_t cmdline;
-
-  /* padding to take it to 16 bytes (must be zero) */
-  //uint32_t pad;
-//};
-//typedef struct multiboot_mod_list multiboot_module_t;
-
-/*struct mboot_mod_list_struct
-{
-    uint32_t mod_start;
-    uint32_t mod_end;
-    uint32_t cmdline;
-    uint32_t pad;
-};*/
-
-
-
 int kernel_init(struct multiboot_info *mboot_info)
 {
 
@@ -79,14 +55,7 @@ int kernel_init(struct multiboot_info *mboot_info)
     framebuffer_size = framebuffer_height*framebuffer_pitch;
     back_framebuffer_addr = framebuffer_addr;
 
-    //tty_printf("Hello ");
-
 	//higher_half_test();
-
-	//tty_printf("                  ");tty_printf(EOS_VERSION_STRING);tty_printf("\n\n");
-	//tty_printf("                  ");tty_putstring_color(EOS_VERSION_STRING, VESA_GREEN);tty_printf("\n");
-
-	//tty_printf("Terminal is ready.\n");
 
 	//install Global Descriptor Table
 	//tty_printf("Installing GDT...\n");
@@ -156,34 +125,16 @@ int kernel_init(struct multiboot_info *mboot_info)
     }*/
 
     vfs_init();
-
-    //struct mboot_mod_list_struct *mod = (struct mboot_mod_list_struct*)mboot_info->mods_addr;
-    //tty_printf("mods_count = %x\n", mboot_info->mods_count);
-    //tty_printf("mods_addr = %x\n", mboot_info->mods_addr);
-    //tty_printf("cmdline = %s\n", (char*)(mod->cmdline));
-    //tty_printf("mod_size = %x\n", *(uint32_t*)(mboot_info->mods_addr + 4));
     
     //if we read initrd_beg and end here oni 0 tk ih kto to zater!
 
     initrd_init(initrd_beg, initrd_end);
-    //initrd_init(mod->mod_start, mod->mod_end);
-
-
-    //tty_printf("mboot_info = %x\n", mboot_info);
-
-    //Detecting CPU
-    //tty_printf("Detecting CPU...\n");
-    //int tmp;
-    //tmp = detect_cpu();
 
 	//disable interrupts while kernel init
-	//tty_printf("\nDisabling all interrupts...\n");
 	interrupt_disable_all();
 
-	//tty_printf("Installing Timer...\n");
 	timer_install();
 
-	//tty_printf("Installing keyboard...\n");
 	keyboard_install();
 
     mouse_install();
@@ -210,10 +161,18 @@ void higher_half_test()
 
 void kernel_main(int magic_number, struct multiboot_info *mboot_info) //Arguments are passed by _start in boot.s
 {
-    asm("movl %%esp,%0" : "=r"(kernel_stack_top_vaddr));
+    asm("movl %%esp,%0" : "=r"(kernel_stack_top_vaddr));// TODO is it unused????
 	//initilize the kernel
 	multiboot_info mboot_info_copy = *mboot_info;
 	kernel_init(&mboot_info_copy);
+
+    
+    // TODO: 172-174 is it normal to place these lines of code here????????????????????????????????????????????????????????
+    // Set TSS stack so that when process return from usermode to kernel mode, the kernel have a ready-to-use stack
+    uint32_t esp;
+    asm volatile("mov %%esp, %0" : "=r"(esp));
+    tss_set_stack(0x10, esp);
+    
 
 	// init the kernel debug shell (ksh)
 	ksh_init();

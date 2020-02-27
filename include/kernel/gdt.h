@@ -7,6 +7,8 @@
 
 #include <stdint.h>
 
+#define GDT_MAX_DESCRIPTORS 6
+
 // Sets up the GDT, should be called on early initialization
 void gdt_install();
 
