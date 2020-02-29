@@ -29,6 +29,7 @@ TODO:
 ----
 
 - Multitasking (processes and threads, user stack, user heap, user-mode)
+- Mutexes and spinlocks for threads synchronization
 - FAT32 driver
 - HDD driver
 - PCI driver
@@ -43,4 +44,6 @@ Thanks to:
 - wiki.osdev.org
 - Arjun Sreedharan
 - Stephen Fewer (stephenfewer)
+- James Molloy
+- Stackoverflow
 - etc.

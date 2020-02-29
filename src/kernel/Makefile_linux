@@ -46,6 +46,8 @@ check-multiboot: $(TARGET_ELF)
 build-iso: check-multiboot
 	rm -rf $(ISODIR)
 	mkdir -p $(ISODIR)boot
+	make -C ../../apps -f Makefile_apps_linux
+	cp -r ../../bin/apps ../../initrd/
 	cd ../../initrd; tar -cf ../isodir/boot/initrd.tar *; cd -
 	mkdir -p $(ISODIR)boot/grub
 	cp $(TARGET_DIR)kernel.elf $(ISODIR)boot/kernel.elf
@@ -63,8 +65,12 @@ run-iso:
 #run-iso-monitor:
 #	qemu-system-i386.exe -cdrom ../../EOS.iso -monitor stdio -serial file:CON
 
+clean-initrd-apps:
+	rm -rf ../../initrd/apps/*
+
 clean:
 	rm -rf $(ISODIR)
+	rm -rf ../../EOS.iso
 	rm -rf *.o
 	rm -rf io/*.o
 	rm -rf devices/*.o
@@ -74,3 +80,6 @@ clean:
 	rm -rf pm/*.o
 	rm -rf ../libk/*.o
 	rm -rf gui/*.o
+	rm -rf $(TARGET_DIR)kernel.elf
+	rm -rf $(TARGET_DIR)../apps/*
+	make -C ../../apps -f Makefile_apps_linux clean
