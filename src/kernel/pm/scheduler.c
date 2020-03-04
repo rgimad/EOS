@@ -6,6 +6,7 @@
 #include <kernel/kernel.h>
 #include <kernel/mm/virt_memory.h>
 #include <kernel/mm/kheap.h>
+#include <kernel/graphics/vesafb.h> // for khread_grafdemo()
 #include <libk/string.h>
 
 uint32_t pid_counter = 0; // last process id value. New process will be pid_counter++
@@ -20,6 +21,17 @@ list_t *process_list; // this list contains all the processes runned in the syst
 
 process_t *current_process; // pointer to current running process structure
 thread_t *current_thread; // pointer to current running thread structure
+
+
+void kthread_grafdemo()
+{
+    int i;
+	while (1)
+	{
+		for (i = 0; i < 1000; i++) draw_square(700, 250, 300 - i % 300, 300 - i % 300, 0x00AAAA);
+		for (i = 0; i < 1000; i++) draw_square(700, 250, 300 - i % 300, 300 - i % 300, 0xAA0000);
+	}
+}
 
 
 void scheduler_init()
@@ -57,10 +69,40 @@ void scheduler_init()
     //kernel_main_thread->entry_point = ???????;
     // TODO set kernel_main_thread regs - eip, esp , etc. !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+    current_process = kernel_process;
+    current_thread = kernel_main_thread;
+
+    scheduler_enabled = true;
     asm volatile ("sti");
+
+    create_kernel_thread(kthread_grafdemo);
 }
 
-void schedule()
+
+void schedule(struct regs *r)//TODO schedule must receive context of the interrupted current thread
 {
-    //
+    if (!scheduler_enabled)
+    {
+        return;
+    }
+    thread_t *next_thread; // pointer to thread to which we are going to switch
+    if (current_thread->self_item->next) // if in the thread list of current process remains some other thread
+    {
+        next_thread = (thread_t*)current_thread->self_item->next->val;
+    } else // else next thread to be run will be from other process
+    {
+        if (current_process->self_item->next) // if the current process was not last in the list
+        {
+            // next thread will be first thread of current_process's next
+            next_thread = (thread_t*)list_peek_front( ((process_t*)(current_process->self_item->next->val))->thread_list );
+        } else
+        {
+            // next thread will be first thread of first process in the process_list 
+            next_thread = (thread_t*)list_peek_front( ((process_t*)list_peek_front(process_list))->thread_list );
+        }
+    }
+    // TODO
+    // save context of interrupted current thread that we have received, to current_thread structure
+    // switch current_thread to next_thread and switch current_process to next_thread's parent process
+    // switch regs
 }

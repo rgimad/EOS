@@ -8,6 +8,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <libk/list.h>
+#include <kernel/interrupts.h>//for struct regs
 #include <kernel/pm/process.h>
 #include <kernel/pm/thread.h>
 
@@ -20,6 +21,6 @@ extern thread_t *kernel_main_thread; // pointer to kernel's main thread structur
 
 void scheduler_init();
 
-void schedule(); // scheduler itself. This function is called at every timer (PIT) tick
+void schedule(struct regs *r); // scheduler itself. This function is called at every timer (PIT) tick
 
 #endif // _SCHEDULER_H

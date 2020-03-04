@@ -62,6 +62,7 @@ listnode_t * list_insert_back(list_t * list, void * val)
 {
 	listnode_t * t = kheap_malloc(sizeof(listnode_t));
 	t->prev = list->tail;
+	t->next = NULL;
     if(list->tail)
         list->tail->next = t;
 	t->val = val;
