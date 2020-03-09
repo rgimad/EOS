@@ -21,6 +21,10 @@ extern thread_t *kernel_main_thread; // pointer to kernel's main thread structur
 
 void scheduler_init();
 
+void kthread_grafdemo();
+
 void schedule(struct regs *r); // scheduler itself. This function is called at every timer (PIT) tick
+
+extern void kernel_regs_switch(context_t *ctx);
 
 #endif // _SCHEDULER_H

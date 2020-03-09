@@ -7,6 +7,8 @@
 #include <kernel/idt.h>
 #include <kernel/tty.h>
 
+#include <kernel/io/qemu_log.h>
+
 
 static interrupt_handler_t interrupt_handlers[IDT_NUM_ENTRIES];
 
@@ -31,11 +33,11 @@ void fault_handler(struct regs *r)
     //void * linearAddress;
     // retrieve the linear address of the page fault stored in CR2
     //ASM( "movl %%cr2, %0" : "=r" (linearAddress) );
-    asm volatile( "movl %cr2, %eax");
-    for (;;);
+    //asm volatile( "movl %cr2, %eax");
+    //for (;;);
     uint32_t adr;
     asm volatile( "movl %%cr2, %0" : "=r" (adr) );
-    tty_printf("System Exception. System Halted! cr2 = %x\n", adr);
+    qemu_printf("System Exception. System Halted! cr2 = %x  r->idt_index = %x\n", adr, r->idt_index);
     for (;;);
 }
 

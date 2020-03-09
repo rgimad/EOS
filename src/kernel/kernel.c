@@ -173,6 +173,7 @@ void kernel_main(int magic_number, struct multiboot_info *mboot_info) //Argument
     asm volatile("mov %%esp, %0" : "=r"(esp));
     tss_set_stack(0x10, esp);
     
+    void scheduler_init();
 
 	// init the kernel debug shell (ksh)
 	ksh_init();

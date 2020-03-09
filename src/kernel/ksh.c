@@ -16,6 +16,7 @@
 #include <kernel/fs/initrd.h>
 
 #include <kernel/pm/elf.h>
+#include <kernel/pm/thread.h>
 
 #include <kernel/kernel.h>
 
@@ -145,21 +146,27 @@ void ksh_main()
 			}
 
 		} else if (strcmp(cmd, "qemu_log_test") == 0) {
-			    qemu_printf("Hello world = %x + %s", 0x779, "privet");
-				//int PORT_COM1 = 0x3f8;
-				/*outb(PORT_COM1 + 1, 0x00);
-			    outb(PORT_COM1 + 3, 0x80);
-			    outb(PORT_COM1 + 0, 0x03);
-			    outb(PORT_COM1 + 1, 0x00);
-			    outb(PORT_COM1 + 3, 0x03);
-			    outb(PORT_COM1 + 2, 0xC7);
-			    outb(PORT_COM1 + 4, 0x0B);*/
-			    /*char *str = "Hello world to qemu log!\n";
-			    for (int i = 0; i < strlen(str); i++)
-			    {
-			    	while (inb(PORT_COM1 + 5) & 0x20 == 0);
-   					outb(PORT_COM1, str[i]);
-			    }*/
+			qemu_printf("Hello world = %x + %s", 0x779, "privet");
+			//int PORT_COM1 = 0x3f8;
+			/*outb(PORT_COM1 + 1, 0x00);
+			outb(PORT_COM1 + 3, 0x80);
+			outb(PORT_COM1 + 0, 0x03);
+			outb(PORT_COM1 + 1, 0x00);
+			outb(PORT_COM1 + 3, 0x03);
+			outb(PORT_COM1 + 2, 0xC7);
+			outb(PORT_COM1 + 4, 0x0B);*/
+			/*char *str = "Hello world to qemu log!\n";
+			for (int i = 0; i < strlen(str); i++)
+			{
+				while (inb(PORT_COM1 + 5) & 0x20 == 0);
+				outb(PORT_COM1, str[i]);
+			}*/
+		} else if (strcmp(cmd, "reg_modif") == 0) {
+			int val = 13372;
+			asm volatile("mov %0, %%eax" :: "r"(val));
+			asm volatile("int $32;");
+		} else if (strcmp(cmd, "kthread_grafdemo") == 0) {
+			create_kernel_thread(kthread_grafdemo);
 		} else {//if...
 			ksh_cmd_unknown();
 		}
@@ -167,6 +174,16 @@ void ksh_main()
 }
 
 //command handlers implementation
+
+void kthread_grafdemo()
+{
+    int i;
+	while (1)
+	{
+		for (i = 0; i < 1000; i++) draw_square(700, 250, 300 - i % 300, 300 - i % 300, 0x00AAAA);
+		for (i = 0; i < 1000; i++) draw_square(700, 250, 300 - i % 300, 300 - i % 300, 0xAA0000);
+	}
+}
 
 void ksh_cmd_cpuid()
 {

@@ -42,7 +42,7 @@ typedef struct thread_t
 {
 	uint32_t tid; // thread id
 	uint32_t state; // thread's state
-	context_t regs; //thread's context
+	context_t registers; //thread's context
     uint32_t privileges; // kernel mode or user mode
 
 	listnode_t *self_item;// pointer to this thread's list node

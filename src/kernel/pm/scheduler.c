@@ -6,8 +6,8 @@
 #include <kernel/kernel.h>
 #include <kernel/mm/virt_memory.h>
 #include <kernel/mm/kheap.h>
-#include <kernel/graphics/vesafb.h> // for khread_grafdemo()
 #include <libk/string.h>
+#include <kernel/io/qemu_log.h>
 
 uint32_t pid_counter = 0; // last process id value. New process will be pid_counter++
 uint32_t tid_counter = 0; // last thread id value. New thread will be tid_counter++
@@ -22,16 +22,6 @@ list_t *process_list; // this list contains all the processes runned in the syst
 process_t *current_process; // pointer to current running process structure
 thread_t *current_thread; // pointer to current running thread structure
 
-
-void kthread_grafdemo()
-{
-    int i;
-	while (1)
-	{
-		for (i = 0; i < 1000; i++) draw_square(700, 250, 300 - i % 300, 300 - i % 300, 0x00AAAA);
-		for (i = 0; i < 1000; i++) draw_square(700, 250, 300 - i % 300, 300 - i % 300, 0xAA0000);
-	}
-}
 
 
 void scheduler_init()
@@ -67,20 +57,20 @@ void scheduler_init()
     kernel_main_thread->kernel_stack_size = 65536; // 64kib stack for main kernel thread was reserved in boot.s
     kernel_main_thread->self_item = list_push(kernel_process->thread_list, kernel_main_thread);
     //kernel_main_thread->entry_point = ???????;
-    // TODO set kernel_main_thread regs - eip, esp , etc. !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    // TODO set kernel_main_thread registers - eip, esp , etc. !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
     current_process = kernel_process;
     current_thread = kernel_main_thread;
 
-    scheduler_enabled = true;
+    scheduler_enabled = true;/////////////////////////////////////////////////
     asm volatile ("sti");
 
-    create_kernel_thread(kthread_grafdemo);
 }
 
 
 void schedule(struct regs *r)//TODO schedule must receive context of the interrupted current thread
 {
+    //qemu_printf("interrupted context eax = %x\n", r->eax);
     if (!scheduler_enabled)
     {
         return;
@@ -101,8 +91,28 @@ void schedule(struct regs *r)//TODO schedule must receive context of the interru
             next_thread = (thread_t*)list_peek_front( ((process_t*)list_peek_front(process_list))->thread_list );
         }
     }
-    // TODO
+
     // save context of interrupted current thread that we have received, to current_thread structure
+	current_thread->registers.eax = r->eax;
+    current_thread->registers.ebx = r->ebx;
+    current_thread->registers.ecx = r->ecx;
+    current_thread->registers.edx = r->edx;
+    current_thread->registers.esp = r->esp;
+    current_thread->registers.ebp = r->ebp;
+    current_thread->registers.esi = r->esi;
+    current_thread->registers.edi = r->edi;
+    current_thread->registers.eflags = r->eflags;
+    uint32_t cur_cr3_val;
+    asm volatile("mov %%esp, %0" : "=r"(cur_cr3_val));
+    current_thread->registers.cr3 = cur_cr3_val;
+    current_thread->registers.eip = r->eip;
+
     // switch current_thread to next_thread and switch current_process to next_thread's parent process
-    // switch regs
+    current_thread = next_thread;
+    current_process = next_thread->process;
+
+    // TODO switch page directory to next_thread's
+
+    // now we write saved context of next_thread to the actual cpu registers
+    kernel_regs_switch(&next_thread->registers);
 }
