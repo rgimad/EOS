@@ -36,6 +36,16 @@ TODO:
 - ACPI driver
 - etc.
 
+Building, debugging etc.
+------------------------
+
+Example: to build release "make -f Makefile_linux build-iso"
+to build and run release "make -f Makefile_linux build-iso-run"
+to build debug "make -f Makefile_linux build-iso-run DEBUG=1"
+to build and run debug "make -f Makefile_linux build-iso-run-debug DEBUG=1"
+p.s always do "make -f Makefile_linux clean" before switching between debug and release configurations
+p.s Makefile_windows is currently incomplete (TODO complete and fix it)
+
 Thanks to:
 ---------
 

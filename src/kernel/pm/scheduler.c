@@ -28,6 +28,7 @@ void scheduler_init()
 {
 	//uint32_t esp = 0;
     //asm volatile("mov %%esp, %0":"=a"(esp)); 
+    
     asm volatile ("cli");
 
     process_list = list_create();
@@ -62,7 +63,7 @@ void scheduler_init()
     current_process = kernel_process;
     current_thread = kernel_main_thread;
 
-    scheduler_enabled = true;/////////////////////////////////////////////////
+    scheduler_enabled = false;/////////////////////////////////////////////////
     asm volatile ("sti");
 
 }
@@ -92,6 +93,10 @@ void schedule(struct regs *r)//TODO schedule must receive context of the interru
         }
     }
 
+    if (next_thread == current_thread) // if there are only one thread (main kernel thread)
+    {
+        return;
+    }
     // save context of interrupted current thread that we have received, to current_thread structure
 	current_thread->registers.eax = r->eax;
     current_thread->registers.ebx = r->ebx;
@@ -103,7 +108,7 @@ void schedule(struct regs *r)//TODO schedule must receive context of the interru
     current_thread->registers.edi = r->edi;
     current_thread->registers.eflags = r->eflags;
     uint32_t cur_cr3_val;
-    asm volatile("mov %%esp, %0" : "=r"(cur_cr3_val));
+    asm volatile("mov %%cr3, %0" : "=r"(cur_cr3_val));
     current_thread->registers.cr3 = cur_cr3_val;
     current_thread->registers.eip = r->eip;
 
@@ -114,5 +119,5 @@ void schedule(struct regs *r)//TODO schedule must receive context of the interru
     // TODO switch page directory to next_thread's
 
     // now we write saved context of next_thread to the actual cpu registers
-    kernel_regs_switch(&next_thread->registers);
+    kernel_regs_switch(&(next_thread->registers));
 }

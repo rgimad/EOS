@@ -90,10 +90,8 @@ int kernel_init(struct multiboot_info *mboot_info)
     kheap_init();
     //kheap_test();
 
-
     //tty_init();
     init_vbe(mboot_info);
-    //uint32_t x = *(uint32_t*)(0xF0FFF000); //page fault example
 
    	/*back_framebuffer_addr = kheap_malloc(framebuffer_size);
 	tty_printf("back_framebuffer_addr = %x\n", back_framebuffer_addr);
@@ -109,24 +107,7 @@ int kernel_init(struct multiboot_info *mboot_info)
 
     //memcpy(framebuffer_addr, back_framebuffer_addr, framebuffer_size);
 
-    //draw_vertical_line(50, 50, 100, 0xFFFFFF);
-    //draw_fill(50, 50, 100, 100, 0x0000AA);
-
-    /*draw_fill(0, 500, framebuffer_width, framebuffer_height - 500, 0x0000AA);
-    int arr[10] = {0x00AA00, 0x00AAAA, 0xAA0000, 0xAA00AA, 0xAA5500, 0xAAAAAA, 0x555555, 0x5555FF, 0x55FF55, 0x55FFFF};
-    int i;
-    for (i = 0; i < 30; i++)
-    	draw_square(30 + 7*i, 30 + 7*i, 200, 300, arr[i % 10]);
-
-    char chr;
-    for (chr = 32; chr <= '~'; chr++)
-    {
-    	draw_vga_character(chr, 500 + ((chr - 32) % 10)*20, 50 + ((chr - 32)/10)*20, 0x00AA00, 0x0000AA, 0);
-    }*/
-
     vfs_init();
-    
-    //if we read initrd_beg and end here oni 0 tk ih kto to zater!
 
     initrd_init(initrd_beg, initrd_end);
 
@@ -173,7 +154,7 @@ void kernel_main(int magic_number, struct multiboot_info *mboot_info) //Argument
     asm volatile("mov %%esp, %0" : "=r"(esp));
     tss_set_stack(0x10, esp);
     
-    void scheduler_init();
+    scheduler_init();
 
 	// init the kernel debug shell (ksh)
 	ksh_init();
@@ -187,7 +168,6 @@ void kernel_main(int magic_number, struct multiboot_info *mboot_info) //Argument
 	ksh_main();
 
 	for(;;) asm("hlt");
-	//kernel_idle();
-	
+
 }
 

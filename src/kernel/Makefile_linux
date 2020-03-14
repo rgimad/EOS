@@ -14,8 +14,13 @@ CC = "/opt/i686-elf-tools-linux/bin/i686-elf-gcc"
 
 #LDFLAGS=-T linker.ld -ffreestanding -O2 -nostdlib -lgcc
 #CCFLAGS=-std=gnu99 -ffreestanding -O2 -Wall -Wextra -I $(INCLUDE_DIR)
+
 LDFLAGS=-T linker.ld -ffreestanding -nostdlib -lgcc
-CCFLAGS=-std=gnu99 -ffreestanding -Wall -Wextra -I $(INCLUDE_DIR)
+ifdef DEBUG
+	CCFLAGS=-std=gnu99 -g -ffreestanding -Wall -Wextra -I $(INCLUDE_DIR)
+else
+	CCFLAGS=-std=gnu99 -ffreestanding -Wall -Wextra -I $(INCLUDE_DIR)
+endif
 
 #LDFLAGS=-T linker.ld -ffreestanding -O1 -nostdlib -lgcc
 #CCFLAGS=-std=gnu99 -ffreestanding -O1 -Wall -Wextra -I $(INCLUDE_DIR)
@@ -62,8 +67,11 @@ run-iso:
 	rm -rf EOS_qemu_serial.log
 	qemu-system-i386 -cdrom ../../EOS.iso -monitor stdio -serial file:EOS_qemu_serial.log
 
-#run-iso-monitor:
-#	qemu-system-i386.exe -cdrom ../../EOS.iso -monitor stdio -serial file:CON
+run-iso-debug:
+	rm -rf EOS_qemu_serial.log
+	qemu-system-i386 -s -S -cdrom ../../EOS.iso -monitor stdio -serial file:EOS_qemu_serial.log & gdb $(TARGET_DIR)$(TARGET_ELF) -ex "target remote localhost:1234" -tui
+
+build-iso-run-debug: build-iso run-iso-debug
 
 clean-initrd-apps:
 	rm -rf ../../initrd/apps/*

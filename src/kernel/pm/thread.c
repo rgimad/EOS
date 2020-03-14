@@ -51,7 +51,7 @@ thread_t* create_kernel_thread(void *entry_point) // TODO somwhere in this funct
     qemu_printf("memory for new_kthread allocated...\n");
     kernel_process->threads_count++;
     qemu_printf("kernel_process->threads_count++; worked successfully...\n");
-    new_kthread->self_item = list_push(kernel_process->thread_list, new_kthread); // TODO kernel crashes on this line!!!!!!!!!!!!!!!!!!! hmmm idt_index is 0xE i.e pagefault
+    new_kthread->self_item = list_push(kernel_process->thread_list, new_kthread);
     qemu_printf("new_kthread pushed to list...\n");
     new_kthread->tid = tid_counter++;
     new_kthread->state = THREAD_READY;

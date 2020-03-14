@@ -73,7 +73,7 @@ kernel_regs_switch: # switch to kernelmode thread.
     movl 16(%ebp), %eax
     push %eax
     pushfl
-    push $0x08 # TODO what is it ??????????
+    push $0x08 # TODO what is it ?????????? was : $0x08
     # push eip
     movl 40(%ebp), %eax
     push %eax
