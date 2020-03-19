@@ -42,6 +42,7 @@ typedef struct thread_t
 {
 	uint32_t tid; // thread id
 	uint32_t state; // thread's state
+    char name[256];
 	context_t registers; //thread's context
     uint32_t privileges; // kernel mode or user mode
 

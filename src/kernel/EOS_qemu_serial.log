@@ -1,0 +1,10 @@
+ticks = 500  interrupted context eax = 0x1  ebx = 0x10001  ecx = 0x7203  edx = 0x13  esp = 0xC01258D5  ebp = 0xC01258E9  eip = 0xC010461E  
+ticks = 1000  interrupted context eax = 0x1  ebx = 0x10001  ecx = 0x5403  edx = 0x2B  esp = 0xC01258D5  ebp = 0xC01258E9  eip = 0xC010461E  
+ticks = 1500  interrupted context eax = 0x1  ebx = 0x10001  ecx = 0x3E03  edx = 0x43  esp = 0xC01258D5  ebp = 0xC01258E9  eip = 0xC010461E  
+ticks = 2000  interrupted context eax = 0x5FAAB  ebx = 0x2EF  ecx = 0x17EAA8  edx = 0xFD17EAA8  esp = 0xC01257B5  ebp = 0xC01257E9  eip = 0xC010075F  
+ticks = 2500  interrupted context eax = 0x1  ebx = 0x1000006A  ecx = 0x55  edx = 0x6A  esp = 0xC01258D5  ebp = 0xC01258E9  eip = 0xC010461E  
+ticks = 3000  interrupted context eax = 0x1  ebx = 0x1000006A  ecx = 0x4C03  edx = 0x73  esp = 0xC01258D5  ebp = 0xC01258E9  eip = 0xC010461E  
+ticks = 3500  interrupted context eax = 0x1  ebx = 0x1000006A  ecx = 0x2603  edx = 0x7F  esp = 0xC01258D5  ebp = 0xC01258E9  eip = 0xC010461E  
+ticks = 4000  interrupted context eax = 0x1  ebx = 0x1000006A  ecx = 0x55  edx = 0x8A  esp = 0xC01258D5  ebp = 0xC01258E9  eip = 0xC010461E  
+ticks = 4500  interrupted context eax = 0x92958  ebx = 0x2EF  ecx = 0x24A55C  edx = 0xFD24A55C  esp = 0xC01256C5  ebp = 0xC01256F9  eip = 0xC010075F  
+ticks = 5000  interrupted context eax = 0x1  ebx = 0x1000006A  ecx = 0x3803  edx = 0xA5  esp = 0xC01258D5  ebp = 0xC01258E9  eip = 0xC010461E  

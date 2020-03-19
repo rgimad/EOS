@@ -52,6 +52,7 @@ void scheduler_init()
 
     kernel_main_thread->tid = tid_counter++;
     kernel_main_thread->state = THREAD_READY; // thread is ready, not blocked beacuse thread become blocked only if it waits for some resource like file or infut etc.
+    strcpy(kernel_main_thread->name, "kernel_main_thread");
     kernel_main_thread->privileges = THREAD_KERNEL_MODE;
     kernel_main_thread->process = kernel_process; // parent process is kernel
     kernel_main_thread->kernel_stack = kernel_stack_top_vaddr;
@@ -63,7 +64,7 @@ void scheduler_init()
     current_process = kernel_process;
     current_thread = kernel_main_thread;
 
-    scheduler_enabled = false;/////////////////////////////////////////////////
+    scheduler_enabled = true;/////////////////////////////////////////////////
     asm volatile ("sti");
 
 }
@@ -72,10 +73,14 @@ void scheduler_init()
 void schedule(struct regs *r)//TODO schedule must receive context of the interrupted current thread
 {
     //qemu_printf("interrupted context eax = %x\n", r->eax);
+    //asm volatile ("cli");
     if (!scheduler_enabled)
     {
+        //asm volatile ("sti");
         return;
     }
+    
+    //qemu_printf("schedule() called!");
     thread_t *next_thread; // pointer to thread to which we are going to switch
     if (current_thread->self_item->next) // if in the thread list of current process remains some other thread
     {
@@ -92,9 +97,11 @@ void schedule(struct regs *r)//TODO schedule must receive context of the interru
             next_thread = (thread_t*)list_peek_front( ((process_t*)list_peek_front(process_list))->thread_list );
         }
     }
-
+    //qemu_printf("next_thread = %s, current_thread = %s\n", next_thread->name, current_thread->name);
     if (next_thread == current_thread) // if there are only one thread (main kernel thread)
     {
+        //qemu_printf("only one thread\n");
+        //asm volatile ("sti");
         return;
     }
     // save context of interrupted current thread that we have received, to current_thread structure
@@ -107,6 +114,7 @@ void schedule(struct regs *r)//TODO schedule must receive context of the interru
     current_thread->registers.esi = r->esi;
     current_thread->registers.edi = r->edi;
     current_thread->registers.eflags = r->eflags;
+    qemu_printf("r->eflags = %x\n", r->eflags);
     uint32_t cur_cr3_val;
     asm volatile("mov %%cr3, %0" : "=r"(cur_cr3_val));
     current_thread->registers.cr3 = cur_cr3_val;
@@ -119,5 +127,19 @@ void schedule(struct regs *r)//TODO schedule must receive context of the interru
     // TODO switch page directory to next_thread's
 
     // now we write saved context of next_thread to the actual cpu registers
+    qemu_printf("switching kernelmode thread context\n");
+
+
+    /* // If the IDT entry that was invoked was greater than 40, sends an EOI
+    // to the slave controller
+    qemu_printf("r->idx_index = %d   r->eip = %x\n", r->idt_index, r->eip);
+    if (r->idt_index >= 40)
+    {
+        outb(0xA0, 0x20);
+    }
+    // Sends an EOI to the master interrupt controller
+    outb(0x20, 0x20);  */
+
+    //asm volatile ("cli");
     kernel_regs_switch(&(next_thread->registers));
 }

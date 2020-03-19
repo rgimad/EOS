@@ -25,7 +25,7 @@ void timer_set_frequency(int hz)
 void timer_handler(struct regs *r)
 {
 	timer_ticks++;
-	if (timer_ticks % 1000 == 0 || r->eax == 13372)
+	if (timer_ticks % 500 == 0 || r->eax == 13372)
 	{
 		qemu_printf("ticks = %d  ", timer_ticks);
 		qemu_printf("interrupted context eax = %x  ebx = %x  ecx = %x  edx = %x  esp = %x  ebp = %x  eip = %x  \n", r->eax, r->ebx, r->ecx, r->edx, r->esp, r->ebp, r->eip);

@@ -42,6 +42,7 @@ typedef struct context {
 #  C signature: void kernel_regs_switch(context_t *ctx);
 .global kernel_regs_switch
 kernel_regs_switch: # switch to kernelmode thread.
+    #cli
     # Now load general registers
     # +4 because of skip return address, and get the pointer to context_t struct
     movl 4(%esp), %ebp   # now ebp contains pointer to received context_t structure
@@ -53,36 +54,45 @@ kernel_regs_switch: # switch to kernelmode thread.
 
     # load eflags
     movl 32(%ebp), %eax
-    pushl %eax
-    popfl
+    push %eax
+    popf
     
     # right now, eax, ebp, esp are not restored yet
 
-    # TODO what we need to do to switch to kernel mode? To user mode?
+    mov $0x10, %ax
+    mov %ax, %ds
+    mov %ax, %es
+    mov %ax, %fs
+    mov %ax, %gs
 
-    # Enter usermode from here(make sure the registers are restored correctly for the user process !) TODO what is it????? 
-    # mov ax, 0x10
-    # mov ds, ax
-    # mov es, ax
-    # mov fs, ax
-    # mov gs, ax
-    
-    push $0x10 # TODO what is 0x10 and why we push it?
+    # push ss selector
+    push $0x10
 
     # Push threads esp
     movl 16(%ebp), %eax
     push %eax
-    pushfl
-    push $0x08 # TODO what is it ?????????? was : $0x08
+
+    # push eflags
+    pushf
+    
+    # push cs selector
+    push $0x08
+
     # push eip
     movl 40(%ebp), %eax
     push %eax
-    # Enter usermode from here(make sure the registers are restored correctly for the user process !) TODO what is it?????
 
     # restore eax
     movl (%ebp), %eax
 
     # now, restore ebp
     movl 20(%ebp), %ebp
+
+    # sending EOI (end of interrupt) signal to pic
+    push %ax
+    mov $0x20, %ax
+    outb %ax, $0x20
+    pop %ax
+
     sti
-    iret
+    iret  # pops 5 things at once: CS, EIP, EFLAGS, ESP and SS!

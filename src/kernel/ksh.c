@@ -165,8 +165,9 @@ void ksh_main()
 			int val = 13372;
 			asm volatile("mov %0, %%eax" :: "r"(val));
 			asm volatile("int $32;");
-		} else if (strcmp(cmd, "kthread_grafdemo") == 0) {
+		} else if (strcmp(cmd, "kg") == 0) {
 			create_kernel_thread(kthread_grafdemo);
+			//int i = 5; while (1) { tty_printf("i = %d \n", i); i += 5; }
 		} else {//if...
 			ksh_cmd_unknown();
 		}
@@ -175,13 +176,42 @@ void ksh_main()
 
 //command handlers implementation
 
-void kthread_grafdemo()
+void kthread_grafdemo()   // TODO why invalid opcode on 0x4C happens ????
 {
     int i;
 	while (1)
 	{
+		/*asm volatile ("cli");
 		for (i = 0; i < 1000; i++) draw_square(700, 250, 300 - i % 300, 300 - i % 300, 0x00AAAA);
 		for (i = 0; i < 1000; i++) draw_square(700, 250, 300 - i % 300, 300 - i % 300, 0xAA0000);
+		asm volatile ("sti");*/
+
+		// TODO understand : why if we dont wrap these code in cli ... sti i see a garbage on the screen? maybe context is corrupting?
+		asm volatile ("cli");
+		for (i = 0; i < 1000; i++) {
+			unsigned int arguments[5];
+			arguments[0] = 700;
+			arguments[1] = 250;
+			arguments[2] = 300 - i % 300;
+			arguments[3] = 300 - i % 300;
+			arguments[4] = 0x00AAAA;
+			unsigned int res = 0;
+			asm volatile("mov %%eax, %0;" : "=a"(res) : "a"(2), "b"(arguments));
+			asm volatile("int $0x80;");
+		}
+
+		for (i = 0; i < 1000; i++) {
+			unsigned int arguments[5];
+			arguments[0] = 700;
+			arguments[1] = 250;
+			arguments[2] = 300 - i % 300;
+			arguments[3] = 300 - i % 300;
+			arguments[4] = 0xAA0000;
+			unsigned int res = 0;
+			asm volatile("mov %%eax, %0;" : "=a"(res) : "a"(2), "b"(arguments));
+			asm volatile("int $0x80;");
+		}
+		asm volatile ("sti"); // 
 	}
 }
 
