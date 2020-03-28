@@ -127,7 +127,7 @@ void schedule(struct regs *r)//TODO schedule must receive context of the interru
     // TODO switch page directory to next_thread's
 
     // now we write saved context of next_thread to the actual cpu registers
-    qemu_printf("switching kernelmode thread context\n");
+    qemu_printf("switching kernelmode thread context to  eax = %x  ebx = %x  ecx = %x  edx = %x  esp = %x  ebp = %x  eip = %x  \n", current_thread->registers.eax, current_thread->registers.ebx, current_thread->registers.ecx, current_thread->registers.edx, current_thread->registers.esp, current_thread->registers.ebp, current_thread->registers.eip);
 
 
     /* // If the IDT entry that was invoked was greater than 40, sends an EOI

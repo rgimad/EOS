@@ -42,7 +42,7 @@ typedef struct context {
 #  C signature: void kernel_regs_switch(context_t *ctx);
 .global kernel_regs_switch
 kernel_regs_switch: # switch to kernelmode thread.
-    #cli
+    cli
     # Now load general registers
     # +4 because of skip return address, and get the pointer to context_t struct
     movl 4(%esp), %ebp   # now ebp contains pointer to received context_t structure
@@ -94,5 +94,5 @@ kernel_regs_switch: # switch to kernelmode thread.
     outb %ax, $0x20
     pop %ax
 
-    sti
+    #sti
     iret  # pops 5 things at once: CS, EIP, EFLAGS, ESP and SS!

@@ -37,7 +37,7 @@ void fault_handler(struct regs *r)
     //for (;;);
     uint32_t adr;
     asm volatile( "movl %%cr2, %0" : "=r" (adr) );
-    qemu_printf("System Exception. System Halted! cr2 = %x  r->idt_index = %x  r->eip = %x\n", adr, r->idt_index, r->eip);
+    qemu_printf("System Exception. System Halted! cr2 = %x  r->idt_index = %x eax = %x  ebx = %x  ecx = %x  edx = %x  esp = %x  ebp = %x  eip = %x\n", adr, r->idt_index, r->eax, r->ebx, r->ecx, r->edx, r->esp, r->ebp, r->eip);
     for (;;);
 }
 

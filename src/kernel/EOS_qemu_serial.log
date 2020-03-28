@@ -1,10 +1,47 @@
-ticks = 500  interrupted context eax = 0x1  ebx = 0x10001  ecx = 0x7203  edx = 0x13  esp = 0xC01258D5  ebp = 0xC01258E9  eip = 0xC010461E  
-ticks = 1000  interrupted context eax = 0x1  ebx = 0x10001  ecx = 0x5403  edx = 0x2B  esp = 0xC01258D5  ebp = 0xC01258E9  eip = 0xC010461E  
-ticks = 1500  interrupted context eax = 0x1  ebx = 0x10001  ecx = 0x3E03  edx = 0x43  esp = 0xC01258D5  ebp = 0xC01258E9  eip = 0xC010461E  
-ticks = 2000  interrupted context eax = 0x5FAAB  ebx = 0x2EF  ecx = 0x17EAA8  edx = 0xFD17EAA8  esp = 0xC01257B5  ebp = 0xC01257E9  eip = 0xC010075F  
-ticks = 2500  interrupted context eax = 0x1  ebx = 0x1000006A  ecx = 0x55  edx = 0x6A  esp = 0xC01258D5  ebp = 0xC01258E9  eip = 0xC010461E  
-ticks = 3000  interrupted context eax = 0x1  ebx = 0x1000006A  ecx = 0x4C03  edx = 0x73  esp = 0xC01258D5  ebp = 0xC01258E9  eip = 0xC010461E  
-ticks = 3500  interrupted context eax = 0x1  ebx = 0x1000006A  ecx = 0x2603  edx = 0x7F  esp = 0xC01258D5  ebp = 0xC01258E9  eip = 0xC010461E  
-ticks = 4000  interrupted context eax = 0x1  ebx = 0x1000006A  ecx = 0x55  edx = 0x8A  esp = 0xC01258D5  ebp = 0xC01258E9  eip = 0xC010461E  
-ticks = 4500  interrupted context eax = 0x92958  ebx = 0x2EF  ecx = 0x24A55C  edx = 0xFD24A55C  esp = 0xC01256C5  ebp = 0xC01256F9  eip = 0xC010075F  
-ticks = 5000  interrupted context eax = 0x1  ebx = 0x1000006A  ecx = 0x3803  edx = 0xA5  esp = 0xC01258D5  ebp = 0xC01258E9  eip = 0xC010461E  
+ticks = 1  interrupted context eax = 0x1  ebx = 0x10001  ecx = 0x55  edx = 0xC0107B4C  esp = 0xC0125A95  ebp = 0xC0125AA9  eip = 0xC0101D87  
+ticks = 2  interrupted context eax = 0x1  ebx = 0x10001  ecx = 0x8201  edx = 0x1  esp = 0xC01258D5  ebp = 0xC01258E9  eip = 0xC0104658  
+ticks = 3  interrupted context eax = 0x1  ebx = 0x10001  ecx = 0x8201  edx = 0x1  esp = 0xC01258D5  ebp = 0xC01258E9  eip = 0xC0104658  
+ticks = 4  interrupted context eax = 0x1  ebx = 0x10001  ecx = 0x8201  edx = 0x1  esp = 0xC01258D5  ebp = 0xC01258E9  eip = 0xC0104658  
+ticks = 5  interrupted context eax = 0x1  ebx = 0x10001  ecx = 0x8201  edx = 0x1  esp = 0xC01258D5  ebp = 0xC01258E9  eip = 0xC0104658  
+ticks = 6  interrupted context eax = 0x1  ebx = 0x10001  ecx = 0x8201  edx = 0x1  esp = 0xC01258D5  ebp = 0xC01258E9  eip = 0xC0104658  
+ticks = 7  interrupted context eax = 0x1  ebx = 0x10001  ecx = 0x8201  edx = 0x1  esp = 0xC01258D5  ebp = 0xC01258E9  eip = 0xC0104658  
+ticks = 8  interrupted context eax = 0x1  ebx = 0x10001  ecx = 0x8201  edx = 0x1  esp = 0xC01258D5  ebp = 0xC01258E9  eip = 0xC0104658  
+ticks = 9  interrupted context eax = 0x1  ebx = 0x10001  ecx = 0x8201  edx = 0x1  esp = 0xC01258D5  ebp = 0xC01258E9  eip = 0xC0104658  
+ticks = 10  interrupted context eax = 0x1  ebx = 0x10001  ecx = 0x8201  edx = 0x1  esp = 0xC01258D5  ebp = 0xC01258E9  eip = 0xC0104658  
+ticks = 11  interrupted context eax = 0x1  ebx = 0x10001  ecx = 0x8201  edx = 0x1  esp = 0xC01258D5  ebp = 0xC01258E9  eip = 0xC0104658  
+ticks = 12  interrupted context eax = 0x1  ebx = 0x10001  ecx = 0x8201  edx = 0x1  esp = 0xC01258D5  ebp = 0xC01258E9  eip = 0xC0104658  
+ticks = 13  interrupted context eax = 0x1  ebx = 0x10001  ecx = 0x8201  edx = 0x1  esp = 0xC01258D5  ebp = 0xC01258E9  eip = 0xC0104658  
+ticks = 14  interrupted context eax = 0x1  ebx = 0x10001  ecx = 0x8201  edx = 0x1  esp = 0xC01258D5  ebp = 0xC01258E9  eip = 0xC0104658  
+ticks = 15  interrupted context eax = 0x1  ebx = 0x10001  ecx = 0x8201  edx = 0x1  esp = 0xC01258D5  ebp = 0xC01258E9  eip = 0xC0104658  
+ticks = 16  interrupted context eax = 0x1  ebx = 0x10001  ecx = 0x8201  edx = 0x1  esp = 0xC01258D5  ebp = 0xC01258E9  eip = 0xC0104658  
+ticks = 17  interrupted context eax = 0x1  ebx = 0x10001  ecx = 0x8201  edx = 0x1  esp = 0xC01258D5  ebp = 0xC01258E9  eip = 0xC0104658  
+ticks = 18  interrupted context eax = 0x1  ebx = 0x10001  ecx = 0x8201  edx = 0x1  esp = 0xC01258D5  ebp = 0xC01258E9  eip = 0xC0104658  
+ticks = 19  interrupted context eax = 0x1  ebx = 0x10001  ecx = 0x8201  edx = 0x1  esp = 0xC01258D5  ebp = 0xC01258E9  eip = 0xC0104658  
+ticks = 20  interrupted context eax = 0x1  ebx = 0x10001  ecx = 0x8201  edx = 0x1  esp = 0xC01258D5  ebp = 0xC01258E9  eip = 0xC0104658  
+ticks = 21  interrupted context eax = 0x1  ebx = 0x10001  ecx = 0x8201  edx = 0x1  esp = 0xC01258D5  ebp = 0xC01258E9  eip = 0xC0104658  
+ticks = 22  interrupted context eax = 0x1  ebx = 0x10001  ecx = 0x8201  edx = 0x1  esp = 0xC01258D5  ebp = 0xC01258E9  eip = 0xC0104658  
+ticks = 23  interrupted context eax = 0x1  ebx = 0x10001  ecx = 0x8201  edx = 0x1  esp = 0xC01258D5  ebp = 0xC01258E9  eip = 0xC0104658  
+ticks = 24  interrupted context eax = 0x1  ebx = 0x10001  ecx = 0x8201  edx = 0x1  esp = 0xC01258D5  ebp = 0xC01258E9  eip = 0xC0104658  
+ticks = 25  interrupted context eax = 0x1  ebx = 0x10001  ecx = 0x8201  edx = 0x1  esp = 0xC01258D5  ebp = 0xC01258E9  eip = 0xC0104658  
+ticks = 26  interrupted context eax = 0x1  ebx = 0x10001  ecx = 0x8201  edx = 0x1  esp = 0xC01258D5  ebp = 0xC01258E9  eip = 0xC0104658  
+ticks = 27  interrupted context eax = 0x1  ebx = 0x10001  ecx = 0x8201  edx = 0x1  esp = 0xC01258D5  ebp = 0xC01258E9  eip = 0xC0104658  
+ticks = 28  interrupted context eax = 0x1  ebx = 0x10001  ecx = 0x8201  edx = 0x1  esp = 0xC01258D5  ebp = 0xC01258E9  eip = 0xC0104658  
+ticks = 29  interrupted context eax = 0x1  ebx = 0x10001  ecx = 0x55  edx = 0x2  esp = 0xC01258D5  ebp = 0xC01258E9  eip = 0xC0104658  
+ticks = 30  interrupted context eax = 0x1  ebx = 0x10001  ecx = 0x4A03  edx = 0x3  esp = 0xC01258D5  ebp = 0xC01258E9  eip = 0xC0104658  
+ticks = 31  interrupted context eax = 0x1  ebx = 0x10001  ecx = 0x4A03  edx = 0x3  esp = 0xC01258D5  ebp = 0xC01258E9  eip = 0xC0104658  
+ticks = 32  interrupted context eax = 0x1  ebx = 0x10001  ecx = 0x55  edx = 0x4  esp = 0xC01258D5  ebp = 0xC01258E9  eip = 0xC0104658  
+ticks = 33  interrupted context eax = 0x1  ebx = 0x10001  ecx = 0x4403  edx = 0x5  esp = 0xC01258D5  ebp = 0xC01258E9  eip = 0xC0104658  
+ticks = 34  interrupted context eax = 0x1  ebx = 0x10001  ecx = 0x4403  edx = 0x5  esp = 0xC01258D5  ebp = 0xC01258E9  eip = 0xC0104658  
+Starting creating kernel thread with entry point = 0xC010146A
+memory for new_kthread allocated...
+kernel_process->threads_count++; worked successfully...
+new_kthread pushed to list...
+new_kthread filled with values..
+Kernel thread with entry point = 0xC010146A was succesfully created
+ticks = 35  interrupted context eax = 0x1  ebx = 0x10001  ecx = 0xAA  edx = 0x6  esp = 0xC01258D5  ebp = 0xC01258E9  eip = 0xC0104658  
+r->eflags = 0x200202
+switching kernelmode thread context to  eax = 0x0  ebx = 0x0  ecx = 0x0  edx = 0x0  esp = 0x0  ebp = 0x0  eip = 0xC010146A  
+ticks = 36  interrupted context eax = 0xFFFFFFFF  ebx = 0xC0125769  ecx = 0x63  edx = 0xC0125769  esp = 0xC0125749  ebp = 0xC01257A1  eip = 0xC0101471  
+r->eflags = 0x202
+switching kernelmode thread context to  eax = 0x1  ebx = 0x10001  ecx = 0xAA  edx = 0x6  esp = 0xC01258D5  ebp = 0xC01258E9  eip = 0xC0104658  
+System Exception. System Halted! cr2 = 0x0  r->idt_index = 0x6 eax = 0x0  ebx = 0x10001  ecx = 0xC01258D6  edx = 0x6  esp = 0xC01255DD  ebp = 0xA9  eip = 0x4C
