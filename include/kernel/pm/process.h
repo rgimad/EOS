@@ -22,17 +22,16 @@
 // Process structure
 typedef	struct process_t
 {
-	uint32_t pid;
-	uint32_t state;
-	char name[256];
-	char *cmdline;
+	uint32_t pid; // 0
+	uint32_t state; // 4
+	char *cmdline; // 8
 
-	listnode_t *self_item; // pointer to this process's list node
+	listnode_t *self_item; // 12, pointer to this process's list node
 
-	size_t threads_count;
-	list_t *thread_list;
+	size_t threads_count; // 16
+	list_t *thread_list; // 20
 
-	void *page_dir; // physical address of page directory structure that was created in kernel heap
+	void *page_dir; // 24 physical address of page directory structure that was created in kernel heap
 
 	void *heap_begin;
 	void *heap_end;
@@ -43,6 +42,7 @@ typedef	struct process_t
 	//void *stack_end;
 
 	void *parent_proc_thread;
+	char name[128];
 
 } __attribute__((packed)) process_t;
 

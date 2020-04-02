@@ -9,15 +9,15 @@
 #include <stdint.h>
 
 typedef struct listnode {
-	struct listnode * prev;
-	struct listnode * next;
-	void * val;
+	struct listnode * prev; // 0
+	struct listnode * next; // 4
+	void * val; // 8
 } listnode_t;
 
 typedef struct list{
-	listnode_t * head;
-	listnode_t * tail;
-	uint32_t size;
+	listnode_t * head; // 0
+	listnode_t * tail; // 4
+	uint32_t size; // 8
 } list_t;
 
 #define foreach(t, list) for(listnode_t * t = list->head; t != NULL; t = t->next)

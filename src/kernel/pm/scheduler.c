@@ -59,17 +59,19 @@ void scheduler_init()
     kernel_main_thread->kernel_stack_size = 65536; // 64kib stack for main kernel thread was reserved in boot.s
     kernel_main_thread->self_item = list_push(kernel_process->thread_list, kernel_main_thread);
     //kernel_main_thread->entry_point = ???????;
-    // TODO set kernel_main_thread registers - eip, esp , etc. !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
     current_process = kernel_process;
     current_thread = kernel_main_thread;
 
-    scheduler_enabled = true;/////////////////////////////////////////////////
+    // !!!!
+    scheduler_enabled = false;
+
+
     asm volatile ("sti");
 
 }
 
-
+// !!!! UNUSED
 void schedule(struct regs *r)//TODO schedule must receive context of the interrupted current thread
 {
     //qemu_printf("interrupted context eax = %x\n", r->eax);
@@ -141,5 +143,7 @@ void schedule(struct regs *r)//TODO schedule must receive context of the interru
     outb(0x20, 0x20);  */
 
     //asm volatile ("cli");
-    kernel_regs_switch(&(next_thread->registers));
+    
+    // now there is NO kernel_regs_switch
+    //kernel_regs_switch(&(next_thread->registers));
 }

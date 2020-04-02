@@ -167,6 +167,7 @@ void ksh_main()
 			asm volatile("int $32;");
 		} else if (strcmp(cmd, "kg") == 0) {
 			create_kernel_thread(kthread_grafdemo);
+			//kthread_grafdemo();
 			//int i = 5; while (1) { tty_printf("i = %d \n", i); i += 5; }
 		} else {//if...
 			ksh_cmd_unknown();
@@ -181,6 +182,7 @@ void kthread_grafdemo()   // TODO why invalid opcode on 0x4C happens ????
     int i;
 	while (1)
 	{
+		//qemu_printf("iteration\n");
 		/*asm volatile ("cli");
 		for (i = 0; i < 1000; i++) draw_square(700, 250, 300 - i % 300, 300 - i % 300, 0x00AAAA);
 		for (i = 0; i < 1000; i++) draw_square(700, 250, 300 - i % 300, 300 - i % 300, 0xAA0000);

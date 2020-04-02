@@ -25,6 +25,8 @@ void kthread_grafdemo();
 
 void schedule(struct regs *r); // scheduler itself. This function is called at every timer (PIT) tick
 
-extern void kernel_regs_switch(context_t *ctx);
+//extern void kernel_regs_switch(context_t *ctx);
+
+extern void task_switch(); // implemented in context_switch_asm.s
 
 #endif // _SCHEDULER_H

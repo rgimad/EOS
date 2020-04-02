@@ -72,10 +72,33 @@ thread_t* create_kernel_thread(void *entry_point) // TODO somwhere in this funct
     // allocate and set the top of the kernel stack of new thread
 	void *new_kthread_kernel_stack = kheap_malloc(THREAD_KSTACK_SIZE);
 	memset(new_kthread_kernel_stack, 0, THREAD_KSTACK_SIZE);
-	new_kthread->kernel_stack = new_kthread_kernel_stack;
+	new_kthread->kernel_stack = new_kthread_kernel_stack + THREAD_KSTACK_SIZE; // + THREAD_KSTACK_SIZE because stack grows downwards, new_kthread_kernel_stack is end of stack
+    new_kthread->esp = new_kthread->kernel_stack - 28; // TODO: WHY -28 ?? if i write e.g. -12 system crashes
+    
+    // Prepare stack for new kernel thread TODO - fix it
+
+    // create pointer to stack frame
+	uint32_t* newthread_esp = (uint32_t*)(new_kthread_kernel_stack + THREAD_KSTACK_SIZE);
+
+    uint32_t eflags;// = read_eflags();
+    asm volatile ("pushf \n\t"
+                            "pop %%eax\n\t"
+                            "movl %%eax, %0\n\t"
+                            :"=r"(eflags)
+                            :
+                            :"%eax"
+                    );
+	eflags |= (1 << 9);
+
+	newthread_esp[-5] = (uint32_t)entry_point;
+	newthread_esp[-7] = eflags;
+
+    //*(uint32_t*)new_kthread->kernel_stack = (uint32_t)new_kthread->entry_point; // ??
+    //new_kthread->kernel_stack -= 4; // ??
+
     //new_kthread->registers.esp = new_kthread->kernel_stack;
 
-    qemu_printf("Kernel thread with entry point = %x was succesfully created\n", entry_point);
+    qemu_printf("Kernel thread with entry point = %x  esp = %x  was succesfully created\n", entry_point, new_kthread->esp);
 
     asm volatile ("sti");
 

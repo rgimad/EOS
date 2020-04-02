@@ -36,7 +36,7 @@ default_interrupt_handler:
     pop %fs
     pop %es
     pop %ds
-    popal #was popa!!!!!!!!!!
+    popal # was popa!!!!!!!!!!
     add $8, %esp   # Cleans up the pushed error code and pushed ISR number
     sti
     iret           # pops 5 things at once: CS, EIP, EFLAGS, SS, and ESP!

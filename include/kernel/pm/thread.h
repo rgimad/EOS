@@ -40,24 +40,28 @@ typedef struct context {
 
 typedef struct thread_t
 {
-	uint32_t tid; // thread id
-	uint32_t state; // thread's state
-    char name[256];
-	context_t registers; //thread's context
-    uint32_t privileges; // kernel mode or user mode
+	uint32_t tid; // 0, thread id
+	uint32_t state; // 4, thread's state
 
-	listnode_t *self_item;// pointer to this thread's list node
-	process_t *process; // process which this thread belongs to
+    uint32_t privileges; // 8, kernel mode or user mode
 
-	void *kernel_stack; // thread's kernel stack top
-	void *user_stack; // thread's user stack top
+    uint32_t esp; // 12, thread's esp value
 
-    uint32_t kernel_stack_size;
-    uint32_t user_stack_size;
+	listnode_t *self_item;// 16, pointer to this thread's list node
+	process_t *process; // 20, process which this thread belongs to
 
-	void* entry_point; // thread's code entry point
+	void *kernel_stack; // 24, thread's kernel stack top
+	void *user_stack; // 28, thread's user stack top
+
+    uint32_t kernel_stack_size; // 32
+    uint32_t user_stack_size; // 36
+
+	void* entry_point; // 40, thread's code entry point
 
 	uint32_t time;// time of execution
+
+    context_t registers; //thread's context
+    char name[128]; // name of thread. //was 256
 
 } __attribute__((packed)) thread_t;
 
