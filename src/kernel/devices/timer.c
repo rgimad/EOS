@@ -38,6 +38,7 @@ int timer_get_ticks() { return timer_ticks; }
 // Timer init
 void timer_install()
 {
-	register_interrupt_handler(TIMER_IDT_INDEX, task_switch); // was timer_handler
-	timer_set_frequency(TICKS_PER_SECOND);
+	//register_interrupt_handler(TIMER_IDT_INDEX, task_switch); // was timer_handler
+	// set_idt_entry(TIMER_IDT_INDEX, (uint32_t) &task_switch, 0x08, 0x8E);
+	// timer_set_frequency(TICKS_PER_SECOND);
 }

@@ -75,10 +75,27 @@ thread_t* create_kernel_thread(void *entry_point) // TODO somwhere in this funct
 	new_kthread->kernel_stack = new_kthread_kernel_stack + THREAD_KSTACK_SIZE; // + THREAD_KSTACK_SIZE because stack grows downwards, new_kthread_kernel_stack is end of stack
     new_kthread->esp = new_kthread->kernel_stack - 28; // TODO: WHY -28 ?? if i write e.g. -12 system crashes
     
-    // Prepare stack for new kernel thread TODO - fix it
+    // Prepare stack for new kernel thread
+    uint32_t* stack = (uint32_t *)(new_kthread->esp);
+	*--stack = 0x00000202; // eflags
+	*--stack = 0x8; // cs , was 0x8
+	*--stack = (uint32_t)entry_point; // eip
+	*--stack = 0; // eax
+	*--stack = 0; // ebx
+	*--stack = 0; // ecx
+	*--stack = 0; //edx
+	*--stack = 0; //esi
+	*--stack = 0; //edi
+	*--stack = new_kthread->esp; //ebp
+	*--stack = 0x10; // ds, was 0x10
+	*--stack = 0x10; // es, was 0x10
+	*--stack = 0x10; // fs, was 0x10
+	*--stack = 0x10; // gs, was 0x10
+    new_kthread->esp = stack;
+
 
     // create pointer to stack frame
-	uint32_t* newthread_esp = (uint32_t*)(new_kthread_kernel_stack + THREAD_KSTACK_SIZE);
+	/*uint32_t* newthread_esp = (uint32_t*)(new_kthread_kernel_stack + THREAD_KSTACK_SIZE);
 
     uint32_t eflags;// = read_eflags();
     asm volatile ("pushf \n\t"
@@ -91,7 +108,7 @@ thread_t* create_kernel_thread(void *entry_point) // TODO somwhere in this funct
 	eflags |= (1 << 9);
 
 	newthread_esp[-5] = (uint32_t)entry_point;
-	newthread_esp[-7] = eflags;
+	newthread_esp[-7] = eflags;*/
 
     //*(uint32_t*)new_kthread->kernel_stack = (uint32_t)new_kthread->entry_point; // ??
     //new_kthread->kernel_stack -= 4; // ??

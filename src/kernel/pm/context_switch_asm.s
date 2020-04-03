@@ -22,10 +22,25 @@
 
 task_switch:
 
-	push	%ebp 				# C-function prologue
-    
-    pushf						# Save EFLAGS in thread stack
-    cli							# Disable all interrupts
+    cli
+
+    # pushf
+    # push %cs
+
+    push %eax
+    push %ebx
+    push %ecx
+    push %edx
+    push %esi
+    push %edi
+    push %ebp
+
+    push %ds
+    push %es
+    push %fs
+    push %gs
+
+
 
     cmp $0, scheduler_enabled
     je restore_context         #  if (!scheduler_enabled) goto restore_context;
@@ -82,6 +97,7 @@ task_switch:
     cmp %eax, %edx
     je restore_context # if (next_thread == current_thread) return;      
 
+    # /*
     perform_switch:
     # following 3 lines cause esp corruption - why???
     # pushl $49
@@ -97,21 +113,44 @@ task_switch:
     mov %ecx, %cr3              # reload CR3 
     
     # Set new ESP 
-    mov 12(%eax), %esp			
+    mov 12(%eax), %esp	        # esp = next_thread->esp		
     
     # Set TSS kernel stack
     
     # mov 24(%edx), %eax			# current_thread->stack_top --> EAX
     # mov $kernel_tss, %edx		# tss address --> EDX   40??
-    # mov %eax, 4(%edx)			#  EAX --> tss.esp		
-    
-    restore_context:
-        popf					#  Restore EFLAGS from new task stack
-        
-        pop		%ebp	        # C-function epilog    
-        
-        ret    # TODO ! now it jumps directly to newly created khread, but is must return to the end of irq_handler which sends EOI and return to the end of run_interrupt_handler which returns to the end of default_interrupt_handler which will restore registers from next_kthread stack and jump to its saved eip
+    # mov %eax, 4(%edx)			#  EAX --> tss.esp
 
+    mov %eax, current_thread    # current_thread = next_thread	
+    mov 20(%eax), %ebx          # ebx = next_thread->process
+    mov %ebx, current_process   # current_process = ebx
+    
+    # */
+
+    restore_context:
+
+        pop %gs
+        pop %fs
+        pop %es
+        pop %ds
+
+        pop %ebp
+        pop %edi
+        pop %esi
+        
+        # send EOI to master pic
+        push %ax
+        mov $0x20, %ax
+        outb %ax, $0x20
+        pop %ax
+
+        pop %edx
+        pop %ecx
+        pop %ebx
+        pop %eax
+
+        iret                    # pops 5 things at once: CS, EIP, EFLAGS, SS, and ESP!  about SS and ESP - ???? really pops them?? where it pop them from? who pushed them?
+        
 # ------------------------------------------------------------------------------------
 
 .global     start_scheduler

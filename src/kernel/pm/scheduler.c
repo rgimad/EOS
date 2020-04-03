@@ -64,7 +64,7 @@ void scheduler_init()
     current_thread = kernel_main_thread;
 
     // !!!!
-    scheduler_enabled = false;
+    scheduler_enabled = true;
 
 
     asm volatile ("sti");

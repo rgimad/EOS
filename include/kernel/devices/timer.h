@@ -10,7 +10,7 @@
 #define TIMER_DATA 0x40
 #define TIMER_OCW 0x36 // Operational command word which means Init, Square Wave Mode, non-BCD, first transfer LSB then MSB
 
-#define TICKS_PER_SECOND 10
+#define TICKS_PER_SECOND 20
 
 
 void timer_install();

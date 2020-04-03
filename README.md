@@ -22,13 +22,14 @@ Current progress: (v.0.0.0.4.x)
 - InitRD
 - ELF loader (in progress)
 - System calls (in progress)
+- Kernel mode thread seems to work properly
 - ELF running (in progress)
 - GUI (window system) (Console window system in progress)
 
 TODO:
 ----
 
-- Multitasking (processes and threads, user stack, user heap, user-mode)
+- Correct exit from kernel threads (situation not checked yet), usermode processes and threads, user stack, user heap etc..
 - Mutexes and spinlocks for threads synchronization
 - FAT32 driver
 - HDD driver
@@ -55,5 +56,7 @@ Thanks to:
 - Arjun Sreedharan
 - Stephen Fewer (stephenfewer)
 - James Molloy
+- levex named user from gihtub
+- reddit /r/osdev
 - Stackoverflow
 - etc.
