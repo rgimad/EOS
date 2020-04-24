@@ -60,14 +60,14 @@ void vfs_init();
 void vfs_mount_list();
 int vfs_mount(vfs_storage_dev_t *dev, vfs_filesystem_handles_t* fs_handles, int type, char* location, int block_size);
 int vfs_mount_find(char* path, int *filename_add);
-int vfs_read(char* filename, int offset, int size, void* buf);
-int vfs_get_size(char* filename);
+int vfs_read(const char* filename, int offset, int size, void* buf);
+int vfs_get_size(const char* filename);
 int vfs_write(char* filename, int offset, int size, void* buf);
 int vfs_mkdir(char* filename, char* path, uint16_t perms);
 int vfs_mkfile(char* filename, char* path, uint16_t perms);
 int vfs_list(char* path, void* buf);
 int vfs_rm(char* filename);
-int vfs_exists(char* filename);
+int vfs_exists(const char* filename);
 int vfs_is_dir(char* filename);//added
 void vfs_get_file_name_from_path(char *fpath, char *buf); // get file name from full path to the file
 

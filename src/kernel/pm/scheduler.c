@@ -55,7 +55,7 @@ void scheduler_init()
     strcpy(kernel_main_thread->name, "kernel_main_thread");
     kernel_main_thread->privileges = THREAD_KERNEL_MODE;
     kernel_main_thread->process = kernel_process; // parent process is kernel
-    kernel_main_thread->kernel_stack = kernel_stack_top_vaddr;
+    kernel_main_thread->kernel_stack = (void*)kernel_stack_top_vaddr;
     kernel_main_thread->kernel_stack_size = 65536; // 64kib stack for main kernel thread was reserved in boot.s
     kernel_main_thread->self_item = list_push(kernel_process->thread_list, kernel_main_thread);
     //kernel_main_thread->entry_point = ???????;

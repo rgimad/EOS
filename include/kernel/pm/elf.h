@@ -70,6 +70,13 @@ struct elf_program_header
 };
 
 
+uint8_t elf_check_header(struct elf_hdr *hdr);
+struct elf_section_header *elf_get_section_header(void *elf_file, int num);
+struct elf_program_header *elf_get_program_header(void *elf_file, int num);
+const char *elf_get_section_name(void *elf_file, int num);
+void elf_hdr_info(struct elf_hdr *hdr);
+
+
 
 void *elf_open(const char*);
 void elf_info(const char*);

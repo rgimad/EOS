@@ -3,6 +3,7 @@
 *    Virtual memory manager module
 */
 #include <kernel/mm/virt_memory.h>
+#include <kernel/mm/phys_memory.h>
 #include <kernel/tty.h>
 
 #include <libk/string.h>

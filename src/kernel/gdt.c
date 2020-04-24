@@ -4,6 +4,7 @@
 */
 
 #include <kernel/gdt.h>
+#include <kernel/tss.h>
 #include <kernel/tty.h>
  
 // Defines a GDT entry.

@@ -10,6 +10,7 @@
 #include <kernel/mm/uheap.h>
 
 #include <kernel/io/qemu_log.h>
+#include <libk/string.h>
 
 
 thread_t* create_user_thread(process_t *parent_proc, void *entry_point)

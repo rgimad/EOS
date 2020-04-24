@@ -4,7 +4,7 @@
 */
 #include <kernel/devices/timer.h>
 #include <kernel/idt.h>
-#include <kernel/interrupts.h>
+#include <kernel/io/ports.h>
 #include <kernel/io/qemu_log.h>
 
 #include <kernel/pm/scheduler.h>

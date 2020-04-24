@@ -6,6 +6,7 @@
 //#include <kernel/interrupts.h>
 
 #include <kernel/tty.h>
+#include <kernel/devices/keyboard.h>
 #include <kernel/graphics/vesafb.h>
 
 #include <libk/string.h>

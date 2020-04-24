@@ -11,6 +11,8 @@
 #include <kernel/mm/kheap.h>
 #include <kernel/mm/uheap.h>
 #include <kernel/fs/vfs.h>
+#include <kernel/tty.h>
+#include <libk/string.h>
 
 process_t* create_process(char *filepath)
 {
@@ -28,7 +30,7 @@ process_t* create_process(char *filepath)
 
 	//we allocate new physical page for proc_page_dir
 	page_directory *proc_page_dir = (page_directory*)pmm_alloc_block();
-	if (proc_page_dir == 0xFFFFFFFF)//if no free space
+	if (proc_page_dir == (page_directory *)0xFFFFFFFF)//if no free space
 	{
 		tty_printf("Failed to allocate phys memory for kernel page dir\n");
 		//panic
@@ -39,7 +41,7 @@ process_t* create_process(char *filepath)
 	virtual_addr kernel_page_dir_tmp_vaddr = vmm_temp_map_page(kernel_page_dir);//temporary mapping
 	memcpy(pdbuf, (void*)kernel_page_dir_tmp_vaddr, PAGE_SIZE);
 	virtual_addr proc_page_dir_tmp_vaddr = vmm_temp_map_page(proc_page_dir);//temporary mapping
-	memcpy(proc_page_dir_tmp_vaddr, (void*)pdbuf, PAGE_SIZE);
+	memcpy((void*)proc_page_dir_tmp_vaddr, (void*)pdbuf, PAGE_SIZE);
 	kheap_free(pdbuf);//free temporary buffer
 
 	// CHECK: will lines 40-46 copy kernel page_dir contents to proc_page_dir correcly?

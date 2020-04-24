@@ -99,7 +99,7 @@ int vfs_mount_find(char* path, int *filename_add)
 }
 
 
-int vfs_read(char* filename, int offset, int size, void* buf)
+int vfs_read(const char* filename, int offset, int size, void* buf)
 {
 	int a = 0;
 	int mntn = vfs_mount_find(filename, &a);
@@ -116,11 +116,11 @@ int vfs_read(char* filename, int offset, int size, void* buf)
 } 
 
 
-int vfs_get_size(char* filename)
+int vfs_get_size(const char* filename)
 {
 	int a = 0;
 	int mntn = vfs_mount_find(filename, &a);
-	filename += a + 1;
+	filename += a + 1; // change the pointer (its not const, but char its pointing to is const)
 
 	if(vfs_mount_points[mntn]->fs_handles->read == 0)
 	{
@@ -240,7 +240,7 @@ int vfs_rm(char* filename)
 }
 
 
-int vfs_exists(char* filename)
+int vfs_exists(const char* filename)
 {
 	int a = 0;
 	int mntn = vfs_mount_find(filename, &a);

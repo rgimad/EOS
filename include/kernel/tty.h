@@ -30,7 +30,7 @@ void tty_putint(int i);
 void tty_puthex(uint32_t i);
 void tty_print(char *format, va_list args);
 void tty_printf(char *text, ... );
-//void tty_scroll();
+void tty_scroll();
 //void update_cursor(size_t row, size_t col);
 
 

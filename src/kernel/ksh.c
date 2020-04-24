@@ -20,6 +20,7 @@
 
 #include <kernel/kernel.h>
 
+#include <kernel/io/qemu_log.h>
 #include <libk/string.h>
 
 #include <kernel/gui/consolewindow.h>
@@ -48,7 +49,9 @@ void ksh_main()
 		tty_setcolor(VESA_LIGHT_CYAN);
 
 		keyboard_gets(cmd, 256);
-		if (strlen(cmd) > 0) if (strcmp(cmd, "cpuid") == 0)
+		if (strlen(cmd) == 0) continue;
+		 
+		if (strcmp(cmd, "cpuid") == 0)
 		{
 			ksh_cmd_cpuid();
 		} else if (strcmp(cmd, "about") == 0)
