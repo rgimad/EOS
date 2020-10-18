@@ -1,6 +1,6 @@
 # EOS (Experimental Operating System)
 
-EOS is an educational operating system for x86 platform. More information on official page https://vk.com/eos_developer_notes
+EOS is an educational operating system for x86 platform. 
 
 Current progress: (v.0.0.0.4.x)
 ----------------
