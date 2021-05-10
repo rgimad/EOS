@@ -1,6 +1,7 @@
 # EOS (Experimental Operating System)
 
 EOS is an educational operating system for x86 platform. 
+![screenshot](https://github.com/rgimad/EOS/blob/master/screenshots/screen1.png "Screenshot")
 
 Current progress: (v.0.0.0.4.x)
 ----------------
