@@ -1,3 +1,0 @@
-EOS is experimental operating system!
-Author - Rustem Gimadutdinov - a student
-this is text file
