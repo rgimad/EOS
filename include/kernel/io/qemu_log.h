@@ -1,7 +1,8 @@
 /*
-*    EOS - Experimental Operating System
-*    Qemu logging functions header
-*/
+ * EOS - Experimental Operating System
+ * Qemu logging functions header
+ */
+
 #ifndef _QEMU_LOG_H
 #define _QEMU_LOG_H
 
