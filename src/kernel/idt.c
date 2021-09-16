@@ -1,7 +1,7 @@
 /*
-*    EOS - Experimental Operating System
-*    IDT setup functions
-*/
+ * EOS - Experimental Operating System
+ * IDT setup functions
+ */
 
 #include <kernel/idt.h>
 #include <kernel/tty.h>
@@ -19,27 +19,26 @@
 //....{}
 #define DECLARE_INTERRUPT_HANDLER(i) void interrupt_handler_##i(void)
 
+#define ICW1 0x11
+#define ICW4 0x01
+#define PIC1 0x20 /* IO base address for master PIC */
+#define PIC2 0xA0 /* IO base address for slave  PIC */
 
-
-
-
-#define ICW1         0x11
-#define ICW4         0x01
-#define PIC1         0x20 /* IO base address for master PIC */
-#define PIC2         0xA0 /* IO base address for slave  PIC */
 #define PIC1_COMMAND PIC1
-#define PIC1_DATA    (PIC1+1)
+#define PIC1_DATA    (PIC1 + 1)
 #define PIC2_COMMAND PIC2
-#define PIC2_DATA    (PIC2+1)
+#define PIC2_DATA    (PIC2 + 1)
 
+void interrupt_enable_all() {
+    asm volatile("sti");
+}
 
-
-void interrupt_enable_all() { asm volatile("sti"); }
-void interrupt_disable_all() { asm volatile("cli"); }
+void interrupt_disable_all() {
+    asm volatile("cli");
+}
 
 // Defines an IDT entry
-struct idt_entry
-{
+struct idt_entry {
     uint16_t handler_lo;
     uint16_t sel;
     uint8_t always0;
@@ -48,22 +47,21 @@ struct idt_entry
 } __attribute__((packed));
 typedef struct idt_entry idt_entry_t;
 
-struct idt_ptr
-{
+struct idt_ptr {
     uint16_t limit;
     uint32_t base;
 } __attribute__((packed));
 typedef struct idt_ptr idt_ptr_t;
 
-// Declare an IDT of 256 entries.
+// Declare an IDT of 256 entries
 idt_entry_t idt[IDT_NUM_ENTRIES];
 idt_ptr_t idtp;
 
 // Function arch/i386/idt.S, loads IDT from a pointer to an idt_ptr
-extern void idt_load(struct idt_ptr* idt_ptr_addr);
+extern void idt_load(struct idt_ptr *idt_ptr_addr);
 
 /* ISRs */
-//void interrupt_handler_0(void){};
+//void interrupt_handler_0(void) {};
 DECLARE_INTERRUPT_HANDLER(0);
 DECLARE_INTERRUPT_HANDLER(1);
 DECLARE_INTERRUPT_HANDLER(2);
@@ -116,7 +114,7 @@ DECLARE_INTERRUPT_HANDLER(45);
 DECLARE_INTERRUPT_HANDLER(46);
 DECLARE_INTERRUPT_HANDLER(47);
 
-//eto fignya ya dobavil a potom zakommentil
+// Eto fignya ya dobavil a potom zakommentil
 /*DECLARE_INTERRUPT_HANDLER(48);
 DECLARE_INTERRUPT_HANDLER(49);
 DECLARE_INTERRUPT_HANDLER(50);
@@ -199,9 +197,7 @@ DECLARE_INTERRUPT_HANDLER(126);
 DECLARE_INTERRUPT_HANDLER(127);*/
 DECLARE_INTERRUPT_HANDLER(128);//for syscalls
 
-
-void set_idt_entry(uint8_t num, uint64_t handler, uint16_t sel, uint8_t flags)
-{
+void set_idt_entry(uint8_t num, uint64_t handler, uint16_t sel, uint8_t flags) {
     idt[num].handler_lo = handler & 0xFFFF;
     idt[num].handler_hi = (handler >> 16) & 0xFFFF;
     idt[num].always0 = 0;
@@ -209,47 +205,37 @@ void set_idt_entry(uint8_t num, uint64_t handler, uint16_t sel, uint8_t flags)
     idt[num].sel = sel;
 }
 
-
-void IRQ_set_mask(unsigned char IRQline)
-{
+void IRQ_set_mask(unsigned char IRQline) {
     uint16_t port;
     uint8_t value;
 
-    if(IRQline < 8)
-    {
+    if (IRQline < 8) {
         port = PIC1_DATA;
-    }
-    else
-    {
+    } else {
         port = PIC2_DATA;
         IRQline -= 8;
     }
+
     value = inb(port) | (1 << IRQline);
     outb(port, value);
 }
 
-void IRQ_clear_mask(unsigned char IRQline)
-{
+void IRQ_clear_mask(unsigned char IRQline) {
     uint16_t port;
     uint8_t value;
 
-    if(IRQline < 8)
-    {
+    if (IRQline < 8) {
         port = PIC1_DATA;
-    }
-    else
-    {
+    } else {
         port = PIC2_DATA;
         IRQline -= 8;
     }
+
     value = inb(port) & ~(1 << IRQline);
     outb(port, value);
 }
 
-
-
-void init_pics(int pic1, int pic2)
-{
+void init_pics(int pic1, int pic2) {
     outb(PIC1, ICW1);
     outb(PIC2, ICW1);
     outb(PIC1 + 1, pic1);
@@ -262,16 +248,14 @@ void init_pics(int pic1, int pic2)
 }
 
 // Installs the IDT
-void idt_install()
-{
+void idt_install() {
     outb(0x21,0xfd);
     outb(0xa1,0xff);
     init_pics(0x20,0x28);
 
-
     // Sets the special IDT pointer up
     idtp.limit = (sizeof(struct idt_entry) * IDT_NUM_ENTRIES) - 1;
-    idtp.base = (uint32_t)&idt;
+    idtp.base = (uint32_t) &idt;
 
     //tty_printf("idtp.base = %x, idtp.limit = %x\n", idtp.base, idtp.limit); //!!!!
 
@@ -280,13 +264,8 @@ void idt_install()
 
     idt_load(&idtp);
 
-
-
-
-
     int i;
-    for (i = 0; i < IDT_NUM_ENTRIES; i++)
-    {
+    for (i = 0; i < IDT_NUM_ENTRIES; i++) {
         idt[i].handler_lo = 0;
         idt[i].handler_hi = 0;
         idt[i].always0 = 0;
@@ -329,8 +308,6 @@ void idt_install()
     SET_IDT_ENTRY(30);
     SET_IDT_ENTRY(31);
 
-
-
     /* IRQs */
     outb(0x20, 0x11);
     outb(0xA0, 0x11);
@@ -344,9 +321,9 @@ void idt_install()
     outb(0xA1, 0x0);
 
     //SET_IDT_ENTRY(32); // !!!
-    // install scheduler by timer interrupt
+    // Install scheduler by timer interrupt
     set_idt_entry(TIMER_IDT_INDEX, (uint32_t) &task_switch, 0x08, 0x8E);
-	timer_set_frequency(TICKS_PER_SECOND);
+    timer_set_frequency(TICKS_PER_SECOND);
 
     SET_IDT_ENTRY(33);
     SET_IDT_ENTRY(34);
@@ -365,89 +342,88 @@ void idt_install()
     SET_IDT_ENTRY(47);
 
     /*SET_IDT_ENTRY(48);
-SET_IDT_ENTRY(49);
-SET_IDT_ENTRY(50);
-SET_IDT_ENTRY(51);
-SET_IDT_ENTRY(52);
-SET_IDT_ENTRY(53);
-SET_IDT_ENTRY(54);
-SET_IDT_ENTRY(55);
-SET_IDT_ENTRY(56);
-SET_IDT_ENTRY(57);
-SET_IDT_ENTRY(58);
-SET_IDT_ENTRY(59);
-SET_IDT_ENTRY(60);
-SET_IDT_ENTRY(61);
-SET_IDT_ENTRY(62);
-SET_IDT_ENTRY(63);
-SET_IDT_ENTRY(64);
-SET_IDT_ENTRY(65);
-SET_IDT_ENTRY(66);
-SET_IDT_ENTRY(67);
-SET_IDT_ENTRY(68);
-SET_IDT_ENTRY(69);
-SET_IDT_ENTRY(70);
-SET_IDT_ENTRY(71);
-SET_IDT_ENTRY(72);
-SET_IDT_ENTRY(73);
-SET_IDT_ENTRY(74);
-SET_IDT_ENTRY(75);
-SET_IDT_ENTRY(76);
-SET_IDT_ENTRY(77);
-SET_IDT_ENTRY(78);
-SET_IDT_ENTRY(79);
-SET_IDT_ENTRY(80);
-SET_IDT_ENTRY(81);
-SET_IDT_ENTRY(82);
-SET_IDT_ENTRY(83);
-SET_IDT_ENTRY(84);
-SET_IDT_ENTRY(85);
-SET_IDT_ENTRY(86);
-SET_IDT_ENTRY(87);
-SET_IDT_ENTRY(88);
-SET_IDT_ENTRY(89);
-SET_IDT_ENTRY(90);
-SET_IDT_ENTRY(91);
-SET_IDT_ENTRY(92);
-SET_IDT_ENTRY(93);
-SET_IDT_ENTRY(94);
-SET_IDT_ENTRY(95);
-SET_IDT_ENTRY(96);
-SET_IDT_ENTRY(97);
-SET_IDT_ENTRY(98);
-SET_IDT_ENTRY(99);
-SET_IDT_ENTRY(100);
-SET_IDT_ENTRY(101);
-SET_IDT_ENTRY(102);
-SET_IDT_ENTRY(103);
-SET_IDT_ENTRY(104);
-SET_IDT_ENTRY(105);
-SET_IDT_ENTRY(106);
-SET_IDT_ENTRY(107);
-SET_IDT_ENTRY(108);
-SET_IDT_ENTRY(109);
-SET_IDT_ENTRY(110);
-SET_IDT_ENTRY(111);
-SET_IDT_ENTRY(112);
-SET_IDT_ENTRY(113);
-SET_IDT_ENTRY(114);
-SET_IDT_ENTRY(115);
-SET_IDT_ENTRY(116);
-SET_IDT_ENTRY(117);
-SET_IDT_ENTRY(118);
-SET_IDT_ENTRY(119);
-SET_IDT_ENTRY(120);
-SET_IDT_ENTRY(121);
-SET_IDT_ENTRY(122);
-SET_IDT_ENTRY(123);
-SET_IDT_ENTRY(124);
-SET_IDT_ENTRY(125);
-SET_IDT_ENTRY(126);
-SET_IDT_ENTRY(127);*/
-SET_IDT_ENTRY(128); // need for system calls - int 0x80 , 0x80 = 128 in decimal
+    SET_IDT_ENTRY(49);
+    SET_IDT_ENTRY(50);
+    SET_IDT_ENTRY(51);
+    SET_IDT_ENTRY(52);
+    SET_IDT_ENTRY(53);
+    SET_IDT_ENTRY(54);
+    SET_IDT_ENTRY(55);
+    SET_IDT_ENTRY(56);
+    SET_IDT_ENTRY(57);
+    SET_IDT_ENTRY(58);
+    SET_IDT_ENTRY(59);
+    SET_IDT_ENTRY(60);
+    SET_IDT_ENTRY(61);
+    SET_IDT_ENTRY(62);
+    SET_IDT_ENTRY(63);
+    SET_IDT_ENTRY(64);
+    SET_IDT_ENTRY(65);
+    SET_IDT_ENTRY(66);
+    SET_IDT_ENTRY(67);
+    SET_IDT_ENTRY(68);
+    SET_IDT_ENTRY(69);
+    SET_IDT_ENTRY(70);
+    SET_IDT_ENTRY(71);
+    SET_IDT_ENTRY(72);
+    SET_IDT_ENTRY(73);
+    SET_IDT_ENTRY(74);
+    SET_IDT_ENTRY(75);
+    SET_IDT_ENTRY(76);
+    SET_IDT_ENTRY(77);
+    SET_IDT_ENTRY(78);
+    SET_IDT_ENTRY(79);
+    SET_IDT_ENTRY(80);
+    SET_IDT_ENTRY(81);
+    SET_IDT_ENTRY(82);
+    SET_IDT_ENTRY(83);
+    SET_IDT_ENTRY(84);
+    SET_IDT_ENTRY(85);
+    SET_IDT_ENTRY(86);
+    SET_IDT_ENTRY(87);
+    SET_IDT_ENTRY(88);
+    SET_IDT_ENTRY(89);
+    SET_IDT_ENTRY(90);
+    SET_IDT_ENTRY(91);
+    SET_IDT_ENTRY(92);
+    SET_IDT_ENTRY(93);
+    SET_IDT_ENTRY(94);
+    SET_IDT_ENTRY(95);
+    SET_IDT_ENTRY(96);
+    SET_IDT_ENTRY(97);
+    SET_IDT_ENTRY(98);
+    SET_IDT_ENTRY(99);
+    SET_IDT_ENTRY(100);
+    SET_IDT_ENTRY(101);
+    SET_IDT_ENTRY(102);
+    SET_IDT_ENTRY(103);
+    SET_IDT_ENTRY(104);
+    SET_IDT_ENTRY(105);
+    SET_IDT_ENTRY(106);
+    SET_IDT_ENTRY(107);
+    SET_IDT_ENTRY(108);
+    SET_IDT_ENTRY(109);
+    SET_IDT_ENTRY(110);
+    SET_IDT_ENTRY(111);
+    SET_IDT_ENTRY(112);
+    SET_IDT_ENTRY(113);
+    SET_IDT_ENTRY(114);
+    SET_IDT_ENTRY(115);
+    SET_IDT_ENTRY(116);
+    SET_IDT_ENTRY(117);
+    SET_IDT_ENTRY(118);
+    SET_IDT_ENTRY(119);
+    SET_IDT_ENTRY(120);
+    SET_IDT_ENTRY(121);
+    SET_IDT_ENTRY(122);
+    SET_IDT_ENTRY(123);
+    SET_IDT_ENTRY(124);
+    SET_IDT_ENTRY(125);
+    SET_IDT_ENTRY(126);
+    SET_IDT_ENTRY(127);*/
+    SET_IDT_ENTRY(128); // Need for system calls - int 0x80 , 0x80 = 128 in decimal
 
-    for(int i = 0; i < 16; ++i)
-    {
+    for (int i = 0; i < 16; ++i) {
         IRQ_clear_mask(i);
     }
 
@@ -463,8 +439,6 @@ SET_IDT_ENTRY(128); // need for system calls - int 0x80 , 0x80 = 128 in decimal
     outb(0x21, 0x0);
     outb(0xA1, 0x0);*/
 
-    //--------
-
     /*outb(0x20, 0x11);
     outb(0xA0, 0x11);
 
@@ -476,7 +450,7 @@ SET_IDT_ENTRY(128); // need for system calls - int 0x80 , 0x80 = 128 in decimal
 
     outb(0x21, 0x01);
     outb(0xA1, 0x01);
-    
+
     outb(0x21, 0x0);
     outb(0xA1, 0x0);*/
 
