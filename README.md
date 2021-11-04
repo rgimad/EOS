@@ -38,6 +38,7 @@
 - etc.
 
 ## Building and debugging
+Go to src/kernel
 
 - Building *release* version:
 

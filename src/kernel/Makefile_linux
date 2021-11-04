@@ -22,6 +22,7 @@ OBJ=boot.o kernel.o ../libk/string.o ../libk/math.o ../libk/list.o ksh.o gdt.o g
 all: $(TARGET_ELF)
 
 $(TARGET_ELF): $(OBJ)
+	mkdir -p $(TARGET_DIR)
 	$(CC) $(LDFLAGS) -o $(TARGET_DIR)$(TARGET_ELF) $(OBJ)
 
 %.o: %.c
@@ -42,7 +43,7 @@ check-multiboot: $(TARGET_ELF)
 build-iso: check-multiboot
 	rm -rf $(ISODIR)
 	mkdir -p $(ISODIR)boot
-	make -C ../../apps -f Makefile_apps_linux
+	make -C ../../apps -f Makefile
 	cp -r ../../bin/apps ../../initrd/
 	cd ../../initrd; tar -cf ../isodir/boot/initrd.tar *; cd -
 	mkdir -p $(ISODIR)boot/grub

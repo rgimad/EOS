@@ -1,1 +1,8 @@
 *.o 
+*/*.o
+*/*/*.o
+*/*/*.log
+*.iso
+initrd/*
+bin/*
+isodir/*

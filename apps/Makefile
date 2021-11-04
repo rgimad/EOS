@@ -1,4 +1,7 @@
-all: app_first_program_gas app_reverse_string app_grafdemo
+all: all_init app_first_program_gas app_reverse_string app_grafdemo
+
+all_init:
+	mkdir -p ../bin/apps
 
 app_first_program_gas:
 	make -C first_program_gas
