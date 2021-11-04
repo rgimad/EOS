@@ -82,4 +82,4 @@ clean:
 	rm -rf gui/*.o
 	rm -rf $(TARGET_DIR)kernel.elf
 	rm -rf $(TARGET_DIR)../apps/*
-	make -C ../../apps -f Makefile_apps_linux clean
+	make -C ../../apps -f Makefile clean

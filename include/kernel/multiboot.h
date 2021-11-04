@@ -3,7 +3,8 @@
 
 #include <stdint.h>
 
-/*typedef struct multiboot_info multiboot_info;
+#if 0 
+typedef struct multiboot_info multiboot_info;
 
 struct multiboot_info {
 	uint32_t flags;
@@ -78,7 +79,8 @@ struct multiboot_mmap
 extern void*    memlist;
 extern uint64_t memlist_size;*/
 
-//extern struct multiboot_info *kernel_mboot_info;*/
+//extern struct multiboot_info *kernel_mboot_info;
+#endif
 
 
 #define MBOOT_FLAG_MEM     0x001

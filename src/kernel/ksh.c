@@ -35,7 +35,6 @@ void ksh_init() {
 
 void ksh_main() {
     char cmd[256];
-    int i;
 
     while (1) {
         tty_setcolor(VESA_LIGHT_GREEN);
@@ -261,6 +260,7 @@ void ksh_cmd_cat(char *fname) {
     } else {
         uint32_t fsize = vfs_get_size(fname);
         int res = vfs_read(fname, 0, fsize, buf);
+        (void)res;
         buf[fsize] = '\0';
         tty_printf("cat: file %s:\n\n%s\n", fname, buf);
         kheap_free(buf);

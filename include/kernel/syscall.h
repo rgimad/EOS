@@ -12,6 +12,7 @@
 //#define SC_CODE_gets        1
 #define SC_CODE_draw_square 2
 
+void syscall_init();
 void syscall_handler(struct regs *r);
 
 #endif

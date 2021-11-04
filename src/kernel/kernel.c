@@ -34,6 +34,7 @@
 
 // Process manager
 #include <kernel/pm/elf.h>
+#include <kernel/pm/scheduler.h>
 
 // Graphics
 #include <kernel/graphics/vesafb.h>
@@ -136,6 +137,7 @@ void higher_half_test() {
 
 void kernel_main(int magic_number, struct multiboot_info *mboot_info) { // Arguments are passed by _start in boot.s
     asm("movl %%esp,%0" : "=r"(kernel_stack_top_vaddr)); // TODO is it unused????
+    (void)magic_number;
 
     // Initilize the kernel
     multiboot_info mboot_info_copy = *mboot_info;

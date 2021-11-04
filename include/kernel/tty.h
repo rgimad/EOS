@@ -32,6 +32,7 @@ void tty_putstring_color(const char *data, uint32_t text_color);
 void tty_putuint(int i);
 void tty_putint(int i);
 void tty_puthex(uint32_t i);
+void tty_backspace();
 
 void tty_print(char *format, va_list args);
 void tty_printf(char *text, ...);
