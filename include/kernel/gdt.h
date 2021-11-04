@@ -1,7 +1,8 @@
 /*
-*    EOS - Experimental Operating System
-*    GDT header
-*/
+ * EOS - Experimental Operating System
+ * GDT header
+ */
+
 #ifndef _KERNEL_GDT_H_
 #define _KERNEL_GDT_H_
 
@@ -14,4 +15,4 @@ void gdt_set_gate(int32_t num, uint32_t base, uint32_t limit, uint8_t access, ui
 // Sets up the GDT, should be called on early initialization
 void gdt_install();
 
-#endif  // _KERNEL_GDT_H_
+#endif // _KERNEL_GDT_H_

@@ -1,10 +1,10 @@
 # EOS (Experimental Operating System)
 
-EOS is an educational operating system for x86 platform. 
-![screenshot](https://github.com/rgimad/EOS/blob/master/screenshots/screen1.png "Screenshot")
+**EOS** is an educational operating system for x86 platform
 
-Current progress: (v.0.0.0.4.x)
-----------------
+[Screenshot](https://github.com/rgimad/EOS/blob/master/screenshots/screen1.png "Screenshot")
+
+## Current status
 
 - GDT and IDT setup
 - VESA framebuffer based terminal :D
@@ -27,8 +27,7 @@ Current progress: (v.0.0.0.4.x)
 - ELF running (in progress)
 - GUI (window system) (Console window system in progress)
 
-TODO:
-----
+## TODO
 
 - Correct exit from kernel threads (situation not checked yet), usermode processes and threads, user stack, user heap etc..
 - Mutexes and spinlocks for threads synchronization
@@ -38,18 +37,41 @@ TODO:
 - ACPI driver
 - etc.
 
-Building, debugging etc.
-------------------------
+## Building and debugging
 
-Example: to build release "make -f Makefile_linux build-iso"
-to build and run release "make -f Makefile_linux build-iso-run"
-to build debug "make -f Makefile_linux build-iso-run DEBUG=1"
-to build and run debug "make -f Makefile_linux build-iso-run-debug DEBUG=1"
-p.s always do "make -f Makefile_linux clean" before switching between debug and release configurations
-p.s Makefile_windows is currently incomplete (TODO complete and fix it)
+- Building *release* version:
 
-Thanks to:
----------
+```Shell
+make -f Makefile_linux build-iso
+```
+
+- Building and running *release* version:
+
+```Shell
+make -f Makefile_linux build-iso-run
+```
+
+- Building *debug* version:
+
+```Shell
+make -f Makefile_linux build-iso-run DEBUG=1
+```
+
+- Building and running *debug* version:
+
+```Shell
+make -f Makefile_linux build-iso-run-debug DEBUG=1
+```
+
+- Always do following command before switching between debug and release configurations:
+
+```Shell
+make -f Makefile_linux clean
+```
+
+- Note: `Makefile_windows` is currently incomplete (TODO complete and fix it)
+
+## Thanks to
 
 - Guilherme Samora (psamora)
 - Nikita Ivanov, Dmitrii Kychanov, etc. from u365

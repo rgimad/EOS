@@ -1,18 +1,22 @@
 /*
-*    EOS - Experimental Operating System
-*    Task State Segment methods implementation
-*/
+ * EOS - Experimental Operating System
+ * Task State Segment methods implementation
+ */
+
 #include <kernel/tss.h>
 #include <kernel/gdt.h>
+
 #include <libk/string.h>
+
 #include <kernel/io/qemu_log.h>
 
 tss_entry_t kernel_tss;
-// we don't need tss to assist all the task switching, but it's required to have one tss for switching back to kernel mode(system call for example)
 
+// We don't need tss to assist all the task switching, but it's required to have one tss for switching back to kernel mode(system call for example)
 void tss_init(uint32_t idx, uint32_t kss, uint32_t kesp) {
-    uint32_t base = (uint32_t)&kernel_tss;
+    uint32_t base = (uint32_t) &kernel_tss;
     gdt_set_gate(idx, base, base + sizeof(tss_entry_t), /*or 0x89??*/0xE9, 0);
+
     /* Kernel tss, access(E9 = 1 11 0 1 0 0 1)
         1   present
         11  ring 3
@@ -24,6 +28,7 @@ void tss_init(uint32_t idx, uint32_t kss, uint32_t kesp) {
     */
     memset(&kernel_tss, 0, sizeof(tss_entry_t));
     kernel_tss.ss0 = kss;
+
     // Note that we usually set tss's esp to 0 when booting our os, however, we need to set it to the real esp when we've switched to usermode because
     // the CPU needs to know what esp to use when usermode app is calling a kernel function(aka system call), that's why we have a function below called tss_set_stack
     kernel_tss.esp0 = kesp;
@@ -41,18 +46,16 @@ void tss_init(uint32_t idx, uint32_t kss, uint32_t kesp) {
     kernel_tss.gs = 0x13;
     kernel_tss.ss = 0x13;
 
-
     //qemu_printf("tss now will flush\n");
     //tss_flush();
     //qemu_printf("tss flushed\n");
 }
 
-//This function is used to set the tss's esp, so that CPU knows what esp the kernel should be using
+// This function is used to set the tss's esp, so that CPU knows what esp the kernel should be using
 void tss_set_stack(uint32_t kss, uint32_t kesp) {
     kernel_tss.ss0 = kss;
     kernel_tss.esp0 = kesp;
 }
-
 
 /*
 0xE9 = 11101001

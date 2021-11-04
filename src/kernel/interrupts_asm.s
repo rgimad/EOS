@@ -23,23 +23,30 @@ default_interrupt_handler:
     push %es
     push %fs
     push %gs
+
     mov $0x10, %ax
     mov %ax, %ds
     mov %ax, %es
     mov %ax, %fs
     mov %ax, %gs
+
     mov %esp, %eax  # Push us the stack
     push %eax
+
     call run_interrupt_handler # A special call, preserves the 'eip' register
+
     pop %eax
     pop %gs
     pop %fs
     pop %es
     pop %ds
+
     popal # was popa!!!!!!!!!!
-    add $8, %esp   # Cleans up the pushed error code and pushed ISR number
+    add $8, %esp # Cleans up the pushed error code and pushed ISR number
+
     sti
-    iret           # pops 5 things at once: CS, EIP, EFLAGS, SS, and ESP!
+
+    iret # pops 5 things at once: CS, EIP, EFLAGS, SS, and ESP!
 
 # ISRs
 no_error_code_handler 0
@@ -75,7 +82,6 @@ no_error_code_handler 28
 no_error_code_handler 29
 no_error_code_handler 30
 no_error_code_handler 31
-
 
 
 # IRQs why starts not from 0??

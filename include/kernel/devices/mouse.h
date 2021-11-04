@@ -1,7 +1,8 @@
 /*
-*    EOS - Experimental Operating System
-*    Mouse driver header
-*/
+ * EOS - Experimental Operating System
+ * Mouse driver header
+ */
+
 #ifndef _MOUSE_H_
 #define _MOUSE_H_
 
@@ -22,26 +23,30 @@
 #define MOUSE_CMD_SEND        0xD4
 #define MOUSE_DATA_PORT       0x60
 
-//Mouse answers:
+// Mouse answers
 #define MOUSE_ACK             0xFA
 
 void mouse_erase();
 void mouse_draw();
+
 void mouse_wait(uint8_t a_type);
+
 void mouse_write(uint8_t a_write);
 uint8_t mouse_read();
-
 
 void mouse_install();
 
 extern uint8_t mouse_ready;
+
 extern int32_t mouse_x;
 extern int32_t mouse_y;
+
 extern uint8_t mouse_b1;
 extern uint8_t mouse_b2;
 extern uint8_t mouse_b3;
 extern uint8_t mouse_b4;
 extern uint8_t mouse_b5;
-extern int     mouse_wheel; // change to 0 after each reading
+
+extern int mouse_wheel; // change to 0 after each reading
 
 #endif // _MOUSE_H_

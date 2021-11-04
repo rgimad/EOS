@@ -1,7 +1,8 @@
-﻿/*
-*    EOS - Experimental Operating System
-*    Keyboard driver header
-*/
+/*
+ * EOS - Experimental Operating System
+ * Keyboard driver header
+ */
+
 #ifndef _KERNEL_KEYBOARD_H_
 #define _KERNEL_KEYBOARD_H_
 
@@ -40,30 +41,36 @@
 #define KEY_ARROW_DOWN  0x150
 #define KEY_DELETE      0x153
 
-typedef struct
-{
-	int exists  : 1;
-	int release : 1;
-	int lshift  : 1;
-	int rshift  : 1;
-	int lctrl   : 1;
-	int rctrl   : 1;
-	int numlk   : 1;
-	int capslk  : 1;
-	int scrllk  : 1;
-	int code    : 11;
+typedef struct {
+    int exists  : 1;
+    int release : 1;
+
+    int lshift  : 1;
+    int rshift  : 1;
+
+    int lctrl   : 1;
+    int rctrl   : 1;
+
+    int numlk   : 1;
+    int capslk  : 1;
+    int scrllk  : 1;
+
+    int code    : 11;
 } __attribute__((packed)) kbd_event;
 
 void keyboard_install();
 
-uint8_t     keyboard_getchar();
-size_t      keyboard_gets(char* s, size_t);
-//size_t      kbd_getsn(char*, size_t);
-void        keyboard_waitForBufToEmpty();
-void        keyboard_reset_cpu();
-//void	 	keyboard_scancodes_setup();
-void        keyboard_wait_irq();
-kbd_event   keyboard_buffer_pop();
-char        keyboard_event_convert(kbd_event e);
+uint8_t keyboard_getchar();
+size_t keyboard_gets(char* s, size_t);
+//size_t kbd_getsn(char*, size_t);
+
+void keyboard_waitForBufToEmpty();
+void keyboard_reset_cpu();
+
+//void keyboard_scancodes_setup();
+
+void keyboard_wait_irq();
+kbd_event keyboard_buffer_pop();
+char keyboard_event_convert(kbd_event e);
 
 #endif

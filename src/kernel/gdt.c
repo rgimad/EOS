@@ -1,42 +1,39 @@
 /*
-*    EOS - Experimental Operating System
-*    GDT setup functions
-*/
+ * EOS - Experimental Operating System
+ * GDT setup functions
+ */
 
 #include <kernel/gdt.h>
 #include <kernel/tss.h>
 #include <kernel/tty.h>
- 
-// Defines a GDT entry.
-struct gdt_entry
-{
+
+// Defines a GDT entry
+struct gdt_entry {
     uint16_t limit_low;
     uint16_t base_low;
     uint8_t base_middle;
     uint8_t access;
     uint8_t granularity;
     uint8_t base_high;
-} __attribute__((packed));  // prevents compiler to optimize struct
+} __attribute__((packed)); // Prevents compiler to optimize struct
 
 // Special pointer which includes the limit: The max bytes
-// taken up by the GDT, minus 1.
-struct gdt_ptr
-{
+// taken up by the GDT, minus 1
+struct gdt_ptr {
     uint16_t limit;
     uint32_t base;
-} __attribute__((packed));  // prevents compiler to optimize struct
+} __attribute__((packed)); // Prevents compiler to optimize struct
 
 // Our GDT, with 6 entries, and finally our special GDT pointer
 struct gdt_entry gdt[GDT_MAX_DESCRIPTORS];
 struct gdt_ptr gp;
 
 // Function arch/i386/gdt.S, loads GDT from the pointeer of a gdt_ptr
-extern void gdt_flush(struct gdt_ptr* gdt_ptr_addr);
+extern void gdt_flush(struct gdt_ptr *gdt_ptr_addr);
 
 // Setup a descriptor in the Global Descriptor Table
 void gdt_set_gate(int32_t num, uint32_t base, uint32_t limit, uint8_t access,
-                  uint8_t gran)
-{
+                  uint8_t gran) {
     // Setup the descriptor base address
     gdt[num].base_low = (base & 0xFFFF);
     gdt[num].base_middle = (base >> 16) & 0xFF;
@@ -51,20 +48,16 @@ void gdt_set_gate(int32_t num, uint32_t base, uint32_t limit, uint8_t access,
     gdt[num].access = access;
 }
 
-
-
-
 // Should be called by the kernal on initializaiton. This will setup the
 // special GDT pointer, set up the first 3 entries in our GDT, and then
 // finally call gdt_flush() in our assembler file in order to tell the
 // processor where the new GDT is and update the new segment registers
-void gdt_install()
-{
-    //  Setup the GDT pointer and limit
+void gdt_install() {
+    // Setup the GDT pointer and limit
     gp.limit = (sizeof(struct gdt_entry) * GDT_MAX_DESCRIPTORS) - 1;
-    gp.base = (uint32_t)&gdt;
+    gp.base = (uint32_t) &gdt;
 
-    //  Our NULL descriptor, required
+    // Our NULL descriptor, required
     gdt_set_gate(0, 0, 0, 0, 0);
     /* Kernel code, access(9A = 1 00 1 1 0 1 0)
         1   present
@@ -89,5 +82,4 @@ void gdt_install()
     // Initialize TSS
     tss_init(5, 0x10, 0);
     tss_flush();
-
 }

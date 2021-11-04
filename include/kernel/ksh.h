@@ -1,7 +1,8 @@
 /*
-*    EOS - Experimental Operating System
-*    Kernel mode shell header
-*/
+ * EOS - Experimental Operating System
+ * Kernel mode shell header
+ */
+
 #ifndef _KSH_TTY_H
 #define _KSH_TTY_H
 
@@ -31,7 +32,4 @@ void ksh_cmd_run(char *fname);
 
 void ksh_cmd_unknown();
 
-
-
-
-#endif  // _KSH_TTY_H
+#endif // _KSH_TTY_H

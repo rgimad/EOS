@@ -1,7 +1,3 @@
-#MAKEFILE=Makefile
-
-#INCLUDE_DIR=../include/libc/
-
 TARGET_ELF = first_program_gas.elf
 TARGET_DIR = ../../bin/apps/
 
@@ -23,4 +19,3 @@ $(TARGET_ELF): $(OBJ)
 
 clean:
 	rm -rf *.o
-
