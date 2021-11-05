@@ -44,7 +44,7 @@ uint32_t kernel_stack_top_vaddr;
 int kernel_init(struct multiboot_info *mboot_info) {
     tty_init();
     svga_mode_info_t *svga_mode = (svga_mode_info_t*) mboot_info->vbe_mode_info;
-    framebuffer_addr = svga_mode->physbase; //vmm_temp_map_page(svga_mode->physbase);
+    framebuffer_addr = (uint8_t *)svga_mode->physbase; //vmm_temp_map_page(svga_mode->physbase);
     framebuffer_pitch = svga_mode->pitch;
     framebuffer_bpp = svga_mode->bpp;
     framebuffer_width = svga_mode->screen_width;

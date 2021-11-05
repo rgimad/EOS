@@ -46,10 +46,10 @@ void tty_setcolor(uint32_t color) {
 
 void tty_putchar(char c) {
     //draw_fill(50, 50, 100, 100, 0x0000AA);
-    if ((tty_pos_x + 8) >= VESA_WIDTH || c == '\n') { // Old == ==
+    if ((tty_pos_x + 8) >= (int)VESA_WIDTH || c == '\n') { // Old == ==
         tty_line_fill[tty_pos_y] = tty_pos_x;
         tty_pos_x = 0;
-        if ((tty_pos_y + 17) >= VESA_HEIGHT) { // Old ==
+        if ((tty_pos_y + 17) >= (int)VESA_HEIGHT) { // Old ==
             //draw_fill(50, 50, 100, 100, 0x0000AA);
             tty_scroll();
         } else {
@@ -57,7 +57,7 @@ void tty_putchar(char c) {
         }
     } else {
         //if (tty_pos_x + 7 > 1024 || tty_pos_y + 15 > 768) draw_fill(50, 50, 100, 100, 0x0000AA);
-        if ((tty_pos_y + 17) >= VESA_HEIGHT) {
+        if ((tty_pos_y + 17) >= (int)VESA_HEIGHT) {
             tty_scroll();
         }
         draw_vga_character(c, tty_pos_x, tty_pos_y, tty_text_color, 0x000000, 0);
