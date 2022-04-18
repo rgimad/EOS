@@ -127,27 +127,12 @@ void ksh_main() {
             }
         } else if (strcmp(cmd, "qemu_log_test") == 0) {
             qemu_printf("Hello world = %x + %s", 0x779, "privet");
-            //int PORT_COM1 = 0x3f8;
-            /*outb(PORT_COM1 + 1, 0x00);
-            outb(PORT_COM1 + 3, 0x80);
-            outb(PORT_COM1 + 0, 0x03);
-            outb(PORT_COM1 + 1, 0x00);
-            outb(PORT_COM1 + 3, 0x03);
-            outb(PORT_COM1 + 2, 0xC7);
-            outb(PORT_COM1 + 4, 0x0B);*/
-            /*char *str = "Hello world to qemu log!\n";
-            for (int i = 0; i < strlen(str); i++) {
-                while (inb(PORT_COM1 + 5) & 0x20 == 0);
-                outb(PORT_COM1, str[i]);
-            }*/
         } else if (strcmp(cmd, "reg_modif") == 0) {
             int val = 13372;
             asm volatile("mov %0, %%eax" :: "r"(val));
             asm volatile("int $32;");
         } else if (strcmp(cmd, "kg") == 0) {
             create_kernel_thread(kthread_grafdemo);
-            //kthread_grafdemo();
-            //int i = 5; while (1) { tty_printf("i = %d \n", i); i += 5; }
         } else {
             ksh_cmd_unknown();
         }
@@ -275,9 +260,6 @@ void ksh_cmd_cd(char *dname) {
         strcpy(dname, temp);
     }
 
-    //tty_printf("%s\n", dname);
-    //tty_printf("e = %x d = %d\n", vfs_exists(dname), vfs_is_dir(dname));
-
     if (dname[strlen(dname) - 1] != '/') { //very important, otherwise vfs won't see the dir
         strcat(dname, "/");
     }
@@ -304,8 +286,6 @@ void ksh_cmd_elf_info(char *fname) {
 
     tty_printf("elf fname = %s\n", fname);
     elf_info_short(fname);
-
-    //run_elf_file(fname);
 }
 
 void ksh_cmd_run(char *fname) {

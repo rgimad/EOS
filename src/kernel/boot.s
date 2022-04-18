@@ -73,7 +73,7 @@ _boot_page_directory:
 .endr
 
 # note: if you use math expressions (except +)
-# with numbers >= 2billionsomewhat in i686-elf-as overflow may occur
+# with numbers >= 2billionsomewhat in i686-elf-as incorrect behavior due to overflow may occur
 
 # What means 0x00000083:
 # the first entry identity maps the first 4MB of memory

@@ -5,7 +5,6 @@
 
 #include <kernel/tty.h>
 #include <kernel/graphics/vesafb.h>
-//#include <kernel/graphics/vgafnt.h>
 
 #include <libk/string.h>
 
@@ -18,8 +17,6 @@ int tty_pos_y;
 
 uint32_t tty_text_color;
 
-/*void update_cursor(size_t row, size_t col) {}*/
-
 void tty_init() {
     tty_pos_y = 0;
     tty_pos_x = 0;
@@ -28,7 +25,7 @@ void tty_init() {
 }
 
 void tty_backspace() {
-    if (tty_pos_x < 8) { // Old: == 0
+    if (tty_pos_x < 8) {
         if (tty_pos_y >= 17) {
             tty_pos_y -= 17;
         }
@@ -37,7 +34,6 @@ void tty_backspace() {
         tty_pos_x -= 8;
     }
     draw_vga_character(' ', tty_pos_x, tty_pos_y, tty_text_color, 0x000000, 1);
-    //update_cursor(tty_pos_y, tty_pos_x);
 }
 
 void tty_setcolor(uint32_t color) {
@@ -45,62 +41,22 @@ void tty_setcolor(uint32_t color) {
 }
 
 void tty_putchar(char c) {
-    //draw_fill(50, 50, 100, 100, 0x0000AA);
-    if ((tty_pos_x + 8) >= (int)VESA_WIDTH || c == '\n') { // Old == ==
+    if ((tty_pos_x + 8) >= (int)VESA_WIDTH || c == '\n') {
         tty_line_fill[tty_pos_y] = tty_pos_x;
         tty_pos_x = 0;
-        if ((tty_pos_y + 17) >= (int)VESA_HEIGHT) { // Old ==
-            //draw_fill(50, 50, 100, 100, 0x0000AA);
+        if ((tty_pos_y + 17) >= (int)VESA_HEIGHT) {
             tty_scroll();
         } else {
             tty_pos_y += 17;
         }
     } else {
-        //if (tty_pos_x + 7 > 1024 || tty_pos_y + 15 > 768) draw_fill(50, 50, 100, 100, 0x0000AA);
         if ((tty_pos_y + 17) >= (int)VESA_HEIGHT) {
             tty_scroll();
         }
         draw_vga_character(c, tty_pos_x, tty_pos_y, tty_text_color, 0x000000, 0);
         tty_pos_x += 8;
     }
-    //update_cursor(tty_pos_y, tty_pos_x);
 }
-
-/*
-void tty_putchar(char c) {
-    draw_fill(50, 50, 100, 100, 0x0000AA);
-    if (c != '\n') {
-        draw_vga_character(c, tty_pos_x, tty_pos_y, tty_text_color, 0x000000, 0);
-    }
-
-    if ((tty_pos_x += 8) >= VESA_WIDTH || c == '\n') { // old == ==
-        tty_line_fill[tty_pos_y] = tty_pos_x -= 8;
-        tty_pos_x = 0;
-        if ((tty_pos_y += 17) >= VESA_HEIGHT) { //old ==
-            tty_scroll();
-        }
-    }
-    //update_cursor(tty_pos_y, tty_pos_x);
-}
-
-*/
-
-/*void tty_scroll() {
-  tty_pos_y--;
-  for (size_t y = 0; y < VESA_HEIGHT - 1; y++) {
-    for (size_t x = 0; x < VESA_WIDTH; x++) {
-      const size_t src_index = y * VESA_WIDTH + x;
-      const size_t dstty_index = (y + 1) * VESA_WIDTH + x;
-      tty_buffer[src_index] = tty_buffer[dstty_index];
-    }
-    tty_line_fill[y] = tty_line_fill[y + 1];
-  }
-
-  for (size_t x = 0; x < VESA_WIDTH; x++) {
-    const size_t index = (VESA_HEIGHT - 1) * VESA_WIDTH + x;
-    tty_buffer[index] = vga_entry(' ', tty_color);
-  }
-}*/
 
 
 // Scrolls the display up number of rows

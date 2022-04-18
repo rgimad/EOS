@@ -154,11 +154,6 @@ void kernel_main(int magic_number, struct multiboot_info *mboot_info) { // Argum
     // init the kernel debug shell (ksh)
     ksh_init();
 
-    //elf_info("/initrd/first_program_gas.elf");
-    //run_elf_file("/initrd/first_program_gas.elf");
-
-    //run_elf_file("/initrd/reverse.elf");
-
     // run ksh main function
     ksh_main();
 
