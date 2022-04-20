@@ -38,8 +38,8 @@ void init_vbe(multiboot_info *mboot) {
 
     physical_addr frame;
     virtual_addr virt;
-    for (frame = framebuffer_addr, virt = framebuffer_addr;
-         frame < (framebuffer_addr + framebuffer_size/*0x00400000*//*0x002C0000 0x000F0000*/);
+    for (frame = (physical_addr)framebuffer_addr, virt = (virtual_addr)framebuffer_addr;
+         frame < ((physical_addr)framebuffer_addr + framebuffer_size/*0x00400000*//*0x002C0000 0x000F0000*/);
          frame += PAGE_SIZE, virt += PAGE_SIZE) {
         vmm_map_page(frame, virt);
     }
@@ -191,7 +191,6 @@ void draw_vga_character(uint8_t c, int x, int y, int fg, int bg, bool bgon) {
 
 void draw_text_string(const char *text, int x, int y, int fg, int bg, bool bgon) {
     int len = strlen(text);
-    int i;
     for (int i = 0; i < len; i++) {
         if (x + 8 <= 1024) {
             draw_vga_character(text[i], x, y, fg, bg, bgon);

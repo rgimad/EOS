@@ -90,7 +90,7 @@ physical_addr page_dir_entry_frame(page_dir_entry entry); // Return the address 
 
 void flush_tlb_entry(virtual_addr addr);
 
-extern enable_paging(physical_addr page_dir);
+extern void enable_paging(physical_addr page_dir);
 
 void vmm_init();
 void vmm_create_kernel_page_dir();
