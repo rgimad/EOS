@@ -82,35 +82,61 @@ void set_pixel(int x, int y, uint32_t color) {
     framebuffer_addr[where + 1] = color >> 8;
     framebuffer_addr[where + 2] = color >> 16;
 
-    //asm("movl %0, %%ecx" : : "r"(where));
-    //for(;;);
-    //double buffering
-
     back_framebuffer_addr[where] = color & 255;
     back_framebuffer_addr[where + 1] = (color >> 8) & 255;
     back_framebuffer_addr[where + 2] = (color >> 16) & 255;
 
-    //memcpy(framebuffer_addr + where, back_framebuffer_addr + where, 3);
-    //framebuffer_addr[where] = back_framebuffer_addr[where];
-    //framebuffer_addr[where + 1] = back_framebuffer_addr[where + 1];
-    //framebuffer_addr[where + 2] = back_framebuffer_addr[where + 2];
 }
 
+// TODO use colors in uint32_t format
+void rgba_blend(uint8_t result[4], uint8_t fg[4], uint8_t bg[4])
+{
+    unsigned int alpha = fg[3] + 1;
+    unsigned int inv_alpha = 256 - fg[3];
+    result[0] = (uint8_t)((alpha * fg[0] + inv_alpha * bg[0]) >> 8);
+    result[1] = (uint8_t)((alpha * fg[1] + inv_alpha * bg[1]) >> 8);
+    result[2] = (uint8_t)((alpha * fg[2] + inv_alpha * bg[2]) >> 8);
+    result[3] = 0xff;
+}
+
+// TODO make color uint32_t here
 void set_pixel_alpha(int x, int y, rgba_color color) {
+    if (x < 0 || y < 0 || 
+        x >= (int) VESA_WIDTH || 
+        y >= (int) VESA_HEIGHT) {
+        return;
+    }
+
     unsigned where = x * (framebuffer_bpp / 8) + y * framebuffer_pitch;
 
     if (color.a != 255) {
         if (color.a != 0) {
-            framebuffer_addr[where] = (255.0f / color.b) * (255.0f / color.a);
-            framebuffer_addr[where + 1] = (255.0f / color.g) * (255.0f / color.a);
-            framebuffer_addr[where + 2] = (255.0f / color.r) * (255.0f / color.a);
-        } else {
+
+            uint8_t bg[4] = {framebuffer_addr[where], framebuffer_addr[where + 1], framebuffer_addr[where + 2], 255};
+            uint8_t fg[4] = {(uint8_t)color.b, (uint8_t)color.g, (uint8_t)color.r, (uint8_t)color.a};
+            uint8_t res[4];
+
+            rgba_blend(res, fg, bg);
+
+            framebuffer_addr[where] = res[0]; 
+            framebuffer_addr[where + 1] = res[1]; 
+            framebuffer_addr[where + 2] = res[2]; 
+
+            back_framebuffer_addr[where] = res[0]; 
+            back_framebuffer_addr[where + 1] = res[1]; 
+            back_framebuffer_addr[where + 2] = res[2];
+            
+        } else { // if absolutely transparent dont draw anything
             return;
         }
-    } else {
-        framebuffer_addr[where] = color.b;
-        framebuffer_addr[where + 1] = color.g;
-        framebuffer_addr[where + 2] = color.r;
+    } else { // if non transparent just draw rgb
+        framebuffer_addr[where] = color.b & 255;
+        framebuffer_addr[where + 1] = color.g & 255;
+        framebuffer_addr[where + 2] = color.r & 255;
+
+        back_framebuffer_addr[where] = color.b & 255;
+        back_framebuffer_addr[where + 1] = color.g & 255;
+        back_framebuffer_addr[where + 2] = color.r & 255;
     }
 }
 
