@@ -22,7 +22,6 @@ char *strtok(char *s, const char *delim);
 size_t strlen(const char*);
 size_t str_bksp(char *str, char c);
 
-//size_t utf8_strlen(const uint32_t*);
 
 int atoi(const char*);
 char* itoa(int, char*, int);
