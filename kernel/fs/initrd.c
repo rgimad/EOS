@@ -8,7 +8,7 @@
 #include <kernel/mm/kheap.h>
 #include <kernel/tty.h>
 
-#include <libk/string.h>
+#include <kernel/libk/string.h>
 
 uint32_t initrd_begin = 0;
 uint32_t initrd_end = 0;

@@ -1,4 +1,4 @@
-#include <libk/math.h>
+#include <kernel/libk/math.h>
 
 int pow(int a, int b) {
     if (b <= 0) {

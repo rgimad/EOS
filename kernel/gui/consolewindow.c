@@ -7,7 +7,7 @@
 #include <kernel/graphics/vesafb.h>
 #include <kernel/graphics/vgafnt.h>
 
-#include <libk/string.h>
+#include <kernel/libk/string.h>
 
 #include <kernel/mm/kheap.h>
 

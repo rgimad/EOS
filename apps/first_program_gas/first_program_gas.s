@@ -17,6 +17,8 @@ _main:
     int $0x80
     int $0x80
     int $0x80
+    int $0x80
+    int $0x80
 
     movl %ebp, %esp
     popl %ebp

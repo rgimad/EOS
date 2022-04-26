@@ -3,7 +3,7 @@
  * Double linked list data structure implementation
  */
 
-#include <libk/list.h>
+#include <kernel/libk/list.h>
 
 #include <kernel/mm/kheap.h>
 

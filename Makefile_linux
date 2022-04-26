@@ -8,7 +8,6 @@ INCLUDE_DIR=../../include/
 
 AS = "/opt/i686-elf-tools-linux/bin/i686-elf-as"
 CC = "/opt/i686-elf-tools-linux/bin/i686-elf-gcc"
-#BASH = ubuntu1804 run
 
 LDFLAGS=-T linker.ld -ffreestanding -nostdlib -lgcc
 ifdef DEBUG

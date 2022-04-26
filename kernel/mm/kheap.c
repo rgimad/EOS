@@ -7,7 +7,7 @@
 #include <kernel/mm/virt_memory.h>
 #include <kernel/tty.h>
 
-#include <libk/string.h>
+#include <kernel/libk/string.h>
 
 bool kheap_is_init; // Was kheap manager initialised or not. TODO: is it unused?
 
@@ -66,7 +66,7 @@ void kheap_free(void *address) {
         //tty_printf("tmp_item = %x\n", tmp_item);
         if (tmp_item == item) {
             // Free it
-            tmp_item->used = FALSE;
+            tmp_item->used = false;
             kheap_memory_used -= tmp_item->size;
             kheap_allocs_num--;
 
@@ -114,7 +114,7 @@ void *kheap_malloc(uint32_t size) {
     if (new_item != NULL) {
         tmp_item = (kheap_item*) ((uint32_t) new_item + total_size);
         tmp_item->size = new_item->size - total_size;
-        tmp_item->used = FALSE;
+        tmp_item->used = false;
         tmp_item->next = new_item->next;
     } else {
         // Didn't find a fit so we must increase the heap to fit
@@ -130,7 +130,7 @@ void *kheap_malloc(uint32_t size) {
         tmp_item->size = PAGE_SIZE - (total_size % PAGE_SIZE 
                                       ? total_size % PAGE_SIZE 
                                       : total_size) - sizeof(kheap_item);
-        tmp_item->used = FALSE;
+        tmp_item->used = false;
         tmp_item->next = NULL;
 
         //tty_printf("last_item = %x", last_item); // Why commenting this causes exception??? ANSWER IS BECAUSE OF FUCKING OPTIMIZATION -O1. i disabled it and it works now witout this line
@@ -139,7 +139,7 @@ void *kheap_malloc(uint32_t size) {
     // !!! A KAK etot new_item svyazan c posledney item v spiske???? to est new_item eto ne poslednyaa item. solved!
     // Create the new item
     new_item->size = size;
-    new_item->used = TRUE;
+    new_item->used = true;
     new_item->next = tmp_item;
 
     kheap_allocs_num++;

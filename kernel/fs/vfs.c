@@ -7,7 +7,7 @@
 #include <kernel/mm/kheap.h>
 #include <kernel/tty.h>
 
-#include <libk/string.h>
+#include <kernel/libk/string.h>
 
 #define MOUNTPOINTS_SIZE 100
 

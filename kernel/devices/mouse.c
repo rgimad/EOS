@@ -10,7 +10,7 @@
 
 #include <kernel/tty.h>
 
-#include <libk/string.h>
+#include <kernel/libk/string.h>
 
 uint8_t mouse_ready = 0;
 

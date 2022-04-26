@@ -8,7 +8,7 @@
 #include <kernel/mm/kheap.h>
 #include <kernel/tty.h>
 
-#include <libk/string.h>
+#include <kernel/libk/string.h>
 
 void init_vbe(multiboot_info *mboot) {
     //if (mboot->framebuffer_type != 1) {
