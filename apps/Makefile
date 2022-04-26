@@ -1,7 +1,16 @@
+# Makefile for building apps for EOS
+
+# if we're on Windows use WSL to run bash commands
+ifeq ($(OS),Windows_NT) 
+    BASH = wsl
+else
+    BASH =
+endif
+
 all: all_init app_first_program_gas app_reverse_string app_grafdemo
 
 all_init:
-	mkdir -p ../bin/apps
+	$(BASH) mkdir -p ../bin/apps
 
 app_first_program_gas:
 	make -C first_program_gas
