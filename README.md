@@ -43,34 +43,32 @@ Go to src/kernel
 - Building *release* version:
 
 ```Shell
-make -f Makefile_linux build-iso
+make build-iso
 ```
 
 - Building and running *release* version:
 
 ```Shell
-make -f Makefile_linux build-iso-run
+make build-iso-run
 ```
 
 - Building *debug* version:
 
 ```Shell
-make -f Makefile_linux build-iso-run DEBUG=1
+make build-iso DEBUG=1
 ```
 
 - Building and running *debug* version:
 
 ```Shell
-make -f Makefile_linux build-iso-run-debug DEBUG=1
+make build-iso-run DEBUG=1
 ```
 
 - Always do following command before switching between debug and release configurations:
 
 ```Shell
-make -f Makefile_linux clean
+make clean
 ```
-
-- Note: `Makefile_windows` is currently incomplete (TODO complete and fix it)
 
 ## Thanks to
 

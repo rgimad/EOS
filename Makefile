@@ -13,17 +13,11 @@ endif
 
 all: build-iso-run
 
-run:
-	qemu-system-i386 -kernel $(KERNEL_FILE) -M pc-i440fx-3.1
-
-build-run: $(TARGET_ELF)
-	qemu-system-i386 -kernel $(KERNEL_FILE) -M pc-i440fx-3.1
-
-check-multiboot: $(TARGET_ELF)
+check-multiboot: $(KERNEL_FILE)
 	$(BASH) grub-file --is-x86-multiboot $(KERNEL_FILE)
 
 compile-kernel:
-	make -C kernel -f Makefile
+	make -C kernel -f Makefile DEBUG=$(DEBUG)
 
 build-iso: compile-kernel check-multiboot
 	$(BASH) rm -rf $(ISODIR)
@@ -39,16 +33,14 @@ build-iso: compile-kernel check-multiboot
 clean-logs:
 	$(BASH) rm -rf $(LOGFILE)
 
-build-iso-run: clean-logs build-iso
-	qemu-system-i386 -cdrom $(TARGET_ISO) -monitor stdio -serial file:$(LOGFILE)
-
 run-iso: clean-logs
-	qemu-system-i386 -cdrom $(TARGET_ISO) -monitor stdio -serial file:$(LOGFILE)
-
-run-iso-debug: clean-logs
+ifeq ($(DEBUG),1)
 	qemu-system-i386 -s -S -cdrom $(TARGET_ISO) -monitor stdio -serial file:$(LOGFILE) & gdb $(KERNEL_FILE) -ex "target remote localhost:1234" -tui
+else
+	qemu-system-i386 -cdrom $(TARGET_ISO) -monitor stdio -serial file:$(LOGFILE)
+endif
 
-build-iso-run-debug: build-iso run-iso-debug
+build-iso-run: build-iso run-iso
 
 clean:
 	$(BASH) rm -rf $(ISODIR)

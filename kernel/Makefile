@@ -15,7 +15,7 @@ else
 endif
 
 LDFLAGS=-T linker.ld -ffreestanding -nostdlib -lgcc
-ifdef DEBUG
+ifeq ($(DEBUG), 1)
 	CCFLAGS=-std=gnu99 -g -ffreestanding -Wall -Wextra -I $(INCLUDE_DIR)
 else
 	CCFLAGS=-std=gnu99 -ffreestanding -Wall -Wextra -I $(INCLUDE_DIR)
