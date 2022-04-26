@@ -11,7 +11,7 @@ CC = i686-elf-gcc
 ifeq ($(OS),Windows_NT) 
     BASH = wsl
 else
-    BASH = ""
+    BASH =
 endif
 
 LDFLAGS=-T linker.ld -ffreestanding -nostdlib -lgcc
@@ -36,7 +36,7 @@ OBJ=boot.o kernel.o \
 all: $(TARGET_ELF)
 
 $(TARGET_ELF): $(OBJ)
-	mkdir -p $(TARGET_DIR)
+	$(BASH) mkdir -p $(TARGET_DIR)
 	$(CC) $(LDFLAGS) -o $(TARGET_DIR)$(TARGET_ELF) $(OBJ)
 
 %.o: %.c
@@ -46,14 +46,14 @@ $(TARGET_ELF): $(OBJ)
 	$(AS) -o $@ $<
 
 clean:
-	rm -rf *.o
-	rm -rf io/*.o
-	rm -rf devices/*.o
-	rm -rf mm/*.o
-	rm -rf graphics/*.o
-	rm -rf fs/*.o
-	rm -rf pm/*.o
-	rm -rf ../libk/*.o
-	rm -rf gui/*.o
-	rm -rf $(TARGET_DIR)kernel.elf
+	$(BASH) rm -rf *.o
+	$(BASH) rm -rf io/*.o
+	$(BASH) rm -rf devices/*.o
+	$(BASH) rm -rf mm/*.o
+	$(BASH) rm -rf graphics/*.o
+	$(BASH) rm -rf fs/*.o
+	$(BASH) rm -rf pm/*.o
+	$(BASH) rm -rf ../libk/*.o
+	$(BASH) rm -rf gui/*.o
+	$(BASH) rm -rf $(TARGET_DIR)kernel.elf
 
