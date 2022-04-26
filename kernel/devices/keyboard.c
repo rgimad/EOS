@@ -8,8 +8,6 @@
 #include <kernel/interrupts.h>
 #include <kernel/io/ports.h>
 
-//#define ARR_LENGTH(a) (a / sizeof(a[0]))
-
 typedef struct {
     uint8_t scancode;
     char chr; // Character it corresponds to.

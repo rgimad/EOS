@@ -7,7 +7,7 @@
 #include <kernel/mm/phys_memory.h>
 #include <kernel/tty.h>
 
-#include <libk/string.h>
+#include <kernel/libk/string.h>
 
 page_directory *kernel_page_dir; // Pointer (physical) to kernel page dircetory structure
 

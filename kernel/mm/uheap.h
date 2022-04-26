@@ -10,8 +10,6 @@
 #include <kernel/pm/process.h>
 #include <kernel/pm/thread.h>
 
-#include <libk/types.h>
-
 #include <stdbool.h>
 #include <stdint.h>
 

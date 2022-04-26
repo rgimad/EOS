@@ -11,7 +11,7 @@
 #include <kernel/devices/keyboard.h>
 #include <kernel/graphics/vesafb.h>
 
-#include <libk/string.h>
+#include <kernel/libk/string.h>
 
 uint32_t sc_puts(char *str) {
     tty_printf("%s", str);

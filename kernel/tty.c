@@ -6,7 +6,7 @@
 #include <kernel/tty.h>
 #include <kernel/graphics/vesafb.h>
 
-#include <libk/string.h>
+#include <kernel/libk/string.h>
 
 volatile uint8_t tty_feedback = 1;
 

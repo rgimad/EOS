@@ -16,7 +16,7 @@
 #include <kernel/fs/vfs.h>
 #include <kernel/tty.h>
 
-#include <libk/string.h>
+#include <kernel/libk/string.h>
 
 process_t *create_process(char *filepath) {
     void *file_buffer = elf_open(filepath);

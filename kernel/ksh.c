@@ -22,7 +22,7 @@
 #include <kernel/kernel.h>
 
 #include <kernel/io/qemu_log.h>
-#include <libk/string.h>
+#include <kernel/libk/string.h>
 
 #include <kernel/gui/consolewindow.h>
 

@@ -6,7 +6,7 @@
 #include <kernel/mm/phys_memory.h>
 #include <kernel/tty.h>
 
-#include <libk/string.h>
+#include <kernel/libk/string.h>
 
 uint32_t *phys_memory_bitmap = 0;
 uint32_t phys_block_count = 0;

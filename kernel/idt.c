@@ -7,7 +7,7 @@
 #include <kernel/tty.h>
 #include <kernel/io/ports.h>
 
-#include <libk/string.h>
+#include <kernel/libk/string.h>
 
 #include <kernel/devices/timer.h>
 #include <kernel/pm/scheduler.h>

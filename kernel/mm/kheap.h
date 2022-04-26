@@ -8,8 +8,6 @@
 
 #include <kernel/mm/memlayout.h>
 
-#include <libk/types.h>
-
 #include <stdbool.h>
 #include <stdint.h>
 

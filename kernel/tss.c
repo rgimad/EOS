@@ -6,7 +6,7 @@
 #include <kernel/tss.h>
 #include <kernel/gdt.h>
 
-#include <libk/string.h>
+#include <kernel/libk/string.h>
 
 #include <kernel/io/qemu_log.h>
 

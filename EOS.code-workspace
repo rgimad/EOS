@@ -4,5 +4,10 @@
 			"path": "."
 		}
 	],
-	"settings": {}
+	"settings": {
+		"files.associations": {
+			"string.h": "c",
+			"stdbool.h": "c"
+		}
+	}
 }

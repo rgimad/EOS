@@ -7,7 +7,7 @@
 
 #include <stdint.h>
 #include <stdbool.h>
-#include <libk/list.h>
+#include <kernel/libk/list.h>
 #include <kernel/interrupts.h>//for struct regs
 #include <kernel/pm/process.h>
 #include <kernel/pm/thread.h>

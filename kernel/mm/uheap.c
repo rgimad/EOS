@@ -6,7 +6,7 @@
 #include <kernel/mm/uheap.h>
 #include <kernel/mm/virt_memory.h>
 
-#include <libk/string.h>
+#include <kernel/libk/string.h>
 
 void uheap_init(process_t *proc) {
     proc->heap_begin = UHEAP_START_VADDR; // UHEAP_START_VADDR is from memlayout.h
@@ -53,7 +53,7 @@ void uheap_free(process_t *proc, void *address) {
 
         if (tmp_item == item) {
             // free it
-            tmp_item->used = FALSE;
+            tmp_item->used = false;
             proc->heap_memory_used -= tmp_item->size;
             proc->heap_allocs_num--;
 
@@ -101,7 +101,7 @@ void *uheap_malloc(process_t *proc, uint32_t size) {
     if (new_item != NULL) {
         tmp_item = (uheap_item*) ((uint32_t) new_item + total_size);
         tmp_item->size = new_item->size - total_size;
-        tmp_item->used = FALSE;
+        tmp_item->used = false;
         tmp_item->next = new_item->next;
     } else {
         // Didn't find a fit so we must increase the heap to fit
@@ -117,7 +117,7 @@ void *uheap_malloc(process_t *proc, uint32_t size) {
         tmp_item->size = PAGE_SIZE - (total_size % PAGE_SIZE 
                                       ? total_size % PAGE_SIZE 
                                       : total_size) - sizeof(uheap_item);
-        tmp_item->used = FALSE;
+        tmp_item->used = false;
         tmp_item->next = NULL;
 
         //tty_printf("last_item = %x", last_item);///////////////why commenting this causes exception??? ANSWER IS BECAUSE OF FUCKING OPTIMIZATION -O1. i disabled it and it works now witout this line
@@ -126,7 +126,7 @@ void *uheap_malloc(process_t *proc, uint32_t size) {
     // !!! A KAK etot new_item svyazan c posledney item v spiske???? to est new_item eto ne poslednyaa item. solved!
     // Create the new item
     new_item->size = size;
-    new_item->used = TRUE;
+    new_item->used = true;
     new_item->next = tmp_item;
 
     proc->heap_allocs_num++;

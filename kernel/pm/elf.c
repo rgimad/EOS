@@ -9,7 +9,7 @@
 #include <kernel/mm/kheap.h>
 #include <kernel/tty.h>
 
-#include <libk/string.h>
+#include <kernel/libk/string.h>
 
 // Returns 0 if header is valid, 1 if magic number invalid, 2 and more if file isn't compatible
 uint8_t elf_check_header(struct elf_hdr *hdr) {
