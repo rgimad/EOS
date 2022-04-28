@@ -222,7 +222,6 @@ void pmm_free_available_memory(struct multiboot_info *mb) {
 }
 
 void pmm_relocate_initrd_to_high_mem(struct multiboot_info *mb) {
-    //tty_printf("test");
     uint32_t initrd_beg = *(uint32_t*) (mb->mods_addr);
     uint32_t initrd_end = *(uint32_t*) (mb->mods_addr + 4);
     uint32_t initrd_size = initrd_end - initrd_beg;
@@ -245,7 +244,8 @@ void pmm_relocate_initrd_to_high_mem(struct multiboot_info *mb) {
         if (mmap_avail_entries_array[i].len >= initrd_size) {
             //tty_printf("addr = %x\n", mmap_avail_entries_array[i].addr);
             initrd_mmap_entry_addr = mmap_avail_entries_array[i].addr;
-            memcpy(initrd_mmap_entry_addr + mmap_avail_entries_array[i].len - initrd_size - 1, initrd_beg, initrd_size);
+            // NOTE: here assuming that address is 32 bit, when porting to 64bit platform need change
+            memcpy((void*)((uint32_t)initrd_mmap_entry_addr + (uint32_t)mmap_avail_entries_array[i].len - initrd_size - 1), (void*)initrd_beg, initrd_size);
             initrd_beg = initrd_mmap_entry_addr + mmap_avail_entries_array[i].len - initrd_size - 1;
             initrd_end = initrd_beg + initrd_size;
             //pmm_free_chunk(initrd_end + 1, mmap_avail_entries_array[i].len - initrd_size);

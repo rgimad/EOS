@@ -10,13 +10,13 @@
 
 #include <kernel/libk/string.h>
 
-uint32_t initrd_begin = 0;
-uint32_t initrd_end = 0;
-uint32_t initrd_size;
+uint8_t* initrd_begin = 0;
+uint8_t* initrd_end = 0;
+size_t initrd_size;
 
-int oct2bin(unsigned char *str, int size) {
+int oct2bin(char *str, int size) {
     int n = 0;
-    unsigned char *c = str;
+    char *c = str;
     while (size-- > 0) {
         n *= 8;
         n += *c - '0';
@@ -37,30 +37,31 @@ unsigned int tar_getsize(const char *in) {
     return size;
 }
 
-/* Returns pointer to file data */
-int tar_lookup(unsigned char *archive, char *filename) {
-    unsigned char *ptr = archive;
+// Returns pointer to file data
+uint8_t* tar_lookup(uint8_t *archive, const char *filename) {
+    uint8_t *ptr = archive;
  
     while (!memcmp(ptr + 257, "ustar", 5)) 
     {
-        int filesize = oct2bin(ptr + 0x7c, 11);
+        int filesize = oct2bin((char*)ptr + 0x7c, 11);
         if (!memcmp(ptr, filename, strlen(filename) + 1)) {
             return ptr + 512;
         }
 
         ptr += (((filesize + 511) / 512) + 1) * 512;
         if (ptr == initrd_end) {
-            return 0;
+            return NULL;
         }
-        if (ptr >  initrd_end) {
-            return 0;
+        if (ptr > initrd_end) {
+            return NULL;
         }
     }
-    return 0;
+    return NULL;
 }
 
-uint32_t initrd_read(char *filename, int offset, int size, vfs_filesystem_t *fs, void *buffer) {
+uint32_t initrd_read(const char *filename, int offset, int size, vfs_filesystem_t *fs, void *buffer) {
     int read_size = 0;
+    (void)fs;
     if (!filename) {
         return 0;
     }
@@ -68,14 +69,12 @@ uint32_t initrd_read(char *filename, int offset, int size, vfs_filesystem_t *fs,
         return 0;
     }
 
-    int file_addr = tar_lookup(initrd_begin, filename);
-    if (!file_addr) { // File not found
+    uint8_t *file_addr = tar_lookup(initrd_begin, filename);
+    if (file_addr == NULL) { // File not found
         return 0;
     }
 
-    file_addr -= 512;
-    ustar_file_t *file = (struct ustar_file_t*) file_addr;
-    file_addr += 512;
+    ustar_file_t *file = (ustar_file_t*)(file_addr - 512);
 
     if (size > oct2bin(file->size, 11)) {
         read_size = oct2bin(file->size, 11);
@@ -88,54 +87,58 @@ uint32_t initrd_read(char *filename, int offset, int size, vfs_filesystem_t *fs,
     return read_size;
 }
 
-uint32_t initrd_file_exists(char *filename, vfs_filesystem_t *fs) {
+uint32_t initrd_file_exists(const char *filename, vfs_filesystem_t *fs) {
+    (void)fs;
     if (!filename) {
         return 0;
     }
 
-    int file_addr = tar_lookup(initrd_begin, filename);
+    uint8_t *file_addr = tar_lookup(initrd_begin, filename);
     if (!file_addr) { // file not found
         return 0;
     } else {
-        return file_addr;
+        return 1; // file_addr;
     }
 }
 
-uint32_t initrd_get_filesize(char *filename) {
+uint32_t initrd_get_filesize(const char *filename, vfs_filesystem_t* fs) {
+    (void)fs;
     if (!filename) {
         return 0;
     }
 
-    int file_addr = tar_lookup(initrd_begin, filename);
+    uint8_t *file_addr = tar_lookup(initrd_begin, filename);
     if (!file_addr) { // file not found
         return 0;
     } else {
         file_addr -= 512;
-        ustar_file_t *file = (struct ustar_file_t*) file_addr;
+        ustar_file_t *file = (ustar_file_t*)file_addr;
         return oct2bin(file->size, 11);
     }
 }
 
-uint32_t initrd_is_dir(char *filename) {
+uint32_t initrd_is_dir(const char *filename, vfs_filesystem_t* fs) {
+    (void)fs;
     if (!filename) {
         return 0;
     }
 
-    int file_addr = tar_lookup(initrd_begin, filename);
+    uint8_t *file_addr = tar_lookup(initrd_begin, filename);
     if (!file_addr) { // file not found
         return 0;
     } else {
-        ustar_file_t *file = (struct ustar_file_t*) file_addr;
+        ustar_file_t *file = (ustar_file_t*)file_addr;
         return file->type; //(file->type == USTAR_DIRECTORY); // TODO why this comparison doenst work?? why for files file->type is 0 and for dirs id 48 aka '0' ????
     }
 }
 
 void initrd_list(int argc, char **arg) {
-    int addr = initrd_begin;
+    (void)argc; (void)arg;
+    uint8_t* addr = initrd_begin;
 
     while (!memcmp(addr + 257, "ustar", 5)) {
-        int filesize = oct2bin(addr + 0x7c, 11);
-        ustar_file_t *file = (struct ustar_file_t*) addr;
+        int filesize = oct2bin((char *)addr + 0x7c, 11);
+        ustar_file_t *file = (ustar_file_t*)addr;
 
         if (file->type == USTAR_DIRECTORY) {
             //printf("\n\e[36%s", file->fname);
@@ -157,7 +160,6 @@ void initrd_list(int argc, char **arg) {
 }
 
 void initrd_init(uint32_t phys_begin, uint32_t phys_end) {
-    // TODO: map initrd image to virtual memory
 
     tty_printf("initrd phys begin = %x\ninitrd phys end = %x\n", phys_begin, phys_end);
 
@@ -166,16 +168,17 @@ void initrd_init(uint32_t phys_begin, uint32_t phys_end) {
     //for (i = 0; i < 20; i++) tty_printf("%c", *(char*) (phys_begin + i));
 
     initrd_size = phys_end - phys_begin;
-    initrd_begin = kheap_malloc(initrd_size + 4 * PAGE_SIZE);
+    initrd_begin = (uint8_t*)(kheap_malloc(initrd_size + 4 * PAGE_SIZE));
 
+    // NOTE: 32bit addresses
     physical_addr frame;
     virtual_addr virt;
-    for (frame = PAGE_ALIGN_DOWN(phys_begin), virt = PAGE_ALIGN_DOWN(initrd_begin) + PAGE_SIZE;
+    for (frame = PAGE_ALIGN_DOWN(phys_begin), virt = PAGE_ALIGN_DOWN((uint32_t)initrd_begin) + PAGE_SIZE;
          frame <= (PAGE_ALIGN_DOWN(phys_end));
          frame += PAGE_SIZE, virt += PAGE_SIZE) {
         vmm_map_page(frame, virt);
     }
-    initrd_begin = PAGE_ALIGN_DOWN(initrd_begin) + PAGE_SIZE + phys_begin % PAGE_SIZE;
+    initrd_begin = (uint8_t *)(PAGE_ALIGN_DOWN((uint32_t)initrd_begin) + PAGE_SIZE + phys_begin % PAGE_SIZE);
     initrd_end = initrd_begin + initrd_size;
 
     //int i;

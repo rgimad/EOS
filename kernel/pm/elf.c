@@ -48,6 +48,7 @@ void *elf_open(const char *fname) { // Returns pointer to ELF file.
     void *addr = kheap_malloc(fsize);
     //tty_printf("addr = %x\n", addr);
     int res = vfs_read(fname, 0, fsize, addr);
+    (void)res;
     struct elf_hdr *hdr = addr;
     //uint8_t status = elf_check_header(hdr);
     //if(status) {

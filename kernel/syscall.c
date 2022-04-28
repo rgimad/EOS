@@ -5,8 +5,6 @@
 
 #include <kernel/syscall.h>
 
-//#include <kernel/interrupts.h>
-
 #include <kernel/tty.h>
 #include <kernel/devices/keyboard.h>
 #include <kernel/graphics/vesafb.h>
@@ -18,9 +16,9 @@ uint32_t sc_puts(char *str) {
     return (uint32_t)0;
 }
 
-uint32_t sc_gets(char *str, int cnt) {
-    keyboard_gets(str, cnt);
-}
+// uint32_t sc_gets(char *str, int cnt) {
+//     keyboard_gets(str, cnt);
+// }
 
 void syscall_init() {
     register_interrupt_handler(SYSCALL_IDT_INDEX, &syscall_handler);

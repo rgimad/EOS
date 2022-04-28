@@ -58,12 +58,11 @@ int vfs_mount(vfs_storage_dev_t *dev, vfs_filesystem_handles_t *fs_handles, int 
     return 1;
 }
 
-int vfs_mount_find(char *path, int *filename_add) {
+int vfs_mount_find(const char *path, int *filename_add) {
     char *a = (char*) kheap_malloc(strlen(path) + 1);
     memset(a, 0, strlen(path) + 1);
     memcpy(a, path, strlen(path) + 1);
     
-    int at = 0;
     if (a[strlen(a)] == '/') {
         str_bksp(a, '/');
     }

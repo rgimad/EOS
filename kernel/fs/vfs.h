@@ -34,19 +34,19 @@ typedef struct vfs_filesystem_t {
 
 // Contains pointers to some filesystems methods
 typedef struct vfs_filesystem_handles_t {
-    uint32_t (*read) (char *fn, int*, int*, vfs_filesystem_t*, void*);
-    uint32_t (*write) (char *fn, int*, int*, vfs_filesystem_t*, void*);
+    uint32_t (*read) (const char *fn, int, int, vfs_filesystem_t*, void*);
+    uint32_t (*write) (const char *fn, int, int, vfs_filesystem_t*, void*);
 
     uint32_t (*readdir) (char*, vfs_filesystem_t*, void*);
 
-    uint32_t (*mkfile) (char *fn, char*, vfs_filesystem_t*, uint16_t*);
-    uint32_t (*mkdir) (char *fn, char*, vfs_filesystem_t*, uint16_t*);
+    uint32_t (*mkfile) (char *fn, char*, vfs_filesystem_t*, uint16_t);
+    uint32_t (*mkdir) (char *fn, char*, vfs_filesystem_t*, uint16_t);
 
     uint32_t (*rm) (char *fn, vfs_filesystem_t*);
 
-    uint32_t (*get_size) (char *fn, vfs_filesystem_t*);
-    uint32_t (*exists) (char *fn, vfs_filesystem_t*);
-    uint32_t (*is_dir) (char *fn, vfs_filesystem_t*);
+    uint32_t (*get_size) (const char *fn, vfs_filesystem_t*);
+    uint32_t (*exists) (const char *fn, vfs_filesystem_t*);
+    uint32_t (*is_dir) (const char *fn, vfs_filesystem_t*);
 } vfs_filesystem_handles_t;
 
 // VFS mount point
@@ -58,10 +58,9 @@ typedef struct vfs_mount_info_t  {
 
 void vfs_init();
 
-// TODO: correct them! corrected
 void vfs_mount_list();
 int vfs_mount(vfs_storage_dev_t *dev, vfs_filesystem_handles_t *fs_handles, int type, char *location, int block_size);
-int vfs_mount_find(char *path, int *filename_add);
+int vfs_mount_find(const char *path, int *filename_add);
 
 int vfs_read(const char *filename, int offset, int size, void *buf);
 int vfs_get_size(const char *filename);
