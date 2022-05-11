@@ -1,20 +1,23 @@
 // Graphical demo for EOS
 
+typedef struct {
+    unsigned int x;
+    unsigned int y;
+    unsigned int width;
+    unsigned int height;
+    unsigned int color;
+} sys_square_t;
+
 void syscall_draw_square(int x, int y, int width, int height, unsigned int color) {
-    unsigned int arguments[5];
-    arguments[0] = x;
-    arguments[1] = y;
-    arguments[2] = width;
-    arguments[3] = height;
-    arguments[4] = color;
-
-    unsigned int res = 0;
-
-    asm volatile("mov %%eax, %0;" : "=a"(res) : "a"(2), "b"(arguments));
-    asm volatile("int $0x80;");
+    sys_square_t args = {x, y, width, height, color};
+    __asm__ __volatile__(
+        "int $0x80"
+        ::"a"(2), "b"(&args)
+        :"memory"
+    );
 }
 
-int main() {
+int main(void) {
     int i;
     while (1) {
         for (i = 0; i < 1000; i++) {
