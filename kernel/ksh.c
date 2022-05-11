@@ -17,6 +17,7 @@
 #include <kernel/fs/initrd.h>
 
 #include <kernel/pm/elf.h>
+#include <kernel/pm/pe.h>
 #include <kernel/pm/thread.h>
 
 #include <kernel/kernel.h>
@@ -25,6 +26,8 @@
 #include <kernel/libk/string.h>
 
 #include <kernel/gui/consolewindow.h>
+
+#include <stdint.h>
 
 char ksh_working_directory[256];
 
@@ -289,13 +292,32 @@ void ksh_cmd_elf_info(char *fname) {
 }
 
 void ksh_cmd_run(char *fname) {
+    int status = 0;
+
     if (fname[0] != '/') { // TODO: make function
         char temp[256];
         strcpy(temp, ksh_working_directory);
         strcat(temp, fname);
         strcpy(fname, temp);
     }
-    run_elf_file(fname);
+
+    if(!vfs_exists(fname)) {
+        tty_printf("File not found!\n");
+        return;
+    }
+
+    uint32_t signature = 0;
+    vfs_read(fname, 0, sizeof(signature), &signature);
+
+    if (signature == ELF_SIGNATURE) { 
+        status = run_elf_file(fname);
+    } else if ((uint16_t)signature == PE_IMAGE_DOS_SIGNATURE) {
+        status = run_pe_file(fname);
+    } else {
+        tty_printf("Unknown executable file format\n");
+        return;
+    }
+    tty_printf("\nProgram exited with code %d\n", status);
 }
 
 void ksh_syscall_test() {
