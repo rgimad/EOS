@@ -8,6 +8,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+#define ELF_SIGNATURE  0x464c457f /* { 0x7f, 'E', 'L', 'F' } */
 #define ELF_ARCH_32BIT (1)
 #define ELF_ARCH_64BIT (2)
 #define ELF_BYTEORDER_LENDIAN (1)
@@ -22,7 +23,7 @@
 enum elf_type {ELF_NONE = 0, ELF_REL = 1, ELF_EXEC = 2};
 
 struct elf_hdr {
-	uint8_t     mag_num[4]; //Should be 0x7f, then "ELF" in ASCII. If it isn't exactly like that, we need to throw an error.
+	uint32_t          sign; //Should be 0x7f, then "ELF" in ASCII. If it isn't exactly like that, we need to throw an error.
 	uint8_t           arch; //ELF file architecture, can be 32- or 64-bit.
 	uint8_t     byte_order; //ELF file byte order (little- or big-endian).
 	uint8_t        elf_ver; //ELF file version.

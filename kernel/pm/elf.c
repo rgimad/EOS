@@ -11,13 +11,10 @@
 
 #include <kernel/libk/string.h>
 
-// Returns 0 if header is valid, 1 if magic number invalid, 2 and more if file isn't compatible
+// Returns 0 if header is valid, 1 if signature number invalid, 2 and more if file isn't compatible
 uint8_t elf_check_header(struct elf_hdr *hdr) {
-    if (hdr->mag_num[0] != 0x7f || 
-        hdr->mag_num[1] != 'E' || 
-        hdr->mag_num[2] != 'L' || 
-        hdr->mag_num[3] != 'F') {
-        return 1; // Our magic number isn't valid
+    if (hdr->sign != ELF_SIGNATURE) {
+        return 1; // Our signature number isn't valid
     }
     if (hdr->arch != ELF_ARCH_32BIT) {
         return 2; // This ELF file can't be loaded because it's not 32-bit
@@ -208,7 +205,7 @@ int run_elf_file(const char *name/*, char **argv, char **env __attribute__((unus
     }
     */
 
-    void(*entry_point)() = (void*) (hdr->entry);
+    int (*entry_point)() = (void*)(hdr->entry);
     tty_printf("ELF entry point: %x\n", hdr->entry);
 
     //tty_printf("%x %x", *(char*)hdr->entry);
@@ -223,8 +220,9 @@ int run_elf_file(const char *name/*, char **argv, char **env __attribute__((unus
     */
 
     /*int result = */
-    entry_point();
+    int ret_code = entry_point();
+
     //tty_printf("[%s] Return value was %i\n", name, result);
 
-    return 0;
+    return ret_code;
 }
