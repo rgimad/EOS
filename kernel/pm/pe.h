@@ -6,16 +6,25 @@
 #include <stddef.h>
 #include <kernel/pm/elf.h>
 
-#define PE_IMAGE_DOS_SIGNATURE              0x5A4D
-#define PE_IMAGE_NT_SIGNATURE               0x00004550
+#define PE_IMAGE_DOS_SIGNATURE              0x5A4D      /* MZ in ASCII */
+#define PE_IMAGE_NT_SIGNATURE               0x00004550  /* PE in ASCII */
 #define PE_IMAGE_NT_OPTIONAL_HDR32_MAGIC    0x10b
-#define PE_IMAGE_FILE_MACHINE_I386          0x014c   /* Intel 386 or later processors and compatible processors */
+#define PE_IMAGE_FILE_MACHINE_I386          0x014c      /* Intel 386 or later processors and compatible processors */
 #define PE_IMAGE_SIZEOF_SHORT_NAME          8
 #define PE_IMAGE_NUMBEROF_DIRECTORY_ENTRIES 16
 
 #define PE_MAX_SECTIONS 96
 
-#define PE_MAKE_PTR(cast, ptr, addValue) (cast)((intptr_t)(ptr) + (uint32_t)(addValue))
+#define PE_MAKE_PTR(cast, ptr, add_value) (cast)((uintptr_t)(ptr) + (uint32_t)(add_value))
+
+#define PE_IMAGE_RELOC_DIRECTORY 5
+
+enum PE_IMAGE_REL_BASED_TYPES {
+    PE_IMAGE_REL_BASED_ABSOLUTE = 0,
+    PE_IMAGE_REL_BASED_HIGH = 1,
+    PE_IMAGE_REL_BASED_LOW = 2,
+    PE_IMAGE_REL_BASED_HIGHLOW = 3,
+};
 
 #pragma pack(push,2)
 typedef struct pe_image_dos_header_s {
@@ -117,6 +126,12 @@ typedef struct pe_image_section_header_s {
     uint32_t    characteristics;
 } pe_image_section_header_t, *pe_pimage_section_header_t;
 #pragma pack(pop)
+
+
+typedef struct pe_image_base_relocation_s {
+    uint32_t    virtual_address;
+    uint32_t    size_of_block;
+} pe_image_base_relocation_t, *pe_pimage_base_relocation_t;
 
 int run_pe_file(const char *name);
 

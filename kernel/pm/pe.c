@@ -5,6 +5,7 @@
 #include <kernel/tty.h>
 
 #include <kernel/libk/string.h>
+#include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 
@@ -55,11 +56,10 @@ bool pe_validate(uintptr_t addr, size_t size) {
 
     if (nt->file_header.number_of_sections > PE_MAX_SECTIONS)
         return false;
-
     return true;
 }
 
-void pe_create_image(uintptr_t img_base, uintptr_t raw) {
+bool pe_create_image(uintptr_t img_base, uintptr_t raw) {
     pe_pimage_dos_header_t     dos;
     pe_pimage_nt_headers32_t   nt;
     pe_pimage_section_header_t img_sec;
@@ -89,11 +89,55 @@ void pe_create_image(uintptr_t img_base, uintptr_t raw) {
         }
         img_sec++;
     }
-    tty_printf("\nCreate PE base %x, size %x, %d sections\n", img_base, nt->optional_header.size_of_image, nt->file_header.number_of_sections);
-};
+
+    pe_image_data_directory_t reloc_dir = nt->optional_header.data_directory[PE_IMAGE_RELOC_DIRECTORY];
+
+    if (img_base != nt->optional_header.image_base) {
+        if (reloc_dir.size) {
+            uint32_t delta = img_base - nt->optional_header.image_base;
+            pe_pimage_base_relocation_t reloc = PE_MAKE_PTR(pe_pimage_base_relocation_t, img_base, reloc_dir.virtual_address);
+
+            while (reloc->size_of_block) {
+                uint32_t count = (reloc->size_of_block - sizeof(*reloc)) / sizeof(uint16_t);
+                uint16_t *entry = PE_MAKE_PTR(uint16_t*, reloc, sizeof(*reloc));
+
+                for (int i = 0; i < count; i++) {
+                    uint16_t *p16;
+                    uint32_t *p32;
+
+                    uint16_t reloc_type = (*entry & 0xF000) >> 12;
+                    uint32_t offs = (*entry & 0x0FFF) + reloc->virtual_address;
+
+                    switch(reloc_type) {
+                        case PE_IMAGE_REL_BASED_HIGH:
+                            p16 = PE_MAKE_PTR(uint16_t*, img_base, offs);
+                            *p16+= (uint16_t)(delta >> 16);
+                            break;
+                        case PE_IMAGE_REL_BASED_LOW:
+                            p16 = PE_MAKE_PTR(uint16_t*, img_base, offs);
+                            *p16+= (uint16_t)delta;
+                            break;
+                        case PE_IMAGE_REL_BASED_HIGHLOW:
+                            p32 = PE_MAKE_PTR(uint32_t*, img_base, offs);
+                            *p32+= delta;
+                    }
+                    entry++;
+                }
+                reloc = PE_MAKE_PTR(pe_pimage_base_relocation_t, reloc, reloc->size_of_block);
+            }
+        } else {
+            tty_printf("PE image base relocation error! Section '.reloc' not found!\n");
+            return false;
+        }
+    }
+
+    tty_printf("Create PE base %x (preferred PE base %x), size %x, %d sections\n",
+                img_base, nt->optional_header.image_base, nt->optional_header.size_of_image, nt->file_header.number_of_sections);
+    return true;
+}
 
 
-void *pe_open(const char *fname) { // Returns pointer to ELF file.
+void *pe_open(const char *fname) { // Returns pointer to PE file.
     size_t fsize = vfs_get_size(fname);
     void *addr = kheap_malloc(fsize);
     int res = vfs_read(fname, 0, fsize, addr);
@@ -104,6 +148,8 @@ void *pe_open(const char *fname) { // Returns pointer to ELF file.
     return addr;
 }
 
+#define TEST_PE_BASE_RELOC
+
 int run_pe_file(const char *name) {
     void *pe_file = pe_open(name);
     if (!pe_file) {
@@ -112,23 +158,29 @@ int run_pe_file(const char *name) {
     pe_pimage_dos_header_t dos = (pe_pimage_dos_header_t)pe_file;
     pe_pimage_nt_headers32_t nt = PE_MAKE_PTR(pe_pimage_nt_headers32_t, dos, dos->e_lfanew);
 
+#ifdef TEST_PE_BASE_RELOC
+    uintptr_t image_base = 0;
+#else
     uintptr_t image_base = nt->optional_header.image_base;
+#endif
 
     uint32_t alloc_addr;
     for (alloc_addr = image_base;
-         alloc_addr < image_base +  nt->optional_header.size_of_image;
+         alloc_addr <= image_base + nt->optional_header.size_of_image;
          alloc_addr += PAGE_SIZE) {
         vmm_alloc_page(alloc_addr);
     }
 
-    pe_create_image(image_base, (uintptr_t)pe_file);
+    if (!pe_create_image(image_base, (uintptr_t)pe_file)) {
+        return -1;
+    }
     int (*entry_point)(void) = (int(*)(void))image_base + nt->optional_header.address_of_entry_point;
     tty_printf("PE entry point: %x\n", entry_point);
 
     int ret_code = entry_point();
 
     for (alloc_addr = image_base;
-         alloc_addr < image_base + nt->optional_header.size_of_image;
+         alloc_addr <= image_base + nt->optional_header.size_of_image;
          alloc_addr += PAGE_SIZE) {
         vmm_free_page(alloc_addr);
     }
