@@ -11,36 +11,34 @@
 
 page_directory *kernel_page_dir; // Pointer (physical) to kernel page dircetory structure
 
-bool vmm_alloc_page(virtual_addr vaddr) {
-    physical_addr paddr = pmm_alloc_block();
+bool vmm_alloc_page(void *vaddr) {
+    void *paddr = pmm_alloc_block();
     if (!paddr) {
         return false;
     }
-
     vmm_map_page(paddr, vaddr);
     return true;
 }
 
-bool vmm_alloc_page_with_userbit(virtual_addr vaddr) {
-    physical_addr paddr = pmm_alloc_block();
+bool vmm_alloc_page_with_userbit(void *vaddr) {
+    void *paddr = pmm_alloc_block();
     if (!paddr) {
         return false;
     }
-
     vmm_map_page(paddr, vaddr);
-    page_table_entry *pte = GET_PTE(vaddr);
+    page_table_entry *pte = (void*)GET_PTE((uintptr_t)vaddr);
     page_table_entry_add_attrib(pte, I86_PTE_USER);
     return true;
 }
 
-void vmm_free_page(virtual_addr vaddr) {
-    page_table_entry *pte = GET_PTE(vaddr);
+void vmm_free_page(void *vaddr) {
+    page_table_entry *pte = (void*)GET_PTE((uintptr_t)vaddr);
     if (!page_table_entry_is_present(*pte)) {
         tty_printf("oh, you try to delete not present page\n");
+        // TODO: panic
         return;
     }
-
-    physical_addr block = page_table_entry_frame(*pte);
+    void *block = page_table_entry_frame(*pte);
     if (block) {
         pmm_free_block(block);
     }
@@ -48,38 +46,37 @@ void vmm_free_page(virtual_addr vaddr) {
 }
 
 void vmm_create_kernel_page_dir() {
-    kernel_page_dir = (page_directory*) pmm_alloc_block();
-    if (kernel_page_dir == 0xFFFFFFFF) {
+    kernel_page_dir = (page_directory*)pmm_alloc_block();
+    if (!kernel_page_dir) {
         tty_printf("Failed to allocate phys memory for kernel page dir\n");
-        // Panic
+        // TODO: panic
         return;
     }
 
-    //page_directory *pd = (page_directory*) vmm_temp_map_page((physical_addr) kernel_page_dir);
     page_directory *pd = kernel_page_dir;
     memset(pd, 0, sizeof(page_directory));
 
-    int i;
-    for (i = 0; i < PAGE_ENTRIES; i++) {
+    for (size_t i = 0; i < PAGE_ENTRIES; i++) {
         page_dir_entry *pde = (page_dir_entry*) &pd->entries[i];
         page_dir_entry_add_attrib(pde, I86_PTE_WRITABLE);
         page_dir_entry_del_attrib(pde, I86_PTE_PRESENT);
 
         if (i == PAGE_ENTRIES - 1) { // Fractal(recursive) mapping technique, which allows us to access PD and PT
             page_dir_entry_add_attrib(pde, I86_PTE_PRESENT);
-            page_dir_entry_set_frame(pde, (physical_addr) kernel_page_dir);
+            page_dir_entry_set_frame(pde, kernel_page_dir);
 
             //tty_printf("pd[1023] = %x\n", pd->entries[1023]);
         }
     }
 }
 
-void vmm_map_page(physical_addr paddr, virtual_addr vaddr) {
-    page_dir_entry *pde = GET_PDE(vaddr);
+void vmm_map_page(void *paddr, void *vaddr) {
+    page_dir_entry *pde = (void*)GET_PDE((uintptr_t)vaddr);
     if (!page_dir_entry_is_present(*pde)) { // If page table isnt present, create it
-        physical_addr pt_p = pmm_alloc_block(); // It's phys addr!
-        if (pt_p == 0xFFFFFFFF) {
+        void *pt_p = pmm_alloc_block(); // It's phys addr!
+        if (!pt_p) {
             tty_printf("wtf? no free phys memory\n");
+            // TODO: panic
             return;
         }
 
@@ -90,16 +87,16 @@ void vmm_map_page(physical_addr paddr, virtual_addr vaddr) {
         page_dir_entry_set_frame(pde, pt_p);
     }
 
-    page_table_entry *pte = GET_PTE(vaddr);
+    page_table_entry *pte = (void*)GET_PTE((uintptr_t)vaddr);
     page_table_entry_set_frame(pte, paddr);
     page_table_entry_add_attrib(pte, I86_PTE_PRESENT);
     page_table_entry_add_attrib(pte, I86_PTE_WRITABLE);
     flush_tlb_entry(vaddr);
 }
 
-virtual_addr vmm_temp_map_page(physical_addr paddr) {
-    page_table_entry *pte = GET_PTE(TEMP_PAGE_ADDR);
-    page_table_entry_set_frame(pte, PAGE_ALIGN_DOWN(paddr)); // Old:DOWN
+void *vmm_temp_map_page(void *paddr) {
+    page_table_entry *pte = (void*)GET_PTE((uintptr_t)TEMP_PAGE_ADDR);
+    page_table_entry_set_frame(pte, (void*)PAGE_ALIGN_DOWN((uintptr_t)paddr));
     page_table_entry_add_attrib(pte, I86_PTE_PRESENT);
     page_table_entry_add_attrib(pte, I86_PTE_WRITABLE);
 
@@ -128,15 +125,14 @@ void vmm_init() {
     memset((void*) table2, 0, sizeof(page_table));
 
     // Maps first MB to 3GB
-    physical_addr frame;
-    virtual_addr virt;
+    uint8_t *frame, *virt;
     for (frame = 0x0, virt = 0xC0000000;
          frame < 0x100000/*0x100000*/;
          frame += PAGE_SIZE, virt += PAGE_SIZE) {
         page_table_entry page = 0;
         page_table_entry_add_attrib(&page, I86_PTE_PRESENT);
         page_table_entry_set_frame(&page, frame);
-        table1->entries[PAGE_TABLE_INDEX(virt)] = page;
+        table1->entries[PAGE_TABLE_INDEX((uintptr_t)virt)] = page;
     }
 
     // Maps kernel pages and phys mem pages
@@ -146,31 +142,31 @@ void vmm_init() {
         page_table_entry page = 0;
         page_table_entry_add_attrib(&page, I86_PTE_PRESENT);
         page_table_entry_set_frame(&page, frame);
-        table2->entries[PAGE_TABLE_INDEX(virt)] = page;
+        table2->entries[PAGE_TABLE_INDEX((uintptr_t)virt)] = page;
     }
 
     page_dir_entry *pde1 = (page_dir_entry*) &kernel_page_dir->entries[PAGE_DIRECTORY_INDEX(0x00000000)]; //pdirectory_lookup_entry(cur_directory, 0x00000000);
     page_dir_entry_add_attrib(pde1, I86_PDE_PRESENT);
     page_dir_entry_add_attrib(pde1, I86_PDE_WRITABLE);
-    page_dir_entry_set_frame(pde1, (physical_addr) table1);
+    page_dir_entry_set_frame(pde1, table1);
 
     page_dir_entry **pde2 = (page_dir_entry*) &kernel_page_dir->entries[PAGE_DIRECTORY_INDEX(0xC0100000)]; //pdirectory_lookup_entry(cur_directory, 0xC0100000);
     page_dir_entry_add_attrib(pde2, I86_PDE_PRESENT);
     page_dir_entry_add_attrib(pde2, I86_PDE_WRITABLE);
-    page_dir_entry_set_frame(pde2, (physical_addr) table2);
+    page_dir_entry_set_frame(pde2, table2);
 
     update_phys_memory_bitmap_addr(KERNEL_END_VADDR);
 
-    enable_paging((physical_addr) kernel_page_dir);
+    enable_paging(kernel_page_dir);
 
     //tty_printf("Virtual memory manager initialized!\n");
 }
 
 void vmm_test() {
-    tty_printf("kernel_page_dir = %x\n", (physical_addr) kernel_page_dir);
+    tty_printf("kernel_page_dir = %x\n", kernel_page_dir);
 
-    physical_addr padr1 = 0xC0500000;
-    virtual_addr vadr1 = vmm_temp_map_page(padr1);
+    void *padr1 = 0xC0500000;
+    void *vadr1 = vmm_temp_map_page(padr1);
     *(uint8_t*) vadr1 = 77;
     tty_printf("%x = %x\n", padr1, *(uint8_t*) vadr1);
 
@@ -194,8 +190,8 @@ void page_table_entry_del_attrib(page_table_entry *entry, uint32_t attrib) {
 }
 
 // Map pte to physical frame
-void page_table_entry_set_frame(page_table_entry *entry, physical_addr addr) {
-    *entry = (*entry & ~I86_PTE_FRAME) | addr;
+void page_table_entry_set_frame(page_table_entry *entry, void *addr) {
+    *entry = (*entry & ~I86_PTE_FRAME) | (uintptr_t)addr;
 }
 
 bool page_table_entry_is_present(page_table_entry entry) {
@@ -207,7 +203,7 @@ bool page_table_entry_is_writable(page_table_entry entry) {
 }
 
 // Return the address of physical frame which pte refers to
-physical_addr page_table_entry_frame(page_table_entry entry) {
+void *page_table_entry_frame(page_table_entry entry) {
     return entry & I86_PTE_FRAME;
 }
 
@@ -224,8 +220,8 @@ void page_dir_entry_del_attrib(page_dir_entry *entry, uint32_t attrib) {
 }
 
 // Map pde to physical frame (where the appropriate page table stores)
-void page_dir_entry_set_frame(page_dir_entry *entry, physical_addr addr) {
-    *entry = (*entry & ~I86_PDE_FRAME) | addr;
+void page_dir_entry_set_frame(page_dir_entry *entry, void *addr) {
+    *entry = (*entry & ~I86_PDE_FRAME) | (uintptr_t)addr;
 }
 
 bool page_dir_entry_is_present(page_dir_entry entry) {
@@ -245,10 +241,10 @@ bool page_dir_entry_is_writable(page_dir_entry entry) {
 }
 
 // Return the address of physical frame which pde refers to
-physical_addr page_dir_entry_frame(page_dir_entry entry) {
+void *page_dir_entry_frame(page_dir_entry entry) {
     return entry & I86_PDE_FRAME;
 }
 
-void flush_tlb_entry(virtual_addr addr) {
+void flush_tlb_entry(void *addr) {
     asm volatile("invlpg (%0)" : : "b"(addr) : "memory");
 }

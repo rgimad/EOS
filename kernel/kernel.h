@@ -7,8 +7,6 @@
 
 #include <stdint.h>
 
-#define EOS_VERSION_STRING "EOS v.0.0.0.4 (added hi-res vesa graphic terminal)"
-
 //#define KERNEL_FILENAME "kernel.elf"
 //#define KERNEL_PID      0
 

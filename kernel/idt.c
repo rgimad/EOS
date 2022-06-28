@@ -10,7 +10,6 @@
 #include <kernel/libk/string.h>
 
 #include <kernel/devices/timer.h>
-#include <kernel/pm/scheduler.h>
 
 #define SET_IDT_ENTRY(idx) \
     set_idt_entry(idx, (uint32_t) &interrupt_handler_##idx,\
@@ -308,7 +307,7 @@ void idt_install() {
     SET_IDT_ENTRY(30);
     SET_IDT_ENTRY(31);
 
-    /* IRQs */
+    // IRQs
     outb(0x20, 0x11);
     outb(0xA0, 0x11);
     outb(0x21, 0x20);
@@ -320,10 +319,10 @@ void idt_install() {
     outb(0x21, 0x0);
     outb(0xA1, 0x0);
 
-    //SET_IDT_ENTRY(32); // !!!
+    SET_IDT_ENTRY(32);
     // Install scheduler by timer interrupt
-    set_idt_entry(TIMER_IDT_INDEX, (uint32_t) &task_switch, 0x08, 0x8E);
-    timer_set_frequency(TICKS_PER_SECOND);
+    // set_idt_entry(TIMER_IDT_INDEX, (uint32_t) &task_switch, 0x08, 0x8E);
+    // timer_set_frequency(TICKS_PER_SECOND);
 
     SET_IDT_ENTRY(33);
     SET_IDT_ENTRY(34);

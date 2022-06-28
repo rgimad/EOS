@@ -8,8 +8,6 @@
 #include <kernel/io/ports.h>
 #include <kernel/io/qemu_log.h>
 
-#include <kernel/pm/scheduler.h>
-
 // Holds how many ticks that the system has been running for
 int timer_ticks = 0;
 
@@ -28,7 +26,7 @@ void timer_handler(struct regs *r) {
         qemu_printf("ticks = %d  ", timer_ticks);
         qemu_printf("interrupted context eax = %x  ebx = %x  ecx = %x  edx = %x  esp = %x  ebp = %x  eip = %x  \n", r->eax, r->ebx, r->ecx, r->edx, r->esp, r->ebp, r->eip);
     }
-    schedule(r);
+    // schedule(r);
 }
 
 int timer_get_ticks() {

@@ -95,6 +95,12 @@ extern uint64_t memlist_size;*/
 #define MBOOT_FLAG_APM     0x200
 #define MBOOT_FLAG_VBE     0x400
 
+#define MULTIBOOT_MEMORY_AVAILABLE         1
+#define MULTIBOOT_MEMORY_RESERVED          2       
+#define MULTIBOOT_MEMORY_ACPI_RECLAIMABLE  3
+#define MULTIBOOT_MEMORY_NVS               4       
+#define MULTIBOOT_MEMORY_BADRAM            5
+
 struct multiboot_info {
     uint32_t flags; /* Header flags */
     uint32_t mem_lower;
@@ -145,7 +151,7 @@ struct multiboot_info {
     };
 } __attribute__((packed));
 
-typedef struct multiboot_info multiboot_info;
+typedef struct multiboot_info multiboot_info_t;
 
 struct multiboot_memory_map_entry {
     uint32_t size;
@@ -154,7 +160,7 @@ struct multiboot_memory_map_entry {
     uint32_t type;
 } __attribute__((packed));
 
-typedef struct multiboot_memory_map_entry multiboot_memory_map_entry;
+typedef struct multiboot_memory_map_entry multiboot_memory_map_entry_t;
 
 // More full multiboot.h take from DiOS
 

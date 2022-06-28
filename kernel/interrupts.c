@@ -60,6 +60,7 @@ void irq_handler(struct regs *r) {
 }
 
 void run_interrupt_handler(struct regs* r) {
+    // tty_printf("int %x\n", r->idt_index);
     size_t idt_index = r->idt_index;
     if (idt_index < 32) {
         fault_handler(r);

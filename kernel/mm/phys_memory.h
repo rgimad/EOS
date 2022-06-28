@@ -10,26 +10,23 @@
 #include <kernel/mm/memlayout.h>
 
 #include <stdint.h>
+#include <stddef.h>
 #include <stdbool.h>
 
-void pmm_parse_memory_map(multiboot_memory_map_entry *mmap_addr, uint32_t length);
+#define PHYS_BLOCK_USED 1
+#define PHYS_BLOCK_FREE 0
 
-int pmm_find_free_block();
-int pmm_find_free_blocks(uint32_t count);
+void pmm_parse_memory_map(multiboot_memory_map_entry_t *mmap_addr, size_t length);
+bool pmm_find_free_block(size_t *block_idx);
+size_t pmm_find_free_blocks(size_t count, size_t *block_idx);
+void* pmm_alloc_block();
+void pmm_free_block(void *addr);
+bool pmm_is_block_alloced(void *addr);
+void* pmm_alloc_blocks(size_t count);
+void pmm_free_blocks(void *addr, size_t count);
+void pmm_free_available_memory(multiboot_info_t *mb);
+void pmm_relocate_initrd_to_high_mem(multiboot_info_t *mb);
+void pmm_init(multiboot_info_t *mboot_info);
 
-physical_addr pmm_alloc_block();
-void pmm_free_block(physical_addr addr);
-
-bool pmm_is_block_alloced(physical_addr addr);
-physical_addr pmm_alloc_blocks(uint32_t count);
-void pmm_free_blocks(physical_addr addr, uint32_t count);
-
-void pmm_alloc_chunk(uint64_t base_addr, uint64_t length);
-void pmm_free_chunk(uint64_t base_addr, uint64_t length);
-
-void pmm_free_available_memory(struct multiboot_info *mb);
-void update_phys_memory_bitmap_addr(physical_addr addr);
-
-void pmm_init(struct multiboot_info *mboot_info);
 
 #endif /* _PHYS_MEMORY_H_ */

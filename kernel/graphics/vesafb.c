@@ -10,7 +10,7 @@
 
 #include <kernel/libk/string.h>
 
-void init_vbe(multiboot_info *mboot) {
+void init_vbe(multiboot_info_t *mboot) {
     //if (mboot->framebuffer_type != 1) {
         //panic
         //tty_printf("Invalid framebuffer type\n");
@@ -36,10 +36,9 @@ void init_vbe(multiboot_info *mboot) {
     //framebuffer_size = framebuffer_width * framebuffer_height * (framebuffer_bpp / 8);
     framebuffer_size = framebuffer_height * framebuffer_pitch;
 
-    physical_addr frame;
-    virtual_addr virt;
-    for (frame = (physical_addr)framebuffer_addr, virt = (virtual_addr)framebuffer_addr;
-         frame < ((physical_addr)framebuffer_addr + framebuffer_size/*0x00400000*//*0x002C0000 0x000F0000*/);
+    uint8_t *frame, *virt;
+    for (frame = framebuffer_addr, virt = framebuffer_addr;
+         frame < (framebuffer_addr + framebuffer_size/*0x00400000*//*0x002C0000 0x000F0000*/);
          frame += PAGE_SIZE, virt += PAGE_SIZE) {
         vmm_map_page(frame, virt);
     }

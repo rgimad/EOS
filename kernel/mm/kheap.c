@@ -12,8 +12,8 @@
 bool kheap_is_init; // Was kheap manager initialised or not. TODO: is it unused?
 
 //virtual_addr kheap_last_alloc_addr; // Address of last allocation
-virtual_addr kheap_begin; // Address where kheap begins
-virtual_addr kheap_end; // Address where kheap ends
+uint8_t *kheap_begin; // Address where kheap begins
+uint8_t *kheap_end; // Address where kheap ends
 
 uint32_t kheap_memory_used; // How many memory was used
 int kheap_allocs_num; // How many allocations now

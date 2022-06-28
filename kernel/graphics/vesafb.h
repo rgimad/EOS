@@ -32,7 +32,7 @@ typedef struct rgba_struct {
     uint32_t a;
 } rgba_color;
 
-void init_vbe(multiboot_info *mboot);
+void init_vbe(multiboot_info_t *mboot);
 
 void set_pixel(int x, int y, uint32_t color);
 void set_pixel_alpha(int x, int y, rgba_color color);

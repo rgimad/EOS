@@ -50,7 +50,4 @@ extern uint32_t kernel_virt_end;
 extern uint32_t kernel_phys_map_start;
 extern uint32_t kernel_phys_map_end;
 
-typedef uint32_t virtual_addr;
-typedef uint32_t physical_addr;
-
 #endif  // _MEMLAYOUT_H_

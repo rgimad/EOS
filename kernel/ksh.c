@@ -18,7 +18,6 @@
 
 #include <kernel/pm/elf.h>
 #include <kernel/pm/pe.h>
-#include <kernel/pm/thread.h>
 
 #include <kernel/kernel.h>
 
@@ -134,8 +133,6 @@ void ksh_main() {
             int val = 13372;
             asm volatile("mov %0, %%eax" :: "r"(val));
             asm volatile("int $32;");
-        } else if (strcmp(cmd, "kg") == 0) {
-            create_kernel_thread(kthread_grafdemo);
         } else {
             ksh_cmd_unknown();
         }
@@ -193,7 +190,7 @@ void ksh_cmd_unknown() {
 }
 
 void ksh_cmd_about() {
-    tty_printf("%s   Rustem Gimadutdinov\n", EOS_VERSION_STRING);
+    tty_printf("EOS v0.1\n");
 }
 
 void ksh_cmd_ticks() {
@@ -333,5 +330,5 @@ void ksh_cmd_regdump() {
 }
 
 void ksh_cmd_help() {
-    tty_printf("Available commands:\n cpuid - information about processor\n kg - run grafdemo in kernelmode thread\n ticks - get number of ticks\n kheap_test - test kernel heap\n draw_demo - demo super effects\n syscall_test - test system calls work\n ls - list of files and dirs\n cd - set current directory\n pwd - print working directory\n cat - print contents of specified file\n gui_test - draw test window\n elf_info - information about elf file\n run - run program (for example - run first_program_gas.elf)\n cwnd_test - console window system test\n qemu_log_test\n about - about EOS\n help\n");
+    tty_printf("Available commands:\n cpuid - information about processor\n ticks - get number of ticks\n kheap_test - test kernel heap\n draw_demo - demo super effects\n syscall_test - test system calls work\n ls - list of files and dirs\n cd - set current directory\n pwd - print working directory\n cat - print contents of specified file\n gui_test - draw test window\n elf_info - information about elf file\n run - run program (for example - run first_program_gas.elf)\n cwnd_test - console window system test\n qemu_log_test\n about - about EOS\n help\n");
 }
