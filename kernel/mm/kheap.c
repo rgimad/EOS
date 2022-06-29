@@ -52,6 +52,7 @@ void *kheap_morecore(uint32_t size) {
 
 // Free a previously allocated item from the kernel heap
 void kheap_free(void *address) {
+    // tty_printf("free!\n");
     kheap_item *tmp_item, *item;
     // Sanity check
     if (address == NULL) {
@@ -86,6 +87,7 @@ void kheap_free(void *address) {
 
 // Allocates an arbiturary size of memory (via first fit) from the kernel heap
 void *kheap_malloc(uint32_t size) {
+    // tty_printf("malloc!\n");
     kheap_item *new_item = NULL, *tmp_item;
     uint32_t total_size;
     // Sanity check
@@ -228,4 +230,11 @@ void kheap_test() {
     kheap_print_stat();
     kheap_free(arr4);
     kheap_print_stat();
+}
+
+void *kheap_realloc(void *p, size_t newsz) {
+    // tty_printf("realloc!\n");
+    void *p2 = kheap_malloc(newsz);
+    memcpy(p2, p, *((uint8_t*)p - 1 - 4));
+    kheap_free(p);
 }

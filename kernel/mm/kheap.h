@@ -9,6 +9,7 @@
 #include <kernel/mm/memlayout.h>
 
 #include <stdbool.h>
+#include <stddef.h>
 #include <stdint.h>
 
 typedef struct __attribute__((packed)) kheap_item { //9 bytes yes?
@@ -22,6 +23,7 @@ void kheap_init();
 void *kheap_morecore(uint32_t size);
 void kheap_free(void *address);
 void *kheap_malloc(uint32_t size);
+void *kheap_realloc(void *p, size_t newsz);
 
 void kheap_print_stat();
 void kheap_test();

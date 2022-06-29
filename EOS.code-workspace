@@ -4,5 +4,11 @@
 			"path": "."
 		}
 	],
-	"settings": {}
+	"settings": {
+		"files.associations": {
+			"stb_image.h": "c",
+			"stdlib.h": "c",
+			"string.h": "c"
+		}
+	}
 }

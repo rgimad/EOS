@@ -23,10 +23,24 @@
 
 #include <kernel/io/qemu_log.h>
 #include <kernel/libk/string.h>
+#include <kernel/libk/assert.h>
 
 #include <kernel/gui/consolewindow.h>
 
 #include <stdint.h>
+
+#define STBI_NO_STDIO 1
+#define STBI_NO_GIF   1
+#define STB_IMAGE_IMPLEMENTATION 1
+#define STBI_NO_LINEAR 1
+#define STBI_NO_HDR 1
+#define STBI_NO_FAILURE_STRINGS 1
+#define STBI_NO_THREAD_LOCALS 1 // !
+#define STBI_ASSERT assert
+#define STBI_MALLOC(sz) kheap_malloc(sz)
+#define STBI_REALLOC(p,newsz) kheap_realloc(p,newsz)
+#define STBI_FREE(p) kheap_free(p)
+#include <kernel/utils/stb_image.h>
 
 char ksh_working_directory[256];
 
@@ -133,6 +147,16 @@ void ksh_main() {
             int val = 13372;
             asm volatile("mov %0, %%eax" :: "r"(val));
             asm volatile("int $32;");
+        } else if (strlen(cmd) > 4 && strncmp(cmd, "img ", 4) == 0) {
+            char fname[100];
+            char *tok = strtok(cmd, " ");
+            tok = strtok(0, " "); // tok - now is filename
+
+            if (fname != 0) {
+                ksh_cmd_img(tok);
+            } else {
+                tty_printf("img: incorrect argument\n");
+            }
         } else {
             ksh_cmd_unknown();
         }
@@ -288,6 +312,35 @@ void ksh_cmd_elf_info(char *fname) {
     elf_info_short(fname);
 }
 
+void ksh_cmd_img(const char *fname) {
+    if (fname[0] != '/') { //TODO: make function
+        char temp[256];
+        strcpy(temp, ksh_working_directory);
+        strcat(temp, fname);
+        strcpy(fname, temp);
+    }
+
+    if (!vfs_exists(fname)) {
+        tty_printf("img: error file not found\n");
+    } else {
+        uint32_t fsize = vfs_get_size(fname);
+        uint8_t *buf = (char*) kheap_malloc(fsize);
+        int res = vfs_read(fname, 0, fsize, buf);
+        (void)res;
+        int x, y, ch;
+        tty_printf("decoding image..\n");
+        uint8_t *res_img = stbi_load_from_memory(buf, fsize, &x, &y, &ch, 3);
+        tty_printf("image decoded:\n  width = %d\n  height = %d\n  channels = %d\n", x, y, ch);
+        for (int i = 0; i < y; i++) {
+            for (int j = 0; j < x; j++) {
+                uint32_t col = ((uint32_t)(res_img[(i*x + j)*ch]) << 16) + ((uint32_t)(res_img[(i*x + j)*ch + 1]) << 8) + ((uint32_t)(res_img[(i*x + j)*ch + 2]));
+                set_pixel(400 + j, 150 + i, col);
+            }
+        }
+        kheap_free(buf);
+    }
+}
+
 void ksh_cmd_run(char *fname) {
     int status = 0;
 
@@ -330,5 +383,5 @@ void ksh_cmd_regdump() {
 }
 
 void ksh_cmd_help() {
-    tty_printf("Available commands:\n cpuid - information about processor\n ticks - get number of ticks\n kheap_test - test kernel heap\n draw_demo - demo super effects\n syscall_test - test system calls work\n ls - list of files and dirs\n cd - set current directory\n pwd - print working directory\n cat - print contents of specified file\n gui_test - draw test window\n elf_info - information about elf file\n run - run program (for example - run first_program_gas.elf)\n cwnd_test - console window system test\n qemu_log_test\n about - about EOS\n help\n");
+    tty_printf("Available commands:\n cpuid - information about processor\n ticks - get number of ticks\n kheap_test - test kernel heap\n draw_demo - demo super effects\n syscall_test - test system calls work\n ls - list of files and dirs\n cd - set current directory\n pwd - print working directory\n cat - print contents of specified file\n gui_test - draw test window\n elf_info - information about elf file\n img - open graphic image file\n run - run program (for example - run first_program_gas.elf)\n cwnd_test - console window system test\n qemu_log_test\n about - about EOS\n help\n");
 }
