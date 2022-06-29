@@ -148,7 +148,7 @@ void *pe_open(const char *fname) { // Returns pointer to PE file.
     return addr;
 }
 
-#define TEST_PE_BASE_RELOC
+//#define TEST_PE_BASE_RELOC
 
 int run_pe_file(const char *name) {
     void *pe_file = pe_open(name);
