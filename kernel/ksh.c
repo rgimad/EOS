@@ -34,7 +34,7 @@
 #define STB_IMAGE_IMPLEMENTATION 1
 #define STBI_NO_LINEAR 1
 #define STBI_NO_HDR 1
-#define STBI_NO_FAILURE_STRINGS 1
+// #define STBI_NO_FAILURE_STRINGS 1
 #define STBI_NO_THREAD_LOCALS 1 // !
 #define STBI_ASSERT assert
 #define STBI_MALLOC(sz) kheap_malloc(sz)
@@ -337,6 +337,7 @@ void ksh_cmd_img(const char *fname) {
                 set_pixel(400 + j, 150 + i, col);
             }
         }
+        stbi_image_free(res_img);
         kheap_free(buf);
     }
 }

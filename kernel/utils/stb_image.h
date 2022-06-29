@@ -981,6 +981,8 @@ STBIDEF const char *stbi_failure_reason(void)
 static int stbi__err(const char *str)
 {
    stbi__g_failure_reason = str;
+   tty_printf("stbi__err: %s\n", str);
+   qemu_printf("stbi__err: %s\n", str);
    return 0;
 }
 #endif
