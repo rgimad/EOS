@@ -17,7 +17,17 @@ void syscall_draw_square(int x, int y, int width, int height, unsigned int color
     );
 }
 
+void print_str(const char *str) {
+    unsigned int res = 0;
+    asm volatile("mov %%eax, %0;" : "=a"(res) : "a"(0), "b"(&str));
+    asm volatile("int $0x80;");
+}
+
+char greet[] = "Hello, world!\n";
+
 int main(void) {
+    print_str(greet);
+
     int i;
     while (1) {
         for (i = 0; i < 1000; i++) {
