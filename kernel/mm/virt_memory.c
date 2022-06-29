@@ -104,7 +104,7 @@ void *vmm_temp_map_page(void *paddr) {
     asm volatile("invlpg %0" :: "m" (*(uint32_t *) TEMP_PAGE_ADDR) : "memory" );
     //flush_tlb_all();
 
-    return TEMP_PAGE_ADDR;
+    return (void*)TEMP_PAGE_ADDR;
 }
 
 // Switch page directory, reveives physical address
@@ -126,8 +126,8 @@ void vmm_init() {
 
     // Maps first MB to 3GB
     uint8_t *frame, *virt;
-    for (frame = 0x0, virt = 0xC0000000;
-         frame < 0x100000/*0x100000*/;
+    for (frame = (uint8_t*)0x0, virt = (uint8_t*)0xC0000000;
+         frame < (uint8_t*)0x100000/*0x100000*/;
          frame += PAGE_SIZE, virt += PAGE_SIZE) {
         page_table_entry page = 0;
         page_table_entry_add_attrib(&page, I86_PTE_PRESENT);
@@ -136,8 +136,8 @@ void vmm_init() {
     }
 
     // Maps kernel pages and phys mem pages
-    for (frame = KERNEL_START_PADDR, virt = KERNEL_START_VADDR;
-         frame < KERNEL_PHYS_MAP_END;
+    for (frame = (uint8_t*)KERNEL_START_PADDR, virt = (uint8_t*)KERNEL_START_VADDR;
+         frame < (uint8_t*)KERNEL_PHYS_MAP_END;
          frame += PAGE_SIZE, virt += PAGE_SIZE) {
         page_table_entry page = 0;
         page_table_entry_add_attrib(&page, I86_PTE_PRESENT);
