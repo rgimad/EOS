@@ -37,7 +37,7 @@ run-iso: clean-logs
 ifeq ($(DEBUG),1)
 	qemu-system-i386 -s -S -m 512 -cdrom $(TARGET_ISO) -monitor stdio -serial file:$(LOGFILE) & gdb $(KERNEL_FILE) -ex "target remote localhost:1234" -tui
 else
-	qemu-system-i386 -m 784 -cdrom $(TARGET_ISO) -monitor stdio -serial file:$(LOGFILE)
+	qemu-system-i386 -m 2024 -cdrom $(TARGET_ISO) -monitor stdio -serial file:$(LOGFILE)
 endif
 
 build-iso-run: build-iso run-iso

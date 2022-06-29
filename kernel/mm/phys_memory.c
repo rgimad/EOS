@@ -152,8 +152,18 @@ static void pmm_mark_range_as(void *base, size_t length, int usedness) {
     size_t block_idx = (uintptr_t)base / PHYS_BLOCK_SIZE,
         num_blocks = length / PHYS_BLOCK_SIZE;
     while (num_blocks--) {
-        (usedness == PHYS_BLOCK_USED ? bitmap_set : bitmap_unset)(block_idx++);
-        phys_used_block_count--;
+        if (usedness == PHYS_BLOCK_USED) {
+            if (!bitmap_test(block_idx)) {
+                bitmap_set(block_idx);
+                phys_used_block_count++;
+            }
+        } else {
+            if (bitmap_test(block_idx)) {
+                bitmap_unset(block_idx);
+                phys_used_block_count--;
+            }
+        }
+        block_idx++;
     }
 }
 
