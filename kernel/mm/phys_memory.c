@@ -173,13 +173,13 @@ void pmm_free_available_memory(multiboot_info_t *mb) {
     while ((uintptr_t)mm < mb->mmap_addr + mb->mmap_length) {
         if (mm->type == MULTIBOOT_MEMORY_AVAILABLE) {
             if (mm->addr != initrd_mmap_entry_addr) { // ADDED BECAUSE INITRD RELOCATION
-                pmm_mark_range_as((void*)(mm->addr), mm->len, PHYS_BLOCK_FREE);
+                pmm_mark_range_as((void*)(uintptr_t)(mm->addr), mm->len, PHYS_BLOCK_FREE);
             } else {
                 uintptr_t initrd_begin = *(uint32_t*) (mb->mods_addr),
                     initrd_end = *(uint32_t*) (mb->mods_addr + 4);
                 size_t initrd_size = initrd_end - initrd_begin;
                 pmm_mark_range_as((void*)initrd_begin, initrd_size, PHYS_BLOCK_USED);
-                pmm_mark_range_as((void*)(mm->addr), mm->len - initrd_size - 2, PHYS_BLOCK_FREE); // Why -2????
+                pmm_mark_range_as((void*)(uintptr_t)(mm->addr), mm->len - initrd_size - 2, PHYS_BLOCK_FREE); // Why -2????
             }
         }
         mm = (multiboot_memory_map_entry_t*) ((uintptr_t)mm + mm->size + sizeof(mm->size));
@@ -204,7 +204,7 @@ void pmm_relocate_initrd_to_high_mem(multiboot_info_t *mb) {
     }
 
     //tty_printf("mmap_avail_entries_count = %x \n\n", mmap_avail_entries_count);
-    for (size_t i = mmap_avail_entries_count - 1; i >= 0; i--) {
+    for (size_t i = mmap_avail_entries_count; i-- > 0 ;) {
         //tty_printf("addr = %x  | len = %x \n", mmap_avail_entries_array[i].addr, mmap_avail_entries_array[i].len);
         if (mmap_avail_entries_array[i].len >= initrd_size) {
             //tty_printf("addr = %x\n", mmap_avail_entries_array[i].addr);

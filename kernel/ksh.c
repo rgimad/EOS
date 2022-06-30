@@ -312,7 +312,7 @@ void ksh_cmd_elf_info(char *fname) {
     elf_info_short(fname);
 }
 
-void ksh_cmd_img(const char *fname) {
+void ksh_cmd_img(char *fname) {
     if (fname[0] != '/') { //TODO: make function
         char temp[256];
         strcpy(temp, ksh_working_directory);
@@ -324,7 +324,7 @@ void ksh_cmd_img(const char *fname) {
         tty_printf("img: error file not found\n");
     } else {
         uint32_t fsize = vfs_get_size(fname);
-        uint8_t *buf = (char*) kheap_malloc(fsize);
+        uint8_t *buf = (uint8_t *)kheap_malloc(fsize);
         int res = vfs_read(fname, 0, fsize, buf);
         (void)res;
         int x, y, ch;
