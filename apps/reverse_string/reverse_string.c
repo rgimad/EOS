@@ -7,7 +7,7 @@ void print_str(char *str) {
 
 void read_str(char *str, int cnt) {
     unsigned int arguments[5];
-    arguments[0] = str;
+    arguments[0] = (unsigned int)str;
     arguments[1] = cnt;
 
     unsigned int res = 0;

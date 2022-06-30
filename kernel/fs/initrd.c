@@ -171,8 +171,8 @@ void initrd_init(uint32_t phys_begin, uint32_t phys_end) {
     initrd_begin = (uint8_t*)(kheap_malloc(initrd_size + 4 * PAGE_SIZE));
 
     uint8_t *frame, *virt;
-    for (frame = PAGE_ALIGN_DOWN(phys_begin), virt = PAGE_ALIGN_DOWN((uint32_t)initrd_begin) + PAGE_SIZE;
-         frame <= (PAGE_ALIGN_DOWN(phys_end));
+    for (frame = (uint8_t *)PAGE_ALIGN_DOWN(phys_begin), virt = (uint8_t *)PAGE_ALIGN_DOWN((uint32_t)initrd_begin) + PAGE_SIZE;
+         frame <= (uint8_t *)(PAGE_ALIGN_DOWN(phys_end));
          frame += PAGE_SIZE, virt += PAGE_SIZE) {
         vmm_map_page(frame, virt);
     }
