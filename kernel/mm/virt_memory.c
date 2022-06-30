@@ -145,27 +145,27 @@ void vmm_init() {
         table2->entries[PAGE_TABLE_INDEX((uintptr_t)virt)] = page;
     }
 
-    page_dir_entry *pde1 = (page_dir_entry*) &kernel_page_dir->entries[PAGE_DIRECTORY_INDEX(0x00000000)]; //pdirectory_lookup_entry(cur_directory, 0x00000000);
+    page_dir_entry *pde1 = &kernel_page_dir->entries[PAGE_DIRECTORY_INDEX(0x00000000)];
     page_dir_entry_add_attrib(pde1, I86_PDE_PRESENT);
     page_dir_entry_add_attrib(pde1, I86_PDE_WRITABLE);
     page_dir_entry_set_frame(pde1, table1);
 
-    page_dir_entry **pde2 = (page_dir_entry*) &kernel_page_dir->entries[PAGE_DIRECTORY_INDEX(0xC0100000)]; //pdirectory_lookup_entry(cur_directory, 0xC0100000);
+    page_dir_entry *pde2 = &kernel_page_dir->entries[PAGE_DIRECTORY_INDEX(0xC0100000)];
     page_dir_entry_add_attrib(pde2, I86_PDE_PRESENT);
     page_dir_entry_add_attrib(pde2, I86_PDE_WRITABLE);
     page_dir_entry_set_frame(pde2, table2);
 
-    update_phys_memory_bitmap_addr(KERNEL_END_VADDR);
+    update_phys_memory_bitmap_addr((void *)KERNEL_END_VADDR);
 
     enable_paging(kernel_page_dir);
 
-    //tty_printf("Virtual memory manager initialized!\n");
+    // tty_printf("Virtual memory manager initialized!\n");
 }
 
 void vmm_test() {
     tty_printf("kernel_page_dir = %x\n", kernel_page_dir);
 
-    void *padr1 = 0xC0500000;
+    void *padr1 = (void *)0xC0500000;
     void *vadr1 = vmm_temp_map_page(padr1);
     *(uint8_t*) vadr1 = 77;
     tty_printf("%x = %x\n", padr1, *(uint8_t*) vadr1);
@@ -204,7 +204,7 @@ bool page_table_entry_is_writable(page_table_entry entry) {
 
 // Return the address of physical frame which pte refers to
 void *page_table_entry_frame(page_table_entry entry) {
-    return entry & I86_PTE_FRAME;
+    return (void *)(entry & I86_PTE_FRAME);
 }
 
 // Functions for Page Directory Entries
@@ -242,7 +242,7 @@ bool page_dir_entry_is_writable(page_dir_entry entry) {
 
 // Return the address of physical frame which pde refers to
 void *page_dir_entry_frame(page_dir_entry entry) {
-    return entry & I86_PDE_FRAME;
+    return (void *)(entry & I86_PDE_FRAME);
 }
 
 void flush_tlb_entry(void *addr) {
