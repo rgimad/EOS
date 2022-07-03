@@ -62,7 +62,7 @@ void init_vbe(multiboot_info_t *mboot) {
 
 void create_back_framebuffer() {
     //flush_tlb_entry(back_framebuffer_addr);
-    back_framebuffer_addr = kheap_malloc(framebuffer_size);
+    back_framebuffer_addr = kmalloc(framebuffer_size);
     tty_printf("back_framebuffer_addr = %x\n", back_framebuffer_addr);
     //tty_printf("init_vbe: [c0800000]->%x\n", page_table_entry_is_writable(GET_PTE(0xC0800000)));
     memset(back_framebuffer_addr, 0, framebuffer_size); //causes page fault at c0800000 when this line is placed in the end of init_vbe

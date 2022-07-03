@@ -95,8 +95,9 @@ void pe_create_image(uintptr_t img_base, uintptr_t raw) {
 
 void *pe_open(const char *fname) { // Returns pointer to ELF file.
     size_t fsize = vfs_get_size(fname);
-    void *addr = kheap_malloc(fsize);
+    void *addr = kmalloc(fsize);
     int res = vfs_read(fname, 0, fsize, addr);
+    (void)res;
     if (!pe_validate((uintptr_t)addr, fsize)){
         tty_printf("Bad PE file!\n");
         return NULL;
@@ -118,7 +119,7 @@ int run_pe_file(const char *name) {
     for (alloc_addr = image_base;
          alloc_addr < image_base +  nt->optional_header.size_of_image;
          alloc_addr += PAGE_SIZE) {
-        vmm_alloc_page(alloc_addr);
+        vmm_alloc_page((void*)alloc_addr);
     }
 
     pe_create_image(image_base, (uintptr_t)pe_file);
@@ -130,7 +131,7 @@ int run_pe_file(const char *name) {
     for (alloc_addr = image_base;
          alloc_addr < image_base + nt->optional_header.size_of_image;
          alloc_addr += PAGE_SIZE) {
-        vmm_free_page(alloc_addr);
+        vmm_free_page((void*)alloc_addr);
     }
     return ret_code;
 }

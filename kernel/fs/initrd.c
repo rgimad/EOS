@@ -168,7 +168,7 @@ void initrd_init(uint32_t phys_begin, uint32_t phys_end) {
     //for (i = 0; i < 20; i++) tty_printf("%c", *(char*) (phys_begin + i));
 
     initrd_size = phys_end - phys_begin;
-    initrd_begin = (uint8_t*)(kheap_malloc(initrd_size + 4 * PAGE_SIZE));
+    initrd_begin = (uint8_t*)(kmalloc(initrd_size + 4 * PAGE_SIZE));
 
     uint8_t *frame, *virt;
     for (frame = (uint8_t *)PAGE_ALIGN_DOWN(phys_begin), virt = (uint8_t *)PAGE_ALIGN_DOWN((uint32_t)initrd_begin) + PAGE_SIZE;
@@ -185,11 +185,11 @@ void initrd_init(uint32_t phys_begin, uint32_t phys_end) {
     //uint32_t v1 = vmm_temp_map_page(phys_begin);
     //for (i = 0; i < 4096; i++) tty_printf("%c", *(char*) (v1 + i));
 
-    vfs_storage_dev_t *dev = kheap_malloc(sizeof(vfs_storage_dev_t));
+    vfs_storage_dev_t *dev = kmalloc(sizeof(vfs_storage_dev_t));
     dev->type = 4;
     strcpy(dev->name, "initrd");
 
-    vfs_filesystem_handles_t *fs_handles = kheap_malloc(sizeof(vfs_filesystem_handles_t));
+    vfs_filesystem_handles_t *fs_handles = kmalloc(sizeof(vfs_filesystem_handles_t));
     fs_handles->read = &initrd_read;
     fs_handles->exists = &initrd_file_exists;
     fs_handles->get_size = &initrd_get_filesize;

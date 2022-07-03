@@ -91,7 +91,7 @@ int kernel_init(struct multiboot_info *mboot_info) {
     //tty_init();
     init_vbe(mboot_info);
 
-    /*back_framebuffer_addr = kheap_malloc(framebuffer_size);
+    /*back_framebuffer_addr = kmalloc(framebuffer_size);
     tty_printf("back_framebuffer_addr = %x\n", back_framebuffer_addr);
     tty_printf("init_vbe: [c0800000]->%x\n", page_table_entry_is_writable(GET_PTE(0xC0800000)));
     memset(back_framebuffer_addr, 0, framebuffer_size); //causes page fault at c0800000*/

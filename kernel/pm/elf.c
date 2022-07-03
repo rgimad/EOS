@@ -42,7 +42,7 @@ void *elf_open(const char *fname) { // Returns pointer to ELF file.
 
     uint32_t fsize = vfs_get_size(fname);
     //tty_printf("elf size = %d\n", fsize);
-    void *addr = kheap_malloc(fsize);
+    void *addr = kmalloc(fsize);
     //tty_printf("addr = %x\n", addr);
     int res = vfs_read(fname, 0, fsize, addr);
     (void)res;
@@ -144,7 +144,7 @@ void elf_info(const char *name) {
         tty_printf("\t\t\t\tSection name: %s\n", elf_get_section_name(elf_file, i));
     }
 
-    //kheap_free(elf_file); //!!!!!!
+    //kfree(elf_file); //!!!!!!
 }
 
 int run_elf_file(const char *name/*, char **argv, char **env __attribute__((unused)), int argc*/) {
@@ -171,7 +171,7 @@ int run_elf_file(const char *name/*, char **argv, char **env __attribute__((unus
         for (alloc_addr = phdr->load_to;
              alloc_addr < phdr->load_to + phdr->size_in_mem;
              alloc_addr += PAGE_SIZE) {
-            vmm_alloc_page(alloc_addr);
+            vmm_alloc_page((void*)alloc_addr);
         }
 
         memset((void*) phdr->load_to, 0, phdr->size_in_mem); // Null segment memory

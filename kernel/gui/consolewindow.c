@@ -12,7 +12,7 @@
 #include <kernel/mm/kheap.h>
 
 consolewindow_t *consolewindow_create(const char *caption, uint32_t x, uint32_t y, uint32_t rows, uint32_t cols) {
-    consolewindow_t *cwnd = kheap_malloc(sizeof(consolewindow_t));
+    consolewindow_t *cwnd = kmalloc(sizeof(consolewindow_t));
     cwnd->x = x;
     cwnd->y = y;
     cwnd->rows = rows;

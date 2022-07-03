@@ -43,8 +43,8 @@ int vfs_mount(vfs_storage_dev_t *dev, vfs_filesystem_handles_t *fs_handles, int 
         }
     }
 
-    vfs_mount_info_t *mnt = (vfs_mount_info_t*) kheap_malloc(sizeof(vfs_mount_info_t));
-    mnt->fs = (vfs_filesystem_t*) kheap_malloc(sizeof(vfs_filesystem_t));
+    vfs_mount_info_t *mnt = (vfs_mount_info_t*) kmalloc(sizeof(vfs_mount_info_t));
+    mnt->fs = (vfs_filesystem_t*) kmalloc(sizeof(vfs_filesystem_t));
     mnt->fs->dev = dev;
     mnt->fs->block_size = block_size;
     mnt->fs_handles = fs_handles;
@@ -59,7 +59,7 @@ int vfs_mount(vfs_storage_dev_t *dev, vfs_filesystem_handles_t *fs_handles, int 
 }
 
 int vfs_mount_find(const char *path, int *filename_add) {
-    char *a = (char*) kheap_malloc(strlen(path) + 1);
+    char *a = (char*) kmalloc(strlen(path) + 1);
     memset(a, 0, strlen(path) + 1);
     memcpy(a, path, strlen(path) + 1);
     
@@ -75,7 +75,7 @@ int vfs_mount_find(const char *path, int *filename_add) {
             if (strcmp(vfs_mount_points[i]->location, a) == 0) {
                 /* Adjust the orig to make it relative to fs/dev */
                 *filename_add = strlen(a) - 1;
-                kheap_free(a);
+                kfree(a);
                 return i;
             }
         }
@@ -240,6 +240,6 @@ void vfs_get_file_name_from_path(char *fpath, char *buf) {
 
 void vfs_init() {
     //tty_printf("\nVFS: Allocating memory for structures.");    
-    vfs_mount_points = (vfs_mount_info_t**) kheap_malloc(sizeof(vfs_mount_info_t) * MOUNTPOINTS_SIZE);
+    vfs_mount_points = (vfs_mount_info_t**) kmalloc(sizeof(vfs_mount_info_t) * MOUNTPOINTS_SIZE);
     __vfs_init = 1;
 }

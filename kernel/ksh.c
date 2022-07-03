@@ -37,9 +37,9 @@
 // #define STBI_NO_FAILURE_STRINGS 1
 #define STBI_NO_THREAD_LOCALS 1 // !
 #define STBI_ASSERT assert
-#define STBI_MALLOC(sz) kheap_malloc(sz)
-#define STBI_REALLOC(p,newsz) kheap_realloc(p,newsz)
-#define STBI_FREE(p) kheap_free(p)
+#define STBI_MALLOC(sz) kmalloc(sz)
+#define STBI_REALLOC(p,newsz) krealloc(p,newsz)
+#define STBI_FREE(p) kfree(p)
 #include <kernel/utils/stb_image.h>
 
 char ksh_working_directory[256];
@@ -262,7 +262,7 @@ void ksh_cmd_cat(char *fname) {
         strcpy(fname, temp);
     }
 
-    char *buf = (char*) kheap_malloc(1000);
+    char *buf = (char*) kmalloc(1000);
 
     if (!vfs_exists(fname)) {
         tty_printf("cat: error file not found\n");
@@ -272,7 +272,7 @@ void ksh_cmd_cat(char *fname) {
         (void)res;
         buf[fsize] = '\0';
         tty_printf("cat: file %s:\n\n%s\n", fname, buf);
-        kheap_free(buf);
+        kfree(buf);
     }
 }
 
@@ -324,7 +324,7 @@ void ksh_cmd_img(char *fname) {
         tty_printf("img: error file not found\n");
     } else {
         uint32_t fsize = vfs_get_size(fname);
-        uint8_t *buf = (uint8_t *)kheap_malloc(fsize);
+        uint8_t *buf = (uint8_t *)kmalloc(fsize);
         int res = vfs_read(fname, 0, fsize, buf);
         (void)res;
         int x, y, ch;
@@ -338,7 +338,7 @@ void ksh_cmd_img(char *fname) {
             }
         }
         stbi_image_free(res_img);
-        kheap_free(buf);
+        kfree(buf);
     }
 }
 
