@@ -10,7 +10,8 @@
 			"stdlib.h": "c",
 			"string.h": "c",
 			"kheap.h": "c",
-			"stdint.h": "c"
+			"stdint.h": "c",
+			"keyboard.h": "c"
 		}
 	}
 }

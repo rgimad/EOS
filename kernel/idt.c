@@ -15,7 +15,6 @@
     set_idt_entry(idx, (uint32_t) &interrupt_handler_##idx,\
                   0x08, 0x8E);
 
-//....{}
 #define DECLARE_INTERRUPT_HANDLER(i) void interrupt_handler_##i(void)
 
 #define ICW1 0x11
@@ -28,11 +27,11 @@
 #define PIC2_COMMAND PIC2
 #define PIC2_DATA    (PIC2 + 1)
 
-void interrupt_enable_all() {
+void interrupt_enable_all(void) {
     asm volatile("sti");
 }
 
-void interrupt_disable_all() {
+void interrupt_disable_all(void) {
     asm volatile("cli");
 }
 
@@ -194,7 +193,7 @@ DECLARE_INTERRUPT_HANDLER(124);
 DECLARE_INTERRUPT_HANDLER(125);
 DECLARE_INTERRUPT_HANDLER(126);
 DECLARE_INTERRUPT_HANDLER(127);*/
-DECLARE_INTERRUPT_HANDLER(128);//for syscalls
+DECLARE_INTERRUPT_HANDLER(128); // for syscalls
 
 void set_idt_entry(uint8_t num, uint64_t handler, uint16_t sel, uint8_t flags) {
     idt[num].handler_lo = handler & 0xFFFF;
@@ -204,76 +203,74 @@ void set_idt_entry(uint8_t num, uint64_t handler, uint16_t sel, uint8_t flags) {
     idt[num].sel = sel;
 }
 
-void IRQ_set_mask(unsigned char IRQline) {
+void irq_set_mask(uint8_t irq_line) {
     uint16_t port;
     uint8_t value;
 
-    if (IRQline < 8) {
+    if (irq_line < 8) {
         port = PIC1_DATA;
     } else {
         port = PIC2_DATA;
-        IRQline -= 8;
+        irq_line -= 8;
     }
 
-    value = inb(port) | (1 << IRQline);
+    value = inb(port) | (1 << irq_line);
     outb(port, value);
 }
 
-void IRQ_clear_mask(unsigned char IRQline) {
+void irq_clear_mask(uint8_t irq_line) {
     uint16_t port;
     uint8_t value;
 
-    if (IRQline < 8) {
+    if (irq_line < 8) {
         port = PIC1_DATA;
     } else {
         port = PIC2_DATA;
-        IRQline -= 8;
+        irq_line -= 8;
     }
 
-    value = inb(port) & ~(1 << IRQline);
+    value = inb(port) & ~(1 << irq_line);
     outb(port, value);
 }
 
-void init_pics(int pic1, int pic2) {
-    outb(PIC1, ICW1);
-    outb(PIC2, ICW1);
-    outb(PIC1 + 1, pic1);
-    outb(PIC2 + 1, pic2);
-    outb(PIC1 + 1, 4);
-    outb(PIC2 + 1, 2);
-    outb(PIC1 + 1, ICW4);
-    outb(PIC2 + 1, ICW4);
-    outb(PIC1 + 1, 0xFF);
+void remap_pics(void) {
+    // 0x20 - master pic command port
+    // 0x21 - master pic data port
+    // 0xA0 - slave pic command port
+    // 0xA1 - slave pic data port
+    outb(0x20, 0x11); // start the initialization sequence (in cascade mode)
+    outb(0xA0, 0x11);
+    outb(0x80, 0); // small delay for pic remapping, for old hardware
+
+    outb(0x21, 0x20); // ICW2: Master PIC vector offset
+    outb(0xA1, 0x28); // ICW2: Slave PIC vector offset
+    outb(0x80, 0);
+
+    outb(0x21, 0x04); // ICW3: tell Master PIC that there is a slave PIC at IRQ2 (0000 0100)
+    outb(0xA1, 0x02); // ICW3: tell Slave PIC its cascade identity (0000 0010)
+    outb(0x80, 0);
+
+    outb(0x21, 0x01); // 8086/88 (MCS-80/85) mode
+    outb(0xA1, 0x01);
+    outb(0x80, 0);
 }
 
 // Installs the IDT
-void idt_install() {
-    outb(0x21,0xfd);
-    outb(0xa1,0xff);
-    init_pics(0x20,0x28);
+void idt_install(void) {
+    remap_pics();
 
     // Sets the special IDT pointer up
     idtp.limit = (sizeof(struct idt_entry) * IDT_NUM_ENTRIES) - 1;
     idtp.base = (uint32_t) &idt;
 
-    //tty_printf("idtp.base = %x, idtp.limit = %x\n", idtp.base, idtp.limit); //!!!!
+    // tty_printf("idtp.base = %x, idtp.limit = %x\n", idtp.base, idtp.limit);
 
     // Clear out the entire IDT, initializing it to zeros
     memset(&idt, 0, sizeof(struct idt_entry) * IDT_NUM_ENTRIES);
 
     idt_load(&idtp);
 
-    int i;
-    for (i = 0; i < IDT_NUM_ENTRIES; i++) {
-        idt[i].handler_lo = 0;
-        idt[i].handler_hi = 0;
-        idt[i].always0 = 0;
-        idt[i].flags = 0;
-        idt[i].sel = 0;
-    }
-
-    /* ISRs */
-    //set_idt_entry(0, (uint32_t) &interrupt_handler_0,0x08, 0x8E);
+    // ISRs
     SET_IDT_ENTRY(0);
     SET_IDT_ENTRY(1);
     SET_IDT_ENTRY(2);
@@ -306,18 +303,6 @@ void idt_install() {
     SET_IDT_ENTRY(29);
     SET_IDT_ENTRY(30);
     SET_IDT_ENTRY(31);
-
-    // IRQs
-    outb(0x20, 0x11);
-    outb(0xA0, 0x11);
-    outb(0x21, 0x20);
-    outb(0xA1, 0x28);
-    outb(0x21, 0x04);
-    outb(0xA1, 0x02);
-    outb(0x21, 0x01);
-    outb(0xA1, 0x01);
-    outb(0x21, 0x0);
-    outb(0xA1, 0x0);
 
     SET_IDT_ENTRY(32);
     // Install scheduler by timer interrupt
@@ -422,38 +407,9 @@ void idt_install() {
     SET_IDT_ENTRY(127);*/
     SET_IDT_ENTRY(128); // Need for system calls - int 0x80 , 0x80 = 128 in decimal
 
-    for (int i = 0; i < 16; ++i) {
-        IRQ_clear_mask(i);
+    irq_set_mask(0); // mask PIT
+    // unmask others
+    for (int i = 1; i < 16; ++i) {
+        irq_clear_mask(i);
     }
-
-    // Remap PICs. Maybe move this somewhere else in the future.
-    /*outb(0x20, 0x10);
-    outb(0xA0, 0x10);
-    outb(0x21, 0x20);
-    outb(0xA1, 0x28);
-    outb(0x21, 0x04);
-    outb(0xA1, 0x02);
-    outb(0x21, 0x01);
-    outb(0xA1, 0x01);
-    outb(0x21, 0x0);
-    outb(0xA1, 0x0);*/
-
-    /*outb(0x20, 0x11);
-    outb(0xA0, 0x11);
-
-    outb(0x21, 0x20);
-    outb(0xA1, 0x28);
-
-    outb(0x21, 0x04);
-    outb(0xA1, 0x02);
-
-    outb(0x21, 0x01);
-    outb(0xA1, 0x01);
-
-    outb(0x21, 0x0);
-    outb(0xA1, 0x0);*/
-
-    // Points the processor's internal register to the new IDT
-    //idt_load(&idtp);
-    //tty_printf("IDT installed.\n");
 }

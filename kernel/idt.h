@@ -13,12 +13,9 @@
 #define IDT_NUM_ENTRIES 256
 
 // Sets up the IDT, should be called on early initialization
-void idt_install();
+void idt_install(void);
 
-//inline void enable_interrupts(void) { asm volatile("sti"); }
-//inline void disable_interrupts(void) { asm volatile("cli"); }
-
-void interrupt_enable_all();
-void interrupt_disable_all();
+void interrupt_enable_all(void);
+void interrupt_disable_all(void);
 
 #endif // _KERNEL_IDT_H_
