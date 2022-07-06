@@ -17,16 +17,6 @@
 
 #define DECLARE_INTERRUPT_HANDLER(i) void interrupt_handler_##i(void)
 
-#define ICW1 0x11
-#define ICW4 0x01
-#define PIC1 0x20 /* IO base address for master PIC */
-#define PIC2 0xA0 /* IO base address for slave  PIC */
-
-#define PIC1_COMMAND PIC1
-#define PIC1_DATA    (PIC1 + 1)
-#define PIC2_COMMAND PIC2
-#define PIC2_DATA    (PIC2 + 1)
-
 void interrupt_enable_all(void) {
     asm volatile("sti");
 }
@@ -208,9 +198,9 @@ void irq_set_mask(uint8_t irq_line) {
     uint8_t value;
 
     if (irq_line < 8) {
-        port = PIC1_DATA;
+        port = 0x21; // master pic data port
     } else {
-        port = PIC2_DATA;
+        port = 0xA1; // slave pic data port
         irq_line -= 8;
     }
 
@@ -223,9 +213,9 @@ void irq_clear_mask(uint8_t irq_line) {
     uint8_t value;
 
     if (irq_line < 8) {
-        port = PIC1_DATA;
+        port = 0x21; // master pic data port
     } else {
-        port = PIC2_DATA;
+        port = 0xA1; // slave pic data port
         irq_line -= 8;
     }
 
