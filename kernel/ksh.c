@@ -18,6 +18,7 @@
 
 #include <kernel/pm/elf.h>
 #include <kernel/pm/pe.h>
+#include <kernel/pm/kex.h>
 
 #include <kernel/kernel.h>
 
@@ -113,6 +114,16 @@ void ksh_main() {
                 ksh_cmd_elf_info(tok);
             } else {
                 tty_printf("elf_info: incorrect argument\n");
+            }
+        } else if (strlen(cmd) > 9 && strncmp(cmd, "kex_info ", 9) == 0) {
+            char fname[100];
+            char *tok = strtok(cmd, " ");
+            tok = strtok(0, " "); // tok - now is filename
+
+            if (fname != 0) {
+                ksh_cmd_kex_info(tok);
+            } else {
+                tty_printf("kex_info: incorrect argument\n");
             }
         } else if (strlen(cmd) > 4 && strncmp(cmd, "run ", 4) == 0) {
             char fname[100];
@@ -312,6 +323,18 @@ void ksh_cmd_elf_info(char *fname) {
     elf_info_short(fname);
 }
 
+void ksh_cmd_kex_info(char *fname) {
+    if (fname[0] != '/') { // TODO: make function
+        char temp[256];
+        strcpy(temp, ksh_working_directory);
+        strcat(temp, fname);
+        strcpy(fname, temp);
+    }
+
+    // tty_printf("kex fname = %s\n", fname);
+    kex_info(fname);
+}
+
 void ksh_cmd_img(char *fname) {
     if (fname[0] != '/') { //TODO: make function
         char temp[256];
@@ -364,6 +387,9 @@ void ksh_cmd_run(char *fname) {
         status = run_elf_file(fname);
     } else if ((uint16_t)signature == PE_IMAGE_DOS_SIGNATURE) {
         status = run_pe_file(fname);
+    } else if (signature == 0x554E454D) {
+        kex_run(fname);
+        status = 0; // stub, TODO
     } else {
         tty_printf("Unknown executable file format\n");
         return;

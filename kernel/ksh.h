@@ -27,6 +27,7 @@ void ksh_cmd_cd();
 void ksh_cmd_ls();
 
 void ksh_cmd_elf_info(char *fname);
+void ksh_cmd_kex_info(char *fname);
 void ksh_cmd_run(char *fname);
 void ksh_cmd_img(char *fname);
 //void ksh_cmd_regdump();

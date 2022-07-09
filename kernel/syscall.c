@@ -22,6 +22,7 @@ uint32_t sc_puts(char *str) {
 
 void syscall_init() {
     register_interrupt_handler(SYSCALL_IDT_INDEX, &syscall_handler);
+    register_interrupt_handler(0x40, &syscall_i40_handler);
 }
 
 void syscall_handler(struct regs *r) {
@@ -56,3 +57,12 @@ void syscall_handler(struct regs *r) {
 
     //asm volatile("sti;" : : "a"(r->eax), "b"(r->ebx), "c"(r->ecx), "d"(r->edx));
 }
+
+void syscall_i40_handler(struct regs *r) {
+    if (r->eax == 63) {
+        if (r->ebx == 1) {
+            tty_printf("%c", (char)(r->ecx & 0xFF));
+        }
+    }
+}
+

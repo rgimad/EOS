@@ -14,5 +14,6 @@
 
 void syscall_init();
 void syscall_handler(struct regs *r);
+void syscall_i40_handler(struct regs *r);
 
 #endif

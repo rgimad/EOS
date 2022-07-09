@@ -30,7 +30,7 @@ OBJ=boot.o kernel.o \
 	devices/keyboard.o devices/timer.o devices/mouse.o \
 	mm/phys_memory.o mm/virt_memory.o mm/kheap.o \
 	fs/vfs.o fs/initrd.o \
-	pm/elf.o pm/pe.o \
+	pm/elf.o pm/pe.o pm/kex.o \
 	gui/consolewindow.o
 
 all: $(TARGET_ELF)

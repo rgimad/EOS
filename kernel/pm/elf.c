@@ -156,8 +156,7 @@ int run_elf_file(const char *name/*, char **argv, char **env __attribute__((unus
     struct elf_hdr *hdr = (struct elf_hdr*) elf_file;
 
     tty_printf("loading segments:\n");
-    int i;
-    for (i = 0; i < hdr->ph_ent_cnt; i++) {
+    for (int i = 0; i < hdr->ph_ent_cnt; i++) {
         //printf("Segment [%i/%i]: ", i, hdr->ph_ent_cnt);
         struct elf_program_header *phdr = elf_get_program_header(elf_file, i);
         if (phdr->type != SEGTYPE_LOAD) {
@@ -167,8 +166,7 @@ int run_elf_file(const char *name/*, char **argv, char **env __attribute__((unus
         tty_printf("Loading %x bytes to %x\n", phdr->size_in_mem, phdr->load_to);
 
         // Alloc needed amount of pages
-        uint32_t alloc_addr;
-        for (alloc_addr = phdr->load_to;
+        for (uint32_t alloc_addr = phdr->load_to;
              alloc_addr < phdr->load_to + phdr->size_in_mem;
              alloc_addr += PAGE_SIZE) {
             vmm_alloc_page((void*)alloc_addr);

@@ -102,8 +102,6 @@ no_error_code_handler 45
 no_error_code_handler 46
 no_error_code_handler 47
 
-#eto fignya (ya dobavil)
-#no_error_code_handler 48
-#....
-#no_error_code_handler 127
-no_error_code_handler 128 #for syscalls
+no_error_code_handler 64 # for kos syscalls
+
+no_error_code_handler 128 # for syscalls
