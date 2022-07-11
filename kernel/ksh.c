@@ -16,7 +16,6 @@
 #include <kernel/fs/vfs.h>
 #include <kernel/fs/initrd.h>
 
-#include <kernel/pm/elf.h>
 #include <kernel/pm/pe.h>
 #include <kernel/pm/kex.h>
 
@@ -105,16 +104,6 @@ void ksh_main() {
             }
         } else if (strcmp(cmd, "ls") == 0) {
             ksh_cmd_ls();
-        } else if (strlen(cmd) > 9 && strncmp(cmd, "elf_info ", 9) == 0) {
-            char fname[100];
-            char *tok = strtok(cmd, " ");
-            tok = strtok(0, " "); // tok - now is filename
-
-            if (fname != 0) {
-                ksh_cmd_elf_info(tok);
-            } else {
-                tty_printf("elf_info: incorrect argument\n");
-            }
         } else if (strlen(cmd) > 9 && strncmp(cmd, "kex_info ", 9) == 0) {
             char fname[100];
             char *tok = strtok(cmd, " ");
@@ -175,45 +164,6 @@ void ksh_main() {
 }
 
 // Command handlers implementation
-
-void kthread_grafdemo() { // TODO why invalid opcode on 0x4C happens ????
-    int i;
-    while (1) {
-        //qemu_printf("iteration\n");
-        /*asm volatile ("cli");
-        for (i = 0; i < 1000; i++) draw_square(700, 250, 300 - i % 300, 300 - i % 300, 0x00AAAA);
-        for (i = 0; i < 1000; i++) draw_square(700, 250, 300 - i % 300, 300 - i % 300, 0xAA0000);
-        asm volatile ("sti");*/
-
-        // TODO understand : why if we dont wrap these code in cli ... sti i see a garbage on the screen? maybe context is corrupting?
-        asm volatile ("cli");
-        for (i = 0; i < 50; i++) {
-            unsigned int arguments[5];
-            arguments[0] = 700;
-            arguments[1] = 250;
-            arguments[2] = 300 - i % 300;
-            arguments[3] = 300 - i % 300;
-            arguments[4] = 0x00AAAA;
-            unsigned int res = 0;
-            asm volatile("mov %%eax, %0;" : "=a"(res) : "a"(2), "b"(arguments));
-            asm volatile("int $0x80;");
-        }
-
-        for (i = 0; i < 50; i++) {
-            unsigned int arguments[5];
-            arguments[0] = 700;
-            arguments[1] = 250;
-            arguments[2] = 300 - i % 300;
-            arguments[3] = 300 - i % 300;
-            arguments[4] = 0xAA0000;
-            unsigned int res = 0;
-            asm volatile("mov %%eax, %0;" : "=a"(res) : "a"(2), "b"(arguments));
-            asm volatile("int $0x80;");
-        }
-
-        asm volatile("sti");
-    }
-}
 
 void ksh_cmd_cpuid() {
     detect_cpu();
@@ -311,18 +261,6 @@ void ksh_cmd_ls() {
     tty_printf("\n");
 }
 
-void ksh_cmd_elf_info(char *fname) {
-    if (fname[0] != '/') { // TODO: make function
-        char temp[256];
-        strcpy(temp, ksh_working_directory);
-        strcat(temp, fname);
-        strcpy(fname, temp);
-    }
-
-    tty_printf("elf fname = %s\n", fname);
-    elf_info_short(fname);
-}
-
 void ksh_cmd_kex_info(char *fname) {
     if (fname[0] != '/') { // TODO: make function
         char temp[256];
@@ -383,11 +321,9 @@ void ksh_cmd_run(char *fname) {
     uint32_t signature = 0;
     vfs_read(fname, 0, sizeof(signature), &signature);
 
-    if (signature == ELF_SIGNATURE) { 
-        status = run_elf_file(fname);
-    } else if ((uint16_t)signature == PE_IMAGE_DOS_SIGNATURE) {
+    if ((uint16_t)signature == PE_IMAGE_DOS_SIGNATURE) {
         status = run_pe_file(fname);
-    } else if (signature == 0x554E454D) {
+    } else if (signature == 0x554E454D) { // TODO check for MENUET01 not only for MENU
         kex_run(fname);
         status = 0; // stub, TODO
     } else {
@@ -398,17 +334,13 @@ void ksh_cmd_run(char *fname) {
 }
 
 void ksh_syscall_test() {
-    uint32_t sc_code = 0; uint32_t res = 0;
     char *str = "Hello i'm system call !\n";
-
-    asm volatile("mov %%eax, %0;" : "=a"(res) : "a"(sc_code), "b"(&str));
-    asm volatile("int $0x80;");
-}
-
-void ksh_cmd_regdump() {
-    //uint32_t eax, ebx, ecx, edx, esi, edi, esp, ebp, cr0, cr2, cr3;
+    unsigned i = 0;
+    while (*(str + i)) {
+        asm("int $0x40" ::"a"(63), "b"(1), "c"(*(str + i++)));
+    }
 }
 
 void ksh_cmd_help() {
-    tty_printf("Available commands:\n cpuid - information about processor\n ticks - get number of ticks\n kheap_test - test kernel heap\n draw_demo - demo super effects\n syscall_test - test system calls work\n ls - list of files and dirs\n cd - set current directory\n pwd - print working directory\n cat - print contents of specified file\n gui_test - draw test window\n elf_info - information about elf file\n img - open graphic image file\n run - run program (for example - run first_program_gas.elf)\n cwnd_test - console window system test\n qemu_log_test\n about - about EOS\n help\n");
+    tty_printf("Available commands:\n cpuid - information about processor\n ticks - get number of ticks\n kheap_test - test kernel heap\n draw_demo - demo super effects\n syscall_test - test system calls work\n ls - list of files and dirs\n cd - set current directory\n pwd - print working directory\n cat - print contents of specified file\n gui_test - draw test window\n kex_info - information about kex file\n img - open graphic image file\n run - run program (for example - run first_program_gas.elf)\n cwnd_test - console window system test\n qemu_log_test\n about - about EOS\n help\n");
 }

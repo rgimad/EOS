@@ -32,9 +32,6 @@
 // Syscalls
 #include <kernel/syscall.h>
 
-// ELF
-#include <kernel/pm/elf.h>
-
 // Graphics
 #include <kernel/graphics/vesafb.h>
 

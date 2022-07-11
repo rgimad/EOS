@@ -19,18 +19,14 @@ void ksh_draw_demo();
 void ksh_gui_test();
 void ksh_syscall_test();
 
-void kthread_grafdemo();
-
 void ksh_cmd_pwd();
 void ksh_cmd_cat();
 void ksh_cmd_cd();
 void ksh_cmd_ls();
 
-void ksh_cmd_elf_info(char *fname);
 void ksh_cmd_kex_info(char *fname);
 void ksh_cmd_run(char *fname);
 void ksh_cmd_img(char *fname);
-//void ksh_cmd_regdump();
 
 void ksh_cmd_unknown();
 

@@ -4,7 +4,6 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <stddef.h>
-#include <kernel/pm/elf.h>
 
 #define PE_IMAGE_DOS_SIGNATURE              0x5A4D
 #define PE_IMAGE_NT_SIGNATURE               0x00004550

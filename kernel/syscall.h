@@ -6,14 +6,10 @@
 #ifndef _SYSCALL_H
 #define _SYSCALL_H
 
+#include <kernel/tty.h>
 #include <kernel/interrupts.h>
 
-#define SC_CODE_puts        0
-//#define SC_CODE_gets        1
-#define SC_CODE_draw_square 2
-
 void syscall_init();
-void syscall_handler(struct regs *r);
 void syscall_i40_handler(struct regs *r);
 
 #endif
