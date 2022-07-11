@@ -10,6 +10,15 @@
 
 #include <kernel/libk/string.h>
 
+uint8_t *framebuffer_addr;
+uint32_t framebuffer_pitch;
+uint32_t framebuffer_bpp;
+uint32_t framebuffer_width;
+uint32_t framebuffer_height;
+uint32_t framebuffer_size;
+
+uint8_t *back_framebuffer_addr;
+
 void init_vbe(multiboot_info_t *mboot) {
     //if (mboot->framebuffer_type != 1) {
         //panic
