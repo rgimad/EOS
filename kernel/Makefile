@@ -4,8 +4,8 @@ TARGET_DIR=../bin/kernel/
 
 INCLUDE_DIR=../
 
-AS = i686-elf-as
-CC = i686-elf-gcc
+CC = clang
+LD = ld.lld
 
 # if we're on Windows use WSL to run bash commands
 ifeq ($(OS),Windows_NT) 
@@ -14,11 +14,11 @@ else
     BASH =
 endif
 
-LDFLAGS=-T linker.ld -ffreestanding -nostdlib -lgcc
+LDFLAGS= -T linker.ld -nostdlib
+CCFLAGS= -target i386-pc-none-elf -Wall -Wextra  -I $(INCLUDE_DIR)
+
 ifeq ($(DEBUG), 1)
-	CCFLAGS=-std=gnu99 -g -ffreestanding -Wall -Wextra -I $(INCLUDE_DIR)
-else
-	CCFLAGS=-std=gnu99 -ffreestanding -Wall -Wextra -I $(INCLUDE_DIR)
+	CCFLAGS += -g
 endif
 
 OBJ=boot.o kernel.o \
@@ -37,13 +37,13 @@ all: $(TARGET_ELF)
 
 $(TARGET_ELF): $(OBJ)
 	$(BASH) mkdir -p $(TARGET_DIR)
-	$(CC) $(LDFLAGS) -o $(TARGET_DIR)$(TARGET_ELF) $(OBJ)
+	$(LD) $(LDFLAGS) -o $(TARGET_DIR)$(TARGET_ELF) $(OBJ)
 
 %.o: %.c
 	$(CC) $(CCFLAGS) -c -o $@ $<
 
 %.o: %.s
-	$(AS) -o $@ $<
+	$(CC) $(CCFLAGS) -c -o $@ $<
 
 clean:
 	$(BASH) rm -rf *.o
