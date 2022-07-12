@@ -2,7 +2,7 @@
 
 **EOS** is an educational operating system for x86 platform
 
-![Screenshot](https://github.com/rgimad/EOS/blob/master/screenshots/screenshot1.png "Screenshot")
+![Screenshot](https://raw.githubusercontent.com/rgimad/EOS/master/screenshots/screenshot1.png "Screenshot")
 
 ## Current status
 
