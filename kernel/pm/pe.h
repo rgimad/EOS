@@ -1,20 +1,37 @@
-#ifndef PE_H
-#define PE_H
+#ifndef _PE_H_
+#define _PE_H_
 
 #include <stdint.h>
 #include <stdbool.h>
 #include <stddef.h>
 
-#define PE_IMAGE_DOS_SIGNATURE              0x5A4D
-#define PE_IMAGE_NT_SIGNATURE               0x00004550
+
+#define PE_IMAGE_DOS_SIGNATURE              0x5A4D      /* MZ in ASCII */
+#define PE_IMAGE_NT_SIGNATURE               0x00004550  /* PE in ASCII */
 #define PE_IMAGE_NT_OPTIONAL_HDR32_MAGIC    0x10b
-#define PE_IMAGE_FILE_MACHINE_I386          0x014c   /* Intel 386 or later processors and compatible processors */
+#define PE_IMAGE_FILE_MACHINE_I386          0x014c      /* Intel 386 or later processors and compatible processors */
 #define PE_IMAGE_SIZEOF_SHORT_NAME          8
 #define PE_IMAGE_NUMBEROF_DIRECTORY_ENTRIES 16
+#define PE_IMAGE_FILE_DLL                   0x2000
 
 #define PE_MAX_SECTIONS 96
+#define PE_IMAGE_ORDINAL_FLAG 0x80000000
+#define PE_EXPORT_NAME_MAX 32
+#define PE_MAKE_PTR(cast, ptr, add_value) (cast)((uintptr_t)(ptr) + (uintptr_t)(add_value))
+#define PE_BAD_IMAGE_BASE (~0)
 
-#define PE_MAKE_PTR(cast, ptr, addValue) (cast)((intptr_t)(ptr) + (uint32_t)(addValue))
+typedef enum PE_IMAGE_DIRECTORY {
+    PE_IMAGE_EXPORT_DIRECTORY = 0,
+    PE_IMAGE_IMPORT_DIRECTORY = 1,
+    PE_IMAGE_RELOC_DIRECTORY = 5
+} pe_image_directory_t;
+
+enum PE_IMAGE_REL_BASED_TYPES {
+    PE_IMAGE_REL_BASED_ABSOLUTE = 0,
+    PE_IMAGE_REL_BASED_HIGH = 1,
+    PE_IMAGE_REL_BASED_LOW = 2,
+    PE_IMAGE_REL_BASED_HIGHLOW = 3,
+};
 
 #pragma pack(push,2)
 typedef struct pe_image_dos_header_s {
@@ -115,8 +132,94 @@ typedef struct pe_image_section_header_s {
     uint16_t    number_of_linenumbers;
     uint32_t    characteristics;
 } pe_image_section_header_t, *pe_pimage_section_header_t;
+
 #pragma pack(pop)
 
-int run_pe_file(const char *name);
+typedef struct pe_image_base_relocation_s {
+    uint32_t    virtual_address;
+    uint32_t    size_of_block;
+} pe_image_base_relocation_t, *pe_pimage_base_relocation_t;
+
+typedef struct pe_image_export_directory_s {
+	uint32_t characteristics;
+	uint32_t time_date_stamp;
+	uint16_t major_version;
+	uint16_t minor_version;
+	uint32_t name;
+	uint32_t base;
+	uint32_t number_of_functions;
+	uint32_t number_of_names;
+	uint32_t address_of_functions;
+	uint32_t address_of_names;
+	uint32_t address_of_name_ordinals;
+} pe_image_export_directory_t, *pe_pimage_export_directory_t;
+
+typedef struct pe_image_import_descriptor_s {
+    union {
+        uint32_t characteristics;
+        uint32_t original_first_thunk;
+    };
+    uint32_t time_date_stamp;
+    uint32_t forwarder_chain;
+    uint32_t name;
+    uint32_t first_thunk;
+} pe_image_import_descriptor_t, *pe_pimage_import_descriptor_t;
+
+typedef struct pe_image_import_by_name_s {
+    uint16_t hint;
+    char name[1];
+} pe_image_import_by_name_t, *pe_pimage_import_by_name_t;
+
+typedef struct pe_image_thunk_data32_s {
+    union {
+        uint32_t forwarder_string;
+        uint32_t function;
+        uint32_t ordinal;
+        uint32_t address_of_data;
+    };
+} pe_image_thunk_data32_t, *pe_pimage_thunk_data32_t;
+
+typedef struct pe_load_s {
+    //char* file_name;
+    uintptr_t image_base;
+    int entry_retcode;
+    /*int load_errcode;   TODO */
+} pe_load_t;
+
+#define pe_get_dos_header(base) \
+    (pe_pimage_dos_header_t)base
+
+#define pe_get_nt_header(dos) \
+    PE_MAKE_PTR(pe_pimage_nt_headers32_t, dos, dos->e_lfanew)
+
+#define pe_get_section_header(nt) \
+    PE_MAKE_PTR(pe_pimage_section_header_t, nt, sizeof(pe_image_nt_headers32_t))
+
+#define pe_get_data_directory(nt, dir) \
+    nt->optional_header.data_directory[dir]
+
+#define pe_get_base_relocation(image_base, reloc_dir) \
+    PE_MAKE_PTR(pe_pimage_base_relocation_t, image_base, (reloc_dir)->virtual_address)
+
+#define pe_get_import_descriptor(image_base, nt) \
+    PE_MAKE_PTR(pe_pimage_import_descriptor_t, image_base, nt->optional_header.data_directory[PE_IMAGE_IMPORT_DIRECTORY].virtual_address)
+
+#define pe_get_export_directory(image_base, nt) \
+    PE_MAKE_PTR(pe_pimage_export_directory_t, image_base, nt->optional_header.data_directory[PE_IMAGE_EXPORT_DIRECTORY].virtual_address)
+
+#define pe_get_iat(image_base, imp_desc) \
+    PE_MAKE_PTR(pe_pimage_thunk_data32_t, image_base, imp_desc->first_thunk)
+
+#define pe_get_ilt(image_base, imp_desc) \
+    PE_MAKE_PTR(pe_pimage_thunk_data32_t, image_base, imp_desc->original_first_thunk)
+
+#define pe_get_import_by_name(image_base, thunk) \
+    PE_MAKE_PTR(pe_pimage_import_by_name_t, image_base, thunk->address_of_data);
+
+#define pe_get_entry(image_base, nt) \
+    PE_MAKE_PTR(int(*)(void), image_base, nt->optional_header.address_of_entry_point)
+
+pe_load_t pe_load(const char *name);
+char* pe_get_last_loaded_file(void);
 
 #endif
