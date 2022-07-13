@@ -1,0 +1,9 @@
+# Format Style Options - Created with Clang Power Tools
+---
+BasedOnStyle: WebKit
+AlignTrailingComments: true
+AlignConsecutiveMacros: true
+AlignAfterOpenBracket: Align
+AllowShortFunctionsOnASingleLine: None
+BreakBeforeBraces: Attach
+...
