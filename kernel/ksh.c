@@ -83,21 +83,19 @@ void ksh_main() {
         } else if (strcmp(cmd, "pwd") == 0) {
             ksh_cmd_pwd();
         } else if (strlen(cmd) > 4 && strncmp(cmd, "cat ", 4) == 0) {
-            char fname[100];
             char *tok = strtok(cmd, " ");
             tok = strtok(0, " "); // tok - now is filename
 
-            if (fname != 0) {
+            if (tok) {
                 ksh_cmd_cat(tok);
             } else {
                 tty_printf("cat: incorrect argument\n");
             }
         } else if (strlen(cmd) > 3 && strncmp(cmd, "cd ", 3) == 0) {
-            char dname[100];
             char *tok = strtok(cmd, " ");
             tok = strtok(0, " "); // tok - now is dirname
 
-            if (dname != 0) {
+            if (tok) {
                 ksh_cmd_cd(tok);
             } else {
                 tty_printf("cd: incorrect argument\n");
@@ -105,21 +103,18 @@ void ksh_main() {
         } else if (strcmp(cmd, "ls") == 0) {
             ksh_cmd_ls();
         } else if (strlen(cmd) > 9 && strncmp(cmd, "kex_info ", 9) == 0) {
-            char fname[100];
             char *tok = strtok(cmd, " ");
             tok = strtok(0, " "); // tok - now is filename
 
-            if (fname != 0) {
+            if (tok) {
                 ksh_cmd_kex_info(tok);
             } else {
                 tty_printf("kex_info: incorrect argument\n");
             }
         } else if (strlen(cmd) > 4 && strncmp(cmd, "run ", 4) == 0) {
-            char fname[100];
             char *tok = strtok(cmd, " ");
             tok = strtok(0, " "); // tok - now is filename
-
-            if (fname != 0) {
+            if (tok) {
                 ksh_cmd_run(tok);
             } else {
                 tty_printf("run: incorrect argument\n");
@@ -148,11 +143,10 @@ void ksh_main() {
             asm volatile("mov %0, %%eax" :: "r"(val));
             asm volatile("int $32;");
         } else if (strlen(cmd) > 4 && strncmp(cmd, "img ", 4) == 0) {
-            char fname[100];
             char *tok = strtok(cmd, " ");
             tok = strtok(0, " "); // tok - now is filename
 
-            if (fname != 0) {
+            if (!tok) {
                 ksh_cmd_img(tok);
             } else {
                 tty_printf("img: incorrect argument\n");
@@ -322,9 +316,14 @@ void ksh_cmd_run(char *fname) {
     vfs_read(fname, 0, sizeof(signature), &signature);
 
     if ((uint16_t)signature == PE_IMAGE_DOS_SIGNATURE) {
-        status = run_pe(fname);
-        if(pe_get_last_err()) {
-            tty_printf("Error processing PE file %s\n", pe_get_last_name()); /* TODO : Added put error code */
+        pe_status_t pe_status;
+        if(!pe_status_init(&pe_status)) {
+            tty_printf("Memory allocation error!\n");
+            return;
+        }
+        status = run_pe(fname, &pe_status);
+        if(pe_status.err_code) {
+            tty_printf("Error #%d when processing PE file '%s'!\n", pe_status.err_code, pe_status.file_name);
             return;
         }
     } else if (signature == 0x554E454D) { // TODO check for MENUET01 not only for MENU

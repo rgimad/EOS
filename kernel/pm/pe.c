@@ -12,29 +12,14 @@
 #include <stdint.h>
 
 #define PE_DEBUG(...) qemu_printf("PE_DEBUG: "__VA_ARGS__)
-
-static char pe_last_name[PE_FILENAME_MAX] = "none";
-static int pe_last_err = 0;
 static const char* pe_libdir = "/apps/";
 
-static uintptr_t pe_load_dll(const char* name, dll_list_t* dll_list);
+static uintptr_t pe_load_dll(const char* name, dll_list_t* dll_list, pe_status_t* status);
 
 static inline bool is_powerof2(uint32_t val) {
     if (val == 0)
         return false;
     return (val & (val - 1)) == 0;
-}
-
-char* pe_get_last_name(void) {
-    return pe_last_name;
-}
-
-int pe_get_last_err(void) {
-    return pe_last_err;
-}
-
-static void pe_set_last_name(const char* name) {
-    strncpy(pe_last_name, name, PE_FILENAME_MAX - 1);
 }
 
 static bool dll_list_init(dll_list_t* list, uint32_t size) {
@@ -53,6 +38,7 @@ static bool dll_list_add(dll_list_t* list, uintptr_t image_base) {
         return false;
     }
     list->image_bases[list->_pos] = image_base;
+    PE_DEBUG("Adeed DLL image_base = %x\n", image_base);
     return true;
 }
 
@@ -76,7 +62,7 @@ static bool pe_validate(uintptr_t base, size_t size) {
     if (dos->e_magic != PE_IMAGE_DOS_SIGNATURE || dos->e_lfanew <= 0)
         return false;
 
-    pe_pimage_nt_headers32_t nt = pe_get_nt_header(dos);
+    pe_pimage_nt_headers32_t nt = pe_get_nt_headers(dos);
 
     if ((uintptr_t)nt < (uintptr_t)base)
         return false;
@@ -107,7 +93,7 @@ static bool pe_validate(uintptr_t base, size_t size) {
 
 static uintptr_t pe_create_image(uintptr_t image_base, uintptr_t file_ptr) {
     pe_pimage_dos_header_t dos = pe_get_dos_header(file_ptr);
-    pe_pimage_nt_headers32_t nt = pe_get_nt_header(dos);
+    pe_pimage_nt_headers32_t nt = pe_get_nt_headers(dos);
 
     memcpy((void*)image_base, (void*)file_ptr,
            nt->optional_header.size_of_headers);
@@ -147,7 +133,7 @@ static uintptr_t pe_create_image(uintptr_t image_base, uintptr_t file_ptr) {
                 uint32_t count = (reloc->size_of_block - sizeof(*reloc)) / sizeof(uint16_t);
                 uint16_t* entry = PE_MAKE_PTR(uint16_t*, reloc, sizeof(*reloc));
 
-                for (int i = 0; i < count; i++) {
+                for (uint32_t i = 0; i < count; i++) {
                     uint16_t* p16;
                     uint32_t* p32;
 
@@ -182,23 +168,26 @@ static uintptr_t pe_create_image(uintptr_t image_base, uintptr_t file_ptr) {
     return image_base;
 }
 
-static void* pe_open(const char* fname) {
+static pe_error_t pe_open(const char* fname, void** addr) {
     size_t fsize = vfs_get_size(fname);
     if (!fsize) {
-        return 0;
+        return PE_ERR_FILE_NOT_FOUND;
     }
-    void* addr = kmalloc(fsize);
-    int res = vfs_read(fname, 0, fsize, addr);
-    if (!pe_validate((uintptr_t)addr, fsize)) {
+    *addr = kmalloc(fsize);
+    if (!*addr) {
+        return PE_ERR_ALLOC;
+    }
+    vfs_read(fname, 0, fsize, *addr);
+    if (!pe_validate((uintptr_t)*addr, fsize)) {
         kfree(addr);
-        return NULL;
+        return PE_ERR_INVALID_FILE;
     }
-    return addr;
+    return 0;
 }
 
 static uintptr_t pe_get_export_fn_by_name(uintptr_t image_base, char* imp_name) {
     pe_pimage_dos_header_t dos = pe_get_dos_header(image_base);
-    pe_pimage_nt_headers32_t nt = pe_get_nt_header(dos);
+    pe_pimage_nt_headers32_t nt = pe_get_nt_headers(dos);
     pe_pimage_export_directory_t export_dir = pe_get_export_directory(image_base, nt);
 
     uintptr_t* fn_ptrs = PE_MAKE_PTR(uintptr_t*, image_base, export_dir->address_of_functions);
@@ -206,7 +195,7 @@ static uintptr_t pe_get_export_fn_by_name(uintptr_t image_base, char* imp_name) 
 
     char** fn_names = PE_MAKE_PTR(char**, image_base, export_dir->address_of_names);
 
-    for (int i = 0; i < export_dir->number_of_functions; i++) {
+    for (uint32_t i = 0; i < export_dir->number_of_functions; i++) {
         if (!ordinals[i]) {
             continue;
         }
@@ -218,8 +207,8 @@ static uintptr_t pe_get_export_fn_by_name(uintptr_t image_base, char* imp_name) 
     return 0;
 }
 
-static bool pe_resolve_import(uintptr_t image_base, pe_pimage_nt_headers32_t nt,
-                              const char* src_name, dll_list_t* dll_list) {
+static pe_error_t pe_resolve_import(uintptr_t image_base, const char* mom_name, dll_list_t* dll_list, const pe_status_t* status) {
+    pe_pimage_nt_headers32_t nt = pe_get_nt_headers(pe_get_dos_header(image_base));
     pe_pimage_import_descriptor_t import_libs = pe_get_import_descriptor(image_base, nt);
 
     while (import_libs->name && !import_libs->time_date_stamp) {
@@ -230,9 +219,9 @@ static bool pe_resolve_import(uintptr_t image_base, pe_pimage_nt_headers32_t nt,
         strcpy(fullpath, pe_libdir);
         strcat(fullpath, PE_MAKE_PTR(char*, image_base, import_libs->name));
 
-        uintptr_t dll_image_base = pe_load_dll(fullpath, dll_list);
-        if (dll_image_base == PE_BAD_IMAGE_BASE) {
-            return false;
+        uintptr_t dll_image_base = pe_load_dll(fullpath, dll_list, (pe_status_t*)status);
+        if (dll_image_base == (uintptr_t)PE_BAD_IMAGE_BASE) {
+            return status->err_code;
         }
 
         while (true) {
@@ -243,12 +232,12 @@ static bool pe_resolve_import(uintptr_t image_base, pe_pimage_nt_headers32_t nt,
             uintptr_t fn_ptr = pe_get_export_fn_by_name(dll_image_base, record->name);
 
             PE_DEBUG("Resolve '%s' import in '%s' from '%s' : %s\n", record->name,
-                     src_name, fullpath, fn_ptr ? "OK" : "ERR");
+                     mom_name, fullpath, fn_ptr ? "OK" : "ERR");
 
             if (fn_ptr) {
                 iat->address_of_data = fn_ptr;
             } else {
-                return false;
+                return PE_ERR_EXP_SYM_NOT_FOUND;
             }
 
             iat++;
@@ -256,57 +245,58 @@ static bool pe_resolve_import(uintptr_t image_base, pe_pimage_nt_headers32_t nt,
         }
         import_libs++;
     }
-    return true;
+    return 0;
 }
 
-static uintptr_t pe_load_dll(const char* name, dll_list_t* dll_list) {
-    pe_last_err = 0;
-    pe_set_last_name(name);
+static uintptr_t pe_load_dll(const char* name, dll_list_t* dll_list, pe_status_t* status) {
+    strncpy(status->file_name, name, PE_FILENAME_MAX - 1);
 
-    uintptr_t pe_file = (uintptr_t)pe_open(name);
-    if (!pe_file) {
-        pe_last_err = 1;
+    void* pe_file = NULL;
+    status->err_code = (uintptr_t)pe_open(name, &pe_file);
+    if (status->err_code) {
         return PE_BAD_IMAGE_BASE;
     }
 
-    pe_pimage_nt_headers32_t nt = pe_get_nt_header(pe_get_dos_header(pe_file));
+    pe_pimage_nt_headers32_t nt = pe_get_nt_headers(pe_get_dos_header(pe_file));
 
     uintptr_t image_base = (uintptr_t)kmalloc(nt->optional_header.size_of_image);
     if (!image_base) {
-        pe_last_err = 1;
+        status->err_code = PE_ERR_ALLOC;
         return PE_BAD_IMAGE_BASE;
     }
 
     image_base = pe_create_image(image_base, (uintptr_t)pe_file);
     kfree((void*)pe_file);
 
-    nt = pe_get_nt_header(pe_get_dos_header(image_base));
-    if (!pe_resolve_import(image_base, nt, name, dll_list)) {
-        kfree(&image_base);
-        pe_last_err = 1;
+    status->err_code = pe_resolve_import(image_base, name, dll_list, status);
+    if (status->err_code) {
+        kfree((void*)image_base);
         return PE_BAD_IMAGE_BASE;
     }
-    dll_list_add(dll_list, image_base);
+    if (!dll_list_add(dll_list, image_base)) {
+        status->err_code = PE_ERR_DLL_LIMIT;
+        return PE_BAD_IMAGE_BASE;
+    }
     return image_base;
 }
 
-int run_pe(const char* name) {
-    pe_set_last_name(name);
-    pe_last_err = 0;
+int run_pe(const char* name, pe_status_t* status) {
+    strncpy(status->file_name, name, PE_FILENAME_MAX - 1);
+    status->err_code = 0;
 
     dll_list_t dll_list;
     if (!dll_list_init(&dll_list, PAGE_SIZE)) {
-        pe_last_err = 1;
+        status->err_code = PE_ERR_ALLOC;
         return 0;
     }
 
-    uintptr_t pe_file = (uintptr_t)pe_open(name);
-    if (!pe_file) {
-        pe_last_err = 1;
+    void* pe_file = NULL;
+    status->err_code = pe_open(name, &pe_file);
+    if (status->err_code) {
         return 0;
     }
 
-    pe_pimage_nt_headers32_t nt = pe_get_nt_header(pe_get_dos_header(pe_file));
+    pe_pimage_nt_headers32_t nt = pe_get_nt_headers(pe_get_dos_header(pe_file));
     uintptr_t image_base = nt->optional_header.image_base;
 
     for (uintptr_t alloc_addr = image_base;
@@ -314,12 +304,14 @@ int run_pe(const char* name) {
          alloc_addr += PAGE_SIZE) {
         vmm_alloc_page((void*)alloc_addr);
     }
+
     image_base = pe_create_image(image_base, (uintptr_t)pe_file);
     kfree((void*)pe_file);
 
-    nt = pe_get_nt_header(pe_get_dos_header(image_base));
-    if (!pe_resolve_import(image_base, nt, name, &dll_list)) {
-        pe_last_err = 1;
+    nt = pe_get_nt_headers(pe_get_dos_header(image_base));
+
+    status->err_code = pe_resolve_import(image_base, name, &dll_list, status);
+    if (status->err_code) {
         goto free;
     }
 
@@ -335,4 +327,18 @@ free:
         vmm_free_page((void*)alloc_addr);
     }
     return entry_retcode;
+}
+
+bool pe_status_init(pe_status_t* status) {
+    status->err_code = 0;
+    status->file_name = kmalloc(PE_FILENAME_MAX);
+    if (!status->file_name) {
+        return false;
+    }
+    return true;
+}
+
+void pe_status_free(pe_status_t* status) {
+    status->err_code = 0;
+    kfree(status->file_name);
 }

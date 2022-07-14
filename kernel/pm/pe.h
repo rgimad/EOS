@@ -34,6 +34,14 @@ enum PE_IMAGE_REL_BASED_TYPES {
     PE_IMAGE_REL_BASED_HIGHLOW = 3,
 };
 
+typedef enum PE_ERROR_CODES {
+    PE_ERR_INVALID_FILE = 1,
+    PE_ERR_FILE_NOT_FOUND = 2,
+    PE_ERR_ALLOC = 3,
+    PE_ERR_EXP_SYM_NOT_FOUND = 4,
+    PE_ERR_DLL_LIMIT = 5,
+} pe_error_t;
+
 #pragma pack(push, 2)
 typedef struct pe_image_dos_header_s {
     uint16_t e_magic;
@@ -183,10 +191,15 @@ typedef struct dll_list_s {
     int _max_size;
 } dll_list_t;
 
+typedef struct pe_status_s {
+    char* file_name;
+    int err_code;
+} pe_status_t;
+
 #define pe_get_dos_header(base) \
     ((pe_pimage_dos_header_t)base)
 
-#define pe_get_nt_header(dos) \
+#define pe_get_nt_headers(dos) \
     PE_MAKE_PTR(pe_pimage_nt_headers32_t, dos, dos->e_lfanew)
 
 #define pe_get_section_header(nt) \
@@ -216,8 +229,8 @@ typedef struct dll_list_s {
 #define pe_get_entry(image_base, nt) \
     PE_MAKE_PTR(int (*)(void), image_base, nt->optional_header.address_of_entry_point)
 
-int run_pe(const char* name);
-int pe_get_last_err(void);
-char* pe_get_last_name(void);
+int run_pe(const char* name, pe_status_t* status);
+bool pe_status_init(pe_status_t* status);
+void pe_status_free(pe_status_t* status);
 
 #endif
