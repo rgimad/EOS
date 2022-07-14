@@ -322,12 +322,11 @@ void ksh_cmd_run(char *fname) {
     vfs_read(fname, 0, sizeof(signature), &signature);
 
     if ((uint16_t)signature == PE_IMAGE_DOS_SIGNATURE) {
-        pe_load_t pe = pe_load(fname);
-        if (pe.image_base == PE_BAD_IMAGE_BASE) {
-            tty_printf("Error processing PE file %s\n", pe_get_last_loaded_file()); /* TODO : Added put error code */
+        status = run_pe(fname);
+        if(pe_get_last_err()) {
+            tty_printf("Error processing PE file %s\n", pe_get_last_name()); /* TODO : Added put error code */
             return;
         }
-        status = pe.entry_retcode;
     } else if (signature == 0x554E454D) { // TODO check for MENUET01 not only for MENU
         kex_run(fname);
         status = 0; // stub, TODO
