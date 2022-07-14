@@ -38,7 +38,7 @@ typedef enum PE_ERROR_CODES {
     PE_ERR_INVALID_FILE = 1,
     PE_ERR_FILE_NOT_FOUND = 2,
     PE_ERR_ALLOC = 3,
-    PE_ERR_EXP_SYM_NOT_FOUND = 4,
+    PE_ERR_RESOLVE_IMP = 4,
     PE_ERR_DLL_LIMIT = 5,
 } pe_error_t;
 
@@ -232,5 +232,6 @@ typedef struct pe_status_s {
 int run_pe(const char* name, pe_status_t* status);
 bool pe_status_init(pe_status_t* status);
 void pe_status_free(pe_status_t* status);
+const char* pe_strerror(pe_error_t err);
 
 #endif

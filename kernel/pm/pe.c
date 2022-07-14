@@ -14,6 +14,22 @@
 #define PE_DEBUG(...) qemu_printf("PE_DEBUG: "__VA_ARGS__)
 static const char* pe_libdir = "/apps/";
 
+static const char *pe_error_strs[] = {
+    "no error",
+    "invalid PE file",
+    "file not found",
+    "memory allocation error",
+    "export table is missing an importable symbol",
+    "DLL loaded limit reached"
+};
+
+const char* pe_strerror(pe_error_t err) {
+    if (err < 0 || err > PE_ERR_DLL_LIMIT) {
+        return "Unknown error";
+    }
+    return pe_error_strs[err];
+}
+
 static uintptr_t pe_load_dll(const char* name, dll_list_t* dll_list, pe_status_t* status);
 
 static inline bool is_powerof2(uint32_t val) {
@@ -237,7 +253,7 @@ static pe_error_t pe_resolve_import(uintptr_t image_base, const char* mom_name, 
             if (fn_ptr) {
                 iat->address_of_data = fn_ptr;
             } else {
-                return PE_ERR_EXP_SYM_NOT_FOUND;
+                return PE_ERR_RESOLVE_IMP;
             }
 
             iat++;
@@ -342,3 +358,4 @@ void pe_status_free(pe_status_t* status) {
     status->err_code = 0;
     kfree(status->file_name);
 }
+
