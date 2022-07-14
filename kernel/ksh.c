@@ -312,7 +312,7 @@ void ksh_cmd_run(char *fname) {
         return;
     }
 
-    uint32_t signature = 0;
+    uint64_t signature = 0;
     vfs_read(fname, 0, sizeof(signature), &signature);
 
     if ((uint16_t)signature == PE_IMAGE_DOS_SIGNATURE) {
@@ -323,10 +323,10 @@ void ksh_cmd_run(char *fname) {
         }
         status = run_pe(fname, &pe_status);
         if(pe_status.err_code) {
-            tty_printf("Error #%d when processing PE file '%s'!\n", pe_status.err_code, pe_status.file_name);
+            tty_printf("Error when processing PE file '%s': %s.\n", pe_status.file_name, pe_strerror(pe_status.err_code));
             return;
         }
-    } else if (signature == 0x554E454D) { // TODO check for MENUET01 not only for MENU
+    } else if (signature == 0x31305445554E454D) { /* check for MENUET01 */
         kex_run(fname);
         status = 0; // stub, TODO
     } else {
