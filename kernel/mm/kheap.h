@@ -18,22 +18,22 @@
 #include <kernel/io/qemu_log.h>
 
 typedef struct kheap_item_t {
-    struct kheap_item_t* next;
+    struct kheap_item_t *next;
     size_t size;
     uint8_t used; // 0 - free, 1 - not free
 } __attribute__((packed)) kheap_item_t;
 
 extern kheap_item_t *kheap_begin, *kheap_end; // pointers to current heap bounds
-extern uint8_t *kheap_limit; // maximal address of heap_end
+extern uint8_t *kheap_limit;                  // maximal address of heap_end
 // how much memory was used and how many allocations were
 extern size_t kheap_memory_used, kheap_allocs_num;
 
 void kheap_init(void);
 size_t kheap_increase(size_t size);
 void kheap_merge_free_adjacent(void);
-void kfree(void* address);
-void* kmalloc(size_t size);
-void* krealloc(void *p, size_t newsz);
+void kfree(void *address);
+void *kmalloc(size_t size);
+void *krealloc(void *p, size_t newsz);
 void kheap_print_stat(void);
 void kheap_test(void);
 

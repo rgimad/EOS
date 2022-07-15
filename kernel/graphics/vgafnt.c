@@ -3,9 +3,7 @@
 
 #include <stdint.h>
 
-
-uint8_t vgafnt[] =
-{
+uint8_t vgafnt[] = {
     0x00,
     0x00,
     0x00,

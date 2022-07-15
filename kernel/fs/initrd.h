@@ -50,14 +50,14 @@ typedef struct {
 int oct2bin(char *str, int size);
 
 unsigned int tar_getsize(const char *in);
-uint8_t* tar_lookup(uint8_t *archive, const char *filename);
+uint8_t *tar_lookup(uint8_t *archive, const char *filename);
 
 uint32_t initrd_read(const char *filename, int offset, int size, vfs_filesystem_t *u, void *buffer);
 
 uint32_t initrd_file_exists(const char *filename, vfs_filesystem_t *u);
-uint32_t initrd_get_filesize(const char *filename, vfs_filesystem_t* fs);
+uint32_t initrd_get_filesize(const char *filename, vfs_filesystem_t *fs);
 
-uint32_t initrd_is_dir(const char *filename, vfs_filesystem_t* fs);
+uint32_t initrd_is_dir(const char *filename, vfs_filesystem_t *fs);
 
 void initrd_list(int argc, char **arg);
 void initrd_init(uint32_t begin, uint32_t end);

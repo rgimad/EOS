@@ -82,7 +82,6 @@ extern uint64_t memlist_size;*/
 //extern struct multiboot_info *kernel_mboot_info;
 #endif
 
-
 #define MBOOT_FLAG_MEM     0x001
 #define MBOOT_FLAG_DEVICE  0x002
 #define MBOOT_FLAG_CMDLINE 0x004
@@ -95,11 +94,11 @@ extern uint64_t memlist_size;*/
 #define MBOOT_FLAG_APM     0x200
 #define MBOOT_FLAG_VBE     0x400
 
-#define MULTIBOOT_MEMORY_AVAILABLE         1
-#define MULTIBOOT_MEMORY_RESERVED          2       
-#define MULTIBOOT_MEMORY_ACPI_RECLAIMABLE  3
-#define MULTIBOOT_MEMORY_NVS               4       
-#define MULTIBOOT_MEMORY_BADRAM            5
+#define MULTIBOOT_MEMORY_AVAILABLE        1
+#define MULTIBOOT_MEMORY_RESERVED         2
+#define MULTIBOOT_MEMORY_ACPI_RECLAIMABLE 3
+#define MULTIBOOT_MEMORY_NVS              4
+#define MULTIBOOT_MEMORY_BADRAM           5
 
 struct multiboot_info {
     uint32_t flags; /* Header flags */

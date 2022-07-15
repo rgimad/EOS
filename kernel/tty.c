@@ -17,14 +17,16 @@ int tty_pos_y;
 
 uint32_t tty_text_color;
 
-void tty_init() {
+void tty_init()
+{
     tty_pos_y = 0;
     tty_pos_x = 0;
 
     tty_text_color = VESA_LIGHT_CYAN;
 }
 
-void tty_backspace() {
+void tty_backspace()
+{
     if (tty_pos_x < 8) {
         if (tty_pos_y >= 17) {
             tty_pos_y -= 17;
@@ -36,11 +38,13 @@ void tty_backspace() {
     draw_vga_character(' ', tty_pos_x, tty_pos_y, tty_text_color, 0x000000, 1);
 }
 
-void tty_setcolor(uint32_t color) {
+void tty_setcolor(uint32_t color)
+{
     tty_text_color = color;
 }
 
-void tty_putchar(char c) {
+void tty_putchar(char c)
+{
     if ((tty_pos_x + 8) >= (int)VESA_WIDTH || c == '\n') {
         tty_line_fill[tty_pos_y] = tty_pos_x;
         tty_pos_x = 0;
@@ -58,37 +62,40 @@ void tty_putchar(char c) {
     }
 }
 
-
 // Scrolls the display up number of rows
-void tty_scroll() {
+void tty_scroll()
+{
     // charheight = 16???
     unsigned int num_rows = 1;
-    tty_pos_y -= 17*num_rows;
+    tty_pos_y -= 17 * num_rows;
 
     // Copy rows upwards
-    uint8_t *read_ptr = (uint8_t*) back_framebuffer_addr + ((num_rows * 17) * framebuffer_pitch);
-    uint8_t *write_ptr = (uint8_t*) back_framebuffer_addr;
+    uint8_t *read_ptr = (uint8_t *)back_framebuffer_addr + ((num_rows * 17) * framebuffer_pitch);
+    uint8_t *write_ptr = (uint8_t *)back_framebuffer_addr;
     uint32_t num_bytes = (framebuffer_pitch * VESA_HEIGHT) - (framebuffer_pitch * (num_rows * 17)); //old: unsigned old
     memcpy(write_ptr, read_ptr, num_bytes);
 
     // Clear the rows at the end
-    write_ptr = (uint8_t*) back_framebuffer_addr + (framebuffer_pitch * VESA_HEIGHT) - (framebuffer_pitch * (num_rows * 17));
+    write_ptr = (uint8_t *)back_framebuffer_addr + (framebuffer_pitch * VESA_HEIGHT) - (framebuffer_pitch * (num_rows * 17));
     memset(write_ptr, 0, framebuffer_pitch * (num_rows * 17));
 
     //swap buffers
     memcpy(framebuffer_addr, back_framebuffer_addr, framebuffer_size);
 }
 
-
-void tty_write(const char *data, size_t size) {
-    for (size_t i = 0; i < size; i++) tty_putchar(data[i]);
+void tty_write(const char *data, size_t size)
+{
+    for (size_t i = 0; i < size; i++)
+        tty_putchar(data[i]);
 }
 
-void tty_putstring(const char *data) {
+void tty_putstring(const char *data)
+{
     tty_write(data, strlen(data));
 }
 
-void tty_putuint(int i) {
+void tty_putuint(int i)
+{
     unsigned int n, d = 1000000000;
     char str[255];
     unsigned int dec_index = 0;
@@ -99,17 +106,18 @@ void tty_putuint(int i) {
     n = i;
 
     while (d >= 10) {
-        str[dec_index++] = ((char) ((int) '0' + n/d));
+        str[dec_index++] = ((char)((int)'0' + n / d));
         n = n % d;
         d /= 10;
     }
 
-    str[dec_index++] = ((char) ((int) '0' + n));
+    str[dec_index++] = ((char)((int)'0' + n));
     str[dec_index] = 0;
     tty_putstring(str);
 }
 
-void tty_putint(int i) {
+void tty_putint(int i)
+{
     if (i >= 0) {
         tty_putuint(i);
     } else {
@@ -118,8 +126,9 @@ void tty_putint(int i) {
     }
 }
 
-void tty_puthex(uint32_t i){
-    const unsigned char hex[16]  =  { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
+void tty_puthex(uint32_t i)
+{
+    const unsigned char hex[16] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
     unsigned int n, d = 0x10000000;
 
     tty_putstring("0x");
@@ -138,7 +147,8 @@ void tty_puthex(uint32_t i){
     tty_putchar(hex[n]);
 }
 
-void tty_print(char *format, va_list args) {
+void tty_print(char *format, va_list args)
+{
     int i = 0;
     char *string;
 
@@ -147,7 +157,7 @@ void tty_print(char *format, va_list args) {
             i++;
             switch (format[i]) {
             case 's':
-                string = va_arg(args, char*);
+                string = va_arg(args, char *);
                 tty_putstring(string);
                 break;
             case 'c':
@@ -176,7 +186,8 @@ void tty_print(char *format, va_list args) {
     }
 }
 
-void tty_printf(char *text, ...) {
+void tty_printf(char *text, ...)
+{
     va_list args;
     // Find the first argument
     va_start(args, text);
@@ -184,7 +195,8 @@ void tty_printf(char *text, ...) {
     tty_print(text, args);
 }
 
-void tty_putstring_color(const char *data, uint32_t text_color) {
+void tty_putstring_color(const char *data, uint32_t text_color)
+{
     uint32_t tty_text_color_old = tty_text_color;
     tty_setcolor(text_color);
     tty_putstring(data);

@@ -33,7 +33,8 @@ extern void gdt_flush(struct gdt_ptr *gdt_ptr_addr);
 
 // Setup a descriptor in the Global Descriptor Table
 void gdt_set_gate(int32_t num, uint32_t base, uint32_t limit, uint8_t access,
-                  uint8_t gran) {
+                  uint8_t gran)
+{
     // Setup the descriptor base address
     gdt[num].base_low = (base & 0xFFFF);
     gdt[num].base_middle = (base >> 16) & 0xFF;
@@ -52,10 +53,11 @@ void gdt_set_gate(int32_t num, uint32_t base, uint32_t limit, uint8_t access,
 // special GDT pointer, set up the first 3 entries in our GDT, and then
 // finally call gdt_flush() in our assembler file in order to tell the
 // processor where the new GDT is and update the new segment registers
-void gdt_install() {
+void gdt_install()
+{
     // Setup the GDT pointer and limit
     gp.limit = (sizeof(struct gdt_entry) * GDT_MAX_DESCRIPTORS) - 1;
-    gp.base = (uint32_t) &gdt;
+    gp.base = (uint32_t)&gdt;
 
     // Our NULL descriptor, required
     gdt_set_gate(0, 0, 0, 0, 0);

@@ -36,13 +36,13 @@ void consolewindow_scroll(consolewindow_t *cwnd);
 void consolewindow_set_text_color(consolewindow_t *cwnd, uint32_t color);
 void consolewindow_write(consolewindow_t *cwnd, const char *data, size_t size);
 
-void consolewindow_putstring(consolewindow_t *cwnd, const char* data);
+void consolewindow_putstring(consolewindow_t *cwnd, const char *data);
 void consolewindow_putuint(consolewindow_t *cwnd, int i);
 void consolewindow_putint(consolewindow_t *cwnd, int i);
 void consolewindow_puthex(consolewindow_t *cwnd, uint32_t i);
 
 void consolewindow_print(consolewindow_t *cwnd, char *format, va_list args);
-void consolewindow_printf(consolewindow_t *cwnd, char *text, ... );
+void consolewindow_printf(consolewindow_t *cwnd, char *text, ...);
 
 void consolewindow_putstring_color(consolewindow_t *cwnd, const char *data, uint32_t text_color);
 

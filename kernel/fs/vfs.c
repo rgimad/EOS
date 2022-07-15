@@ -15,7 +15,8 @@ int __vfs_init = 0;
 int vfs_lastmnt = 0;
 vfs_mount_info_t **vfs_mount_points = 0;
 
-void vfs_mount_list() {
+void vfs_mount_list()
+{
     for (int i = 0; i < vfs_lastmnt; ++i) {
         tty_printf("\n%s on %s type ", vfs_mount_points[i]->fs->dev->name, vfs_mount_points[i]->location);
 
@@ -35,7 +36,8 @@ void vfs_mount_list() {
     }
 }
 
-int vfs_mount(vfs_storage_dev_t *dev, vfs_filesystem_handles_t *fs_handles, int type, char *location, int block_size) {
+int vfs_mount(vfs_storage_dev_t *dev, vfs_filesystem_handles_t *fs_handles, int type, char *location, int block_size)
+{
     for (int i = 0; i < vfs_lastmnt; ++i) {
         if (strcmp(vfs_mount_points[i]->location, location) == 0) {
             tty_printf("\nVFS: Device %s already mounted.", location);
@@ -43,8 +45,8 @@ int vfs_mount(vfs_storage_dev_t *dev, vfs_filesystem_handles_t *fs_handles, int 
         }
     }
 
-    vfs_mount_info_t *mnt = (vfs_mount_info_t*) kmalloc(sizeof(vfs_mount_info_t));
-    mnt->fs = (vfs_filesystem_t*) kmalloc(sizeof(vfs_filesystem_t));
+    vfs_mount_info_t *mnt = (vfs_mount_info_t *)kmalloc(sizeof(vfs_mount_info_t));
+    mnt->fs = (vfs_filesystem_t *)kmalloc(sizeof(vfs_filesystem_t));
     mnt->fs->dev = dev;
     mnt->fs->block_size = block_size;
     mnt->fs_handles = fs_handles;
@@ -58,11 +60,12 @@ int vfs_mount(vfs_storage_dev_t *dev, vfs_filesystem_handles_t *fs_handles, int 
     return 1;
 }
 
-int vfs_mount_find(const char *path, int *filename_add) {
-    char *a = (char*) kmalloc(strlen(path) + 1);
+int vfs_mount_find(const char *path, int *filename_add)
+{
+    char *a = (char *)kmalloc(strlen(path) + 1);
     memset(a, 0, strlen(path) + 1);
     memcpy(a, path, strlen(path) + 1);
-    
+
     if (a[strlen(a)] == '/') {
         str_bksp(a, '/');
     }
@@ -89,7 +92,8 @@ int vfs_mount_find(const char *path, int *filename_add) {
     return 0;
 }
 
-int vfs_read(const char *filename, int offset, int size, void *buf) {
+int vfs_read(const char *filename, int offset, int size, void *buf)
+{
     int a = 0;
     int mntn = vfs_mount_find(filename, &a);
     filename += a + 1;
@@ -102,7 +106,8 @@ int vfs_read(const char *filename, int offset, int size, void *buf) {
     return 1;
 }
 
-int vfs_get_size(const char *filename) {
+int vfs_get_size(const char *filename)
+{
     int a = 0;
     int mntn = vfs_mount_find(filename, &a);
     filename += a + 1; // Change the pointer (its not const, but char its pointing to is const)
@@ -114,7 +119,8 @@ int vfs_get_size(const char *filename) {
     return vfs_mount_points[mntn]->fs_handles->get_size(filename, vfs_mount_points[mntn]->fs);
 }
 
-int vfs_is_dir(char *filename) {
+int vfs_is_dir(char *filename)
+{
     int a = 0;
     int mntn = vfs_mount_find(filename, &a);
     filename += a + 1;
@@ -125,7 +131,8 @@ int vfs_is_dir(char *filename) {
     return vfs_mount_points[mntn]->fs_handles->is_dir(filename, vfs_mount_points[mntn]->fs);
 }
 
-int vfs_write(char *filename, int offset, int size, void *buf) {
+int vfs_write(char *filename, int offset, int size, void *buf)
+{
     int a = 0;
     int mntn = vfs_mount_find(filename, &a);
     filename += a + 1;
@@ -138,7 +145,8 @@ int vfs_write(char *filename, int offset, int size, void *buf) {
     return 1;
 }
 
-int vfs_mkdir(char *filename, char *path, uint16_t perms) {
+int vfs_mkdir(char *filename, char *path, uint16_t perms)
+{
     int a = 0;
     int mntn = vfs_mount_find(path, &a);
     path += a + 1;
@@ -151,7 +159,8 @@ int vfs_mkdir(char *filename, char *path, uint16_t perms) {
     return 1;
 }
 
-int vfs_mkfile(char *filename, char *path, uint16_t perms) {
+int vfs_mkfile(char *filename, char *path, uint16_t perms)
+{
     int a = 0;
     int mntn = vfs_mount_find(path, &a);
     path += a + 1;
@@ -164,7 +173,8 @@ int vfs_mkfile(char *filename, char *path, uint16_t perms) {
     return 1;
 }
 
-int vfs_list(char *path, void *buf) {
+int vfs_list(char *path, void *buf)
+{
     if (strcmp(path, "/") == 0) {
         for (int i = 0; i < vfs_lastmnt; ++i) {
             tty_printf(" %s ", vfs_mount_points[i]->location);
@@ -185,7 +195,8 @@ int vfs_list(char *path, void *buf) {
     return 1;
 }
 
-int vfs_rm(char *filename) {
+int vfs_rm(char *filename)
+{
     int a = 0;
     int mntn = vfs_mount_find(filename, &a);
     filename += a + 1;
@@ -198,7 +209,8 @@ int vfs_rm(char *filename) {
     return 1;
 }
 
-int vfs_exists(const char *filename) {
+int vfs_exists(const char *filename)
+{
     int a = 0;
     int mntn = vfs_mount_find(filename, &a);
     filename += a + 1;
@@ -209,7 +221,8 @@ int vfs_exists(const char *filename) {
     return vfs_mount_points[mntn]->fs_handles->exists(filename, vfs_mount_points[mntn]->fs);
 }
 
-void vfs_get_file_name_from_path(char *fpath, char *buf) {
+void vfs_get_file_name_from_path(char *fpath, char *buf)
+{
     int len = strlen(fpath), last_slash, was_slash = 0, p1, i;
     last_slash = len - 1;
 
@@ -238,8 +251,9 @@ void vfs_get_file_name_from_path(char *fpath, char *buf) {
     buf[len - p1] = '\0';
 }
 
-void vfs_init() {
-    //tty_printf("\nVFS: Allocating memory for structures.");    
-    vfs_mount_points = (vfs_mount_info_t**) kmalloc(sizeof(vfs_mount_info_t) * MOUNTPOINTS_SIZE);
+void vfs_init()
+{
+    //tty_printf("\nVFS: Allocating memory for structures.");
+    vfs_mount_points = (vfs_mount_info_t **)kmalloc(sizeof(vfs_mount_info_t) * MOUNTPOINTS_SIZE);
     __vfs_init = 1;
 }

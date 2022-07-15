@@ -9,12 +9,12 @@
 #include <stdint.h>
 
 // Constants to the boundaries of memory
-#define KERNEL_START_PADDR ((uint32_t) &kernel_phys_start)
-#define KERNEL_END_PADDR   ((uint32_t) &kernel_phys_end)
+#define KERNEL_START_PADDR ((uint32_t)&kernel_phys_start)
+#define KERNEL_END_PADDR   ((uint32_t)&kernel_phys_end)
 #define KERNEL_SIZE        (KERNEL_END_PADDR - KERNEL_START_PADDR)
 
-#define KERNEL_START_VADDR ((uint32_t) &kernel_virt_start)
-#define KERNEL_END_VADDR   ((uint32_t) &kernel_virt_end)
+#define KERNEL_START_VADDR ((uint32_t)&kernel_virt_start)
+#define KERNEL_END_VADDR   ((uint32_t)&kernel_virt_end)
 
 #define KERNEL_PHYS_MAP_START kernel_phys_map_start
 #define KERNEL_PHYS_MAP_END   kernel_phys_map_end
@@ -46,4 +46,4 @@ extern uint32_t kernel_virt_end;
 extern uint32_t kernel_phys_map_start;
 extern uint32_t kernel_phys_map_end;
 
-#endif  // _MEMLAYOUT_H_
+#endif // _MEMLAYOUT_H_

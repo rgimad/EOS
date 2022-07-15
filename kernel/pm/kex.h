@@ -30,6 +30,4 @@ void kex_hdr_info(const kex_hdr_t *hdr);
 void kex_info(const char *fname);
 void kex_run(const char *fname);
 
-
-
 #endif // KEX_H

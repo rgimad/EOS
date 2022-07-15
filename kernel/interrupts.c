@@ -12,7 +12,8 @@
 
 static interrupt_handler_t interrupt_handlers[IDT_NUM_ENTRIES];
 
-bool register_interrupt_handler(uint32_t idt_index, interrupt_handler_t handler) {
+bool register_interrupt_handler(uint32_t idt_index, interrupt_handler_t handler)
+{
     if (idt_index >= IDT_NUM_ENTRIES) {
         return false;
     }
@@ -25,7 +26,8 @@ bool register_interrupt_handler(uint32_t idt_index, interrupt_handler_t handler)
     return true;
 }
 
-void fault_handler(struct regs *r) {
+void fault_handler(struct regs *r)
+{
     //void *linearAddress;
     // Retrieve the linear address of the page fault stored in CR2
     //ASM( "movl %%cr2, %0" : "=r" (linearAddress) );
@@ -33,16 +35,19 @@ void fault_handler(struct regs *r) {
     //for (;;);
 
     uint32_t adr;
-    asm volatile("movl %%cr2, %0" : "=r" (adr));
+    asm volatile("movl %%cr2, %0"
+                 : "=r"(adr));
     qemu_printf("System Exception. System Halted! cr2 = %x  r->idt_index = %x eax = %x  ebx = %x  ecx = %x  edx = %x  esp = %x  ebp = %x  eip = %x\n", adr, r->idt_index, r->eax, r->ebx, r->ecx, r->edx, r->esp, r->ebp, r->eip);
-    for (; ; );
+    for (;;)
+        ;
 }
 
-void irq_handler(struct regs *r) {
+void irq_handler(struct regs *r)
+{
     // qemu_printf("INT %u\n", r->idt_index);
     //if (r->idt_index != 32) tty_printf("idt_index = %d\n", r->idt_index);
     // Blank function pointer
-    void (*handler)(struct regs *r);
+    void (*handler)(struct regs * r);
 
     // If there's a custom handler to handle the IRQ, handle it
     handler = interrupt_handlers[r->idt_index];
@@ -60,7 +65,8 @@ void irq_handler(struct regs *r) {
     outb(0x20, 0x20);
 }
 
-void run_interrupt_handler(struct regs* r) {
+void run_interrupt_handler(struct regs *r)
+{
     // tty_printf("int %x\n", r->idt_index);
     size_t idt_index = r->idt_index;
     if (idt_index < 32) {

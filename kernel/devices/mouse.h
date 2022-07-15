@@ -24,7 +24,7 @@
 #define MOUSE_DATA_PORT       0x60
 
 // Mouse answers
-#define MOUSE_ACK             0xFA
+#define MOUSE_ACK 0xFA
 
 void mouse_erase();
 void mouse_draw();

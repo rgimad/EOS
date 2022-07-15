@@ -2,7 +2,8 @@
 
 const char *test_init = "*** printf.dll test ***";
 
-int main(void) {
+int main(void)
+{
     char *s;
     char c;
     int i;
@@ -11,7 +12,7 @@ int main(void) {
     long unsigned n;
     unsigned x;
 
-    for(int i = 0; test_init[i]; i++) {
+    for (int i = 0; test_init[i]; i++) {
         putchar(test_init[i]);
     }
     putchar('\n');
@@ -19,9 +20,9 @@ int main(void) {
     s = "test";
     c = 'X';
     i = -12345;
-    u =  12345;
+    u = 12345;
     l = -1234567890;
-    n =  1234567890;
+    n = 1234567890;
     x = 0xABCD;
 
     printf("String        %s\n", s);

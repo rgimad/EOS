@@ -1,8 +1,8 @@
 ﻿#ifndef _LIBK_MATH_H_
 #define _LIBK_MATH_H_
 
-#define fabs(x) ((x<0) ? -x : x)
-#define abs(x)  ((x<0) ? -x : x)
+#define fabs(x) ((x < 0) ? -x : x)
+#define abs(x)  ((x < 0) ? -x : x)
 
 int pow(int, int);
 double sqrt(double);
@@ -21,7 +21,7 @@ double tan(double);*/
 
 int sign(double a);
 
-#define isnan(in) ((in)!=(in))
-#define isinf(in) ((in)==(in-1))
+#define isnan(in) ((in) != (in))
+#define isinf(in) ((in) == (in - 1))
 
 #endif

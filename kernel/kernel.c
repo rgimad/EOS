@@ -37,9 +37,10 @@
 
 uint32_t kernel_stack_top_vaddr;
 
-int kernel_init(struct multiboot_info *mboot_info) {
+int kernel_init(struct multiboot_info *mboot_info)
+{
     tty_init();
-    svga_mode_info_t *svga_mode = (svga_mode_info_t*) mboot_info->vbe_mode_info;
+    svga_mode_info_t *svga_mode = (svga_mode_info_t *)mboot_info->vbe_mode_info;
     framebuffer_addr = (uint8_t *)svga_mode->physbase; //vmm_temp_map_page(svga_mode->physbase);
     framebuffer_pitch = svga_mode->pitch;
     framebuffer_bpp = svga_mode->bpp;
@@ -71,8 +72,8 @@ int kernel_init(struct multiboot_info *mboot_info) {
     // tty_printf("pmm initialized\n");
     //pmm_test();
 
-    uint32_t initrd_beg = *(uint32_t*) (mboot_info->mods_addr);
-    uint32_t initrd_end = *(uint32_t*) (mboot_info->mods_addr + 4);
+    uint32_t initrd_beg = *(uint32_t *)(mboot_info->mods_addr);
+    uint32_t initrd_end = *(uint32_t *)(mboot_info->mods_addr + 4);
 
     //tty_printf("pde0 = %u\n", *(page_dir_entry*)(0xFFFFF000));
     //tty_printf("pde_%d = %u\n", (0xC0000000 >> 22), *(page_dir_entry*)(0xFFFFF000 + (0xC0000000 >> 22)*4));
@@ -119,20 +120,26 @@ int kernel_init(struct multiboot_info *mboot_info) {
     return 1;
 }
 
-void higher_half_test() {
+void higher_half_test()
+{
     int eip, esp;
     //asm("movl %%ebx,%0" : "=r"(eip_val));
     tty_printf("Hello from higher half! ");
 
-    asm volatile("1: lea 1b, %0;": "=a"(eip));
+    asm volatile("1: lea 1b, %0;"
+                 : "=a"(eip));
     tty_printf("EIP = %x  ", eip);
 
-    asm("movl %%esp,%0" : "=r"(esp));
+    asm("movl %%esp, %0"
+        : "=r"(esp));
+
     tty_printf("ESP = %x  \n", esp);
 }
 
-void kernel_main(int magic_number, struct multiboot_info *mboot_info) { // Arguments are passed by _start in boot.s
-    asm("movl %%esp,%0" : "=r"(kernel_stack_top_vaddr)); // TODO is it unused????
+void kernel_main(int magic_number, struct multiboot_info *mboot_info) // Arguments are passed by _start in boot.s
+{
+    asm("movl %%esp,%0"
+        : "=r"(kernel_stack_top_vaddr)); // TODO is it unused????
     (void)magic_number;
 
     // Initilize the kernel
@@ -142,7 +149,8 @@ void kernel_main(int magic_number, struct multiboot_info *mboot_info) { // Argum
     // TODO: 172-174 is it normal to place these lines of code here????????????????????????????????????????????????????????
     // Set TSS stack so that when process return from usermode to kernel mode, the kernel have a ready-to-use stack
     uint32_t esp;
-    asm volatile("mov %%esp, %0" : "=r"(esp));
+    asm volatile("mov %%esp, %0"
+                 : "=r"(esp));
     tss_set_stack(0x10, esp);
 
     // init the kernel debug shell (ksh)
@@ -151,7 +159,7 @@ void kernel_main(int magic_number, struct multiboot_info *mboot_info) { // Argum
     // run ksh main function
     ksh_main();
 
-    for (; ; ) {
+    for (;;) {
         asm("hlt");
     }
 }

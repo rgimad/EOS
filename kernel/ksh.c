@@ -29,27 +29,29 @@
 
 #include <stdint.h>
 
-#define STBI_NO_STDIO 1
-#define STBI_NO_GIF   1
+#define STBI_NO_STDIO            1
+#define STBI_NO_GIF              1
 #define STB_IMAGE_IMPLEMENTATION 1
-#define STBI_NO_LINEAR 1
-#define STBI_NO_HDR 1
+#define STBI_NO_LINEAR           1
+#define STBI_NO_HDR              1
 // #define STBI_NO_FAILURE_STRINGS 1
-#define STBI_NO_THREAD_LOCALS 1 // !
-#define STBI_ASSERT assert
-#define STBI_MALLOC(sz) kmalloc(sz)
-#define STBI_REALLOC(p,newsz) krealloc(p,newsz)
-#define STBI_FREE(p) kfree(p)
+#define STBI_NO_THREAD_LOCALS  1 // !
+#define STBI_ASSERT            assert
+#define STBI_MALLOC(sz)        kmalloc(sz)
+#define STBI_REALLOC(p, newsz) krealloc(p, newsz)
+#define STBI_FREE(p)           kfree(p)
 #include <kernel/utils/stb_image.h>
 
 char ksh_working_directory[256];
 
-void ksh_init() {
+void ksh_init()
+{
     tty_putstring_color("                  EOS KSH (Kernel SHell):\n\n", VESA_LIGHT_RED);
     strcpy(ksh_working_directory, "/initrd/");
 }
 
-void ksh_main() {
+void ksh_main()
+{
     char cmd[256];
 
     while (1) {
@@ -78,7 +80,7 @@ void ksh_main() {
             ksh_draw_demo();
         } else if (strcmp(cmd, "gui_test") == 0) {
             ksh_gui_test();
-        }  else if (strcmp(cmd, "syscall_test") == 0) {
+        } else if (strcmp(cmd, "syscall_test") == 0) {
             ksh_syscall_test();
         } else if (strcmp(cmd, "pwd") == 0) {
             ksh_cmd_pwd();
@@ -140,7 +142,7 @@ void ksh_main() {
             qemu_printf("Hello world = %x + %s", 0x779, "privet");
         } else if (strcmp(cmd, "reg_modif") == 0) {
             int val = 13372;
-            asm volatile("mov %0, %%eax" :: "r"(val));
+            asm volatile("mov %0, %%eax" ::"r"(val));
             asm volatile("int $32;");
         } else if (strlen(cmd) > 4 && strncmp(cmd, "img ", 4) == 0) {
             char *tok = strtok(cmd, " ");
@@ -159,31 +161,37 @@ void ksh_main() {
 
 // Command handlers implementation
 
-void ksh_cmd_cpuid() {
+void ksh_cmd_cpuid()
+{
     detect_cpu();
     tty_printf("\n");
 }
 
-void ksh_cmd_unknown() {
+void ksh_cmd_unknown()
+{
     tty_printf("Error: unknown command.\n");
 }
 
-void ksh_cmd_about() {
+void ksh_cmd_about()
+{
     tty_printf("EOS v0.1\n");
 }
 
-void ksh_cmd_ticks() {
+void ksh_cmd_ticks()
+{
     tty_printf("Timer ticks = %d\n", timer_get_ticks());
 }
 
-void ksh_kheap_test() {
+void ksh_kheap_test()
+{
     kheap_test();
 }
 
-void ksh_draw_demo() {
+void ksh_draw_demo()
+{
     draw_fill(0, 500, framebuffer_width, framebuffer_height - 500, 0x0000AA);
 
-    int arr[10] = {0x00AA00, 0x00AAAA, 0xAA0000, 0xAA00AA, 0xAA5500, 0xAAAAAA, 0x555555, 0x5555FF, 0x55FF55, 0x55FFFF};
+    int arr[10] = { 0x00AA00, 0x00AAAA, 0xAA0000, 0xAA00AA, 0xAA5500, 0xAAAAAA, 0x555555, 0x5555FF, 0x55FF55, 0x55FFFF };
     int i;
     for (i = 0; i < 30; i++) {
         draw_square(30 + 7 * i, 30 + 7 * i, 200, 300, arr[i % 10]);
@@ -195,21 +203,24 @@ void ksh_draw_demo() {
     }
 }
 
-void ksh_gui_test() {
-    int wnd_x = 400, wnd_y = 200, wnd_width = 500, wnd_height = 300,  wnd_border = 4, wnd_hdr_height = 30;
+void ksh_gui_test()
+{
+    int wnd_x = 400, wnd_y = 200, wnd_width = 500, wnd_height = 300, wnd_border = 4, wnd_hdr_height = 30;
     uint32_t wnd_frame_color = VESA_LIGHT_BLUE, wnd_background_color = VESA_LIGHT_GREY;
     draw_fill(wnd_x, wnd_y, wnd_width, wnd_height, wnd_frame_color);
     //draw_square(wnd_x, wnd_y, wnd_width, wnd_height, VESA_WHITE);
-    draw_fill(wnd_x + wnd_border, wnd_y + wnd_hdr_height, wnd_width - 2*wnd_border, wnd_height - wnd_hdr_height - wnd_border, wnd_background_color);
-    draw_fill(wnd_x + wnd_width - wnd_hdr_height, wnd_y + wnd_border, wnd_hdr_height - 2*wnd_border, wnd_hdr_height - 2*wnd_border, VESA_RED);
-    draw_square(wnd_x + wnd_width - wnd_hdr_height, wnd_y + wnd_border, wnd_hdr_height - 2*wnd_border, wnd_hdr_height - 2*wnd_border, VESA_WHITE);
+    draw_fill(wnd_x + wnd_border, wnd_y + wnd_hdr_height, wnd_width - 2 * wnd_border, wnd_height - wnd_hdr_height - wnd_border, wnd_background_color);
+    draw_fill(wnd_x + wnd_width - wnd_hdr_height, wnd_y + wnd_border, wnd_hdr_height - 2 * wnd_border, wnd_hdr_height - 2 * wnd_border, VESA_RED);
+    draw_square(wnd_x + wnd_width - wnd_hdr_height, wnd_y + wnd_border, wnd_hdr_height - 2 * wnd_border, wnd_hdr_height - 2 * wnd_border, VESA_WHITE);
 }
 
-void ksh_cmd_pwd() {
+void ksh_cmd_pwd()
+{
     tty_printf("%s\n", ksh_working_directory);
 }
 
-void ksh_cmd_cat(char *fname) {
+void ksh_cmd_cat(char *fname)
+{
     if (fname[0] != '/') { //TODO: make function
         char temp[256];
         strcpy(temp, ksh_working_directory);
@@ -217,7 +228,7 @@ void ksh_cmd_cat(char *fname) {
         strcpy(fname, temp);
     }
 
-    char *buf = (char*) kmalloc(1000);
+    char *buf = (char *)kmalloc(1000);
 
     if (!vfs_exists(fname)) {
         tty_printf("cat: error file not found\n");
@@ -231,7 +242,8 @@ void ksh_cmd_cat(char *fname) {
     }
 }
 
-void ksh_cmd_cd(char *dname) {
+void ksh_cmd_cd(char *dname)
+{
     if (dname[0] != '/') {
         char temp[256];
         strcpy(temp, ksh_working_directory);
@@ -250,12 +262,14 @@ void ksh_cmd_cd(char *dname) {
     }
 }
 
-void ksh_cmd_ls() {
+void ksh_cmd_ls()
+{
     initrd_list(0, 0);
     tty_printf("\n");
 }
 
-void ksh_cmd_kex_info(char *fname) {
+void ksh_cmd_kex_info(char *fname)
+{
     if (fname[0] != '/') { // TODO: make function
         char temp[256];
         strcpy(temp, ksh_working_directory);
@@ -267,7 +281,8 @@ void ksh_cmd_kex_info(char *fname) {
     kex_info(fname);
 }
 
-void ksh_cmd_img(char *fname) {
+void ksh_cmd_img(char *fname)
+{
     if (fname[0] != '/') { //TODO: make function
         char temp[256];
         strcpy(temp, ksh_working_directory);
@@ -288,7 +303,7 @@ void ksh_cmd_img(char *fname) {
         tty_printf("image decoded:\n  width = %d\n  height = %d\n  channels = %d\n", x, y, ch);
         for (int i = 0; i < y; i++) {
             for (int j = 0; j < x; j++) {
-                uint32_t col = ((uint32_t)(res_img[(i*x + j)*ch]) << 16) + ((uint32_t)(res_img[(i*x + j)*ch + 1]) << 8) + ((uint32_t)(res_img[(i*x + j)*ch + 2]));
+                uint32_t col = ((uint32_t)(res_img[(i * x + j) * ch]) << 16) + ((uint32_t)(res_img[(i * x + j) * ch + 1]) << 8) + ((uint32_t)(res_img[(i * x + j) * ch + 2]));
                 set_pixel(400 + j, 150 + i, col);
             }
         }
@@ -297,7 +312,8 @@ void ksh_cmd_img(char *fname) {
     }
 }
 
-void ksh_cmd_run(char *fname) {
+void ksh_cmd_run(char *fname)
+{
     int status = 0;
 
     if (fname[0] != '/') { // TODO: make function
@@ -307,7 +323,7 @@ void ksh_cmd_run(char *fname) {
         strcpy(fname, temp);
     }
 
-    if(!vfs_exists(fname)) {
+    if (!vfs_exists(fname)) {
         tty_printf("File not found!\n");
         return;
     }
@@ -317,12 +333,12 @@ void ksh_cmd_run(char *fname) {
 
     if ((uint16_t)signature == PE_IMAGE_DOS_SIGNATURE) {
         pe_status_t pe_status;
-        if(!pe_status_init(&pe_status)) {
+        if (!pe_status_init(&pe_status)) {
             tty_printf("Memory allocation error!\n");
             return;
         }
         status = run_pe(fname, &pe_status);
-        if(pe_status.err_code) {
+        if (pe_status.err_code) {
             tty_printf("Error when processing PE file '%s': %s.\n", pe_status.file_name, pe_strerror(pe_status.err_code));
             return;
         }
@@ -336,7 +352,8 @@ void ksh_cmd_run(char *fname) {
     tty_printf("\nProgram exited with code %d\n", status);
 }
 
-void ksh_syscall_test() {
+void ksh_syscall_test()
+{
     char *str = "Hello i'm system call !\n";
     unsigned i = 0;
     while (*(str + i)) {
@@ -344,6 +361,7 @@ void ksh_syscall_test() {
     }
 }
 
-void ksh_cmd_help() {
+void ksh_cmd_help()
+{
     tty_printf("Available commands:\n cpuid - information about processor\n ticks - get number of ticks\n kheap_test - test kernel heap\n draw_demo - demo super effects\n syscall_test - test system calls work\n ls - list of files and dirs\n cd - set current directory\n pwd - print working directory\n cat - print contents of specified file\n gui_test - draw test window\n kex_info - information about kex file\n img - open graphic image file\n run - run program (for example - run first_program_gas.elf)\n cwnd_test - console window system test\n qemu_log_test\n about - about EOS\n help\n");
 }

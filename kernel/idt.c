@@ -11,17 +11,19 @@
 
 #include <kernel/devices/timer.h>
 
-#define SET_IDT_ENTRY(idx) \
-    set_idt_entry(idx, (uint32_t) &interrupt_handler_##idx,\
+#define SET_IDT_ENTRY(idx)                                 \
+    set_idt_entry(idx, (uint32_t)&interrupt_handler_##idx, \
                   0x08, 0x8E);
 
 #define DECLARE_INTERRUPT_HANDLER(i) void interrupt_handler_##i(void)
 
-void interrupt_enable_all(void) {
+void interrupt_enable_all(void)
+{
     asm volatile("sti");
 }
 
-void interrupt_disable_all(void) {
+void interrupt_disable_all(void)
+{
     asm volatile("cli");
 }
 
@@ -187,7 +189,8 @@ DECLARE_INTERRUPT_HANDLER(126);
 DECLARE_INTERRUPT_HANDLER(127);*/
 DECLARE_INTERRUPT_HANDLER(128); // for syscalls
 
-void set_idt_entry(uint8_t num, uint64_t handler, uint16_t sel, uint8_t flags) {
+void set_idt_entry(uint8_t num, uint64_t handler, uint16_t sel, uint8_t flags)
+{
     idt[num].handler_lo = handler & 0xFFFF;
     idt[num].handler_hi = (handler >> 16) & 0xFFFF;
     idt[num].always0 = 0;
@@ -195,7 +198,8 @@ void set_idt_entry(uint8_t num, uint64_t handler, uint16_t sel, uint8_t flags) {
     idt[num].sel = sel;
 }
 
-void irq_set_mask(uint8_t irq_line) {
+void irq_set_mask(uint8_t irq_line)
+{
     uint16_t port;
     uint8_t value;
 
@@ -210,7 +214,8 @@ void irq_set_mask(uint8_t irq_line) {
     outb(port, value);
 }
 
-void irq_clear_mask(uint8_t irq_line) {
+void irq_clear_mask(uint8_t irq_line)
+{
     uint16_t port;
     uint8_t value;
 
@@ -225,7 +230,8 @@ void irq_clear_mask(uint8_t irq_line) {
     outb(port, value);
 }
 
-void remap_pics(void) {
+void remap_pics(void)
+{
     // 0x20 - master pic command port
     // 0x21 - master pic data port
     // 0xA0 - slave pic command port
@@ -248,12 +254,13 @@ void remap_pics(void) {
 }
 
 // Installs the IDT
-void idt_install(void) {
+void idt_install(void)
+{
     remap_pics();
 
     // Sets the special IDT pointer up
     idtp.limit = (sizeof(struct idt_entry) * IDT_NUM_ENTRIES) - 1;
-    idtp.base = (uint32_t) &idt;
+    idtp.base = (uint32_t)&idt;
 
     // tty_printf("idtp.base = %x, idtp.limit = %x\n", idtp.base, idtp.limit);
 

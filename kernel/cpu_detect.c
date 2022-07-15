@@ -30,7 +30,8 @@
 #include <kernel/tty.h>
 
 /* Simply call this function detect_cpu(); */
-int detect_cpu(void) { /* or main() if your trying to port this as an independant application */
+int detect_cpu(void)
+{ /* or main() if your trying to port this as an independant application */
     unsigned long ebx, unused;
     cpuid(0, unused, ebx, unused, unused);
     switch (ebx) {
@@ -49,62 +50,63 @@ int detect_cpu(void) { /* or main() if your trying to port this as an independan
 
 /* Intel Specific brand list */
 char *Intel[] = {
-    "Brand ID Not Supported.", 
-    "Intel(R) Celeron(R) processor", 
-    "Intel(R) Pentium(R) III processor", 
-    "Intel(R) Pentium(R) III Xeon(R) processor", 
-    "Intel(R) Pentium(R) III processor", 
-    "Reserved", 
-    "Mobile Intel(R) Pentium(R) III processor-M", 
-    "Mobile Intel(R) Celeron(R) processor", 
-    "Intel(R) Pentium(R) 4 processor", 
-    "Intel(R) Pentium(R) 4 processor", 
-    "Intel(R) Celeron(R) processor", 
-    "Intel(R) Xeon(R) Processor", 
-    "Intel(R) Xeon(R) processor MP", 
-    "Reserved", 
-    "Mobile Intel(R) Pentium(R) 4 processor-M", 
-    "Mobile Intel(R) Pentium(R) Celeron(R) processor", 
-    "Reserved", 
-    "Mobile Genuine Intel(R) processor", 
-    "Intel(R) Celeron(R) M processor", 
-    "Mobile Intel(R) Celeron(R) processor", 
-    "Intel(R) Celeron(R) processor", 
-    "Mobile Geniune Intel(R) processor", 
-    "Intel(R) Pentium(R) M processor", 
+    "Brand ID Not Supported.",
+    "Intel(R) Celeron(R) processor",
+    "Intel(R) Pentium(R) III processor",
+    "Intel(R) Pentium(R) III Xeon(R) processor",
+    "Intel(R) Pentium(R) III processor",
+    "Reserved",
+    "Mobile Intel(R) Pentium(R) III processor-M",
+    "Mobile Intel(R) Celeron(R) processor",
+    "Intel(R) Pentium(R) 4 processor",
+    "Intel(R) Pentium(R) 4 processor",
+    "Intel(R) Celeron(R) processor",
+    "Intel(R) Xeon(R) Processor",
+    "Intel(R) Xeon(R) processor MP",
+    "Reserved",
+    "Mobile Intel(R) Pentium(R) 4 processor-M",
+    "Mobile Intel(R) Pentium(R) Celeron(R) processor",
+    "Reserved",
+    "Mobile Genuine Intel(R) processor",
+    "Intel(R) Celeron(R) M processor",
+    "Mobile Intel(R) Celeron(R) processor",
+    "Intel(R) Celeron(R) processor",
+    "Mobile Geniune Intel(R) processor",
+    "Intel(R) Pentium(R) M processor",
     "Mobile Intel(R) Celeron(R) processor"
 };
 
 /* This table is for those brand strings that have two values depending on the processor signature. It should have the same number of entries as the above table. */
 char *Intel_Other[] = {
-    "Reserved", 
-    "Reserved", 
-    "Reserved", 
-    "Intel(R) Celeron(R) processor", 
-    "Reserved", 
-    "Reserved", 
-    "Reserved", 
-    "Reserved", 
-    "Reserved", 
-    "Reserved", 
-    "Reserved", 
-    "Intel(R) Xeon(R) processor MP", 
-    "Reserved", 
-    "Reserved", 
-    "Intel(R) Xeon(R) processor", 
-    "Reserved", 
-    "Reserved", 
-    "Reserved", 
-    "Reserved", 
-    "Reserved", 
-    "Reserved", 
-    "Reserved", 
-    "Reserved", 
+    "Reserved",
+    "Reserved",
+    "Reserved",
+    "Intel(R) Celeron(R) processor",
+    "Reserved",
+    "Reserved",
+    "Reserved",
+    "Reserved",
+    "Reserved",
+    "Reserved",
+    "Reserved",
+    "Intel(R) Xeon(R) processor MP",
+    "Reserved",
+    "Reserved",
+    "Intel(R) Xeon(R) processor",
+    "Reserved",
+    "Reserved",
+    "Reserved",
+    "Reserved",
+    "Reserved",
+    "Reserved",
+    "Reserved",
+    "Reserved",
     "Reserved"
 };
 
 /* Intel-specific information */
-int do_intel(void) {
+int do_intel(void)
+{
     tty_printf("Detected Intel CPU. Intel-specific features:\n");
     unsigned long eax, ebx, ecx, edx, max_eax, signature, unused;
     int model, family, type, brand, stepping, reserved;
@@ -277,7 +279,8 @@ int do_intel(void) {
 }
 
 /* Print Registers */
-void printregs(int eax, int ebx, int ecx, int edx) {
+void printregs(int eax, int ebx, int ecx, int edx)
+{
     int j;
     char string[17];
     string[16] = '\0';
@@ -291,7 +294,8 @@ void printregs(int eax, int ebx, int ecx, int edx) {
 }
 
 /* AMD-specific information */
-int do_amd(void) {
+int do_amd(void)
+{
     tty_printf("Detected AMD CPU. AMD-specific features:\n");
     unsigned long extended, eax, ebx, ecx, edx, unused;
     int family, model, stepping, reserved;

@@ -8,6 +8,6 @@
 
 #include <stdarg.h>
 
-void qemu_printf(char *text, ... );
+void qemu_printf(char *text, ...);
 
 #endif

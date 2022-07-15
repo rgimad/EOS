@@ -191,13 +191,13 @@ typedef struct pe_image_thunk_data32_s {
 } pe_image_thunk_data32_t, *pe_pimage_thunk_data32_t;
 
 typedef struct dll_list_s {
-    uintptr_t* image_bases;
+    uintptr_t *image_bases;
     int _pos;
     int _max_size;
 } dll_list_t;
 
 typedef struct pe_status_s {
-    char* file_name;
+    char *file_name;
     int err_code;
 } pe_status_t;
 
@@ -234,9 +234,9 @@ typedef struct pe_status_s {
 #define pe_get_entry(image_base, nt) \
     PE_MAKE_PTR(int (*)(void), image_base, nt->optional_header.address_of_entry_point)
 
-int run_pe(const char* name, pe_status_t* status);
-bool pe_status_init(pe_status_t* status);
-void pe_status_free(pe_status_t* status);
-const char* pe_strerror(pe_error_t err);
+int run_pe(const char *name, pe_status_t *status);
+bool pe_status_init(pe_status_t *status);
+void pe_status_free(pe_status_t *status);
+const char *pe_strerror(pe_error_t err);
 
 #endif

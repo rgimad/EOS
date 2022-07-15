@@ -13,9 +13,10 @@
 tss_entry_t kernel_tss;
 
 // We don't need tss to assist all the task switching, but it's required to have one tss for switching back to kernel mode(system call for example)
-void tss_init(uint32_t idx, uint32_t kss, uint32_t kesp) {
-    uint32_t base = (uint32_t) &kernel_tss;
-    gdt_set_gate(idx, base, base + sizeof(tss_entry_t), /*or 0x89??*/0xE9, 0);
+void tss_init(uint32_t idx, uint32_t kss, uint32_t kesp)
+{
+    uint32_t base = (uint32_t)&kernel_tss;
+    gdt_set_gate(idx, base, base + sizeof(tss_entry_t), /*or 0x89??*/ 0xE9, 0);
 
     /* Kernel tss, access(E9 = 1 11 0 1 0 0 1)
         1   present
@@ -52,7 +53,8 @@ void tss_init(uint32_t idx, uint32_t kss, uint32_t kesp) {
 }
 
 // This function is used to set the tss's esp, so that CPU knows what esp the kernel should be using
-void tss_set_stack(uint32_t kss, uint32_t kesp) {
+void tss_set_stack(uint32_t kss, uint32_t kesp)
+{
     kernel_tss.ss0 = kss;
     kernel_tss.esp0 = kesp;
 }

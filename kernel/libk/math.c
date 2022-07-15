@@ -1,6 +1,7 @@
 #include <kernel/libk/math.h>
 
-int pow(int a, int b) {
+int pow(int a, int b)
+{
     if (b <= 0) {
         return 1;
     }
@@ -10,7 +11,8 @@ int pow(int a, int b) {
     return a;
 }
 
-double sqrt(double x) {
+double sqrt(double x)
+{
     int sp = 0;
     int inv = 0;
 
@@ -50,11 +52,13 @@ double sqrt(double x) {
     return a;
 }
 
-int floor(double x) {
+int floor(double x)
+{
     return x;
 }
 
-int ceil(double x) {
+int ceil(double x)
+{
     return x + 0.5;
 }
 
@@ -64,10 +68,11 @@ long double ldexp(long double man, int power) {
 }
 */
 
-int sign(double a) {
-    return a > 0 
-           ? 1 
-           : a < 0 
-             ? -1 
-             : 0;
+int sign(double a)
+{
+    return a > 0
+        ? 1
+        : a < 0
+        ? -1
+        : 0;
 }

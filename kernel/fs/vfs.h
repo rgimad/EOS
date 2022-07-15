@@ -20,8 +20,8 @@ typedef struct vfs_storage_dev_t {
 
     char *name;
 
-    uint32_t (*read) (int*, unsigned long long, unsigned long long, uint16_t*);
-    uint32_t (*write) (int*, unsigned long long, unsigned long long, uint16_t*);
+    uint32_t (*read)(int *, unsigned long long, unsigned long long, uint16_t *);
+    uint32_t (*write)(int *, unsigned long long, unsigned long long, uint16_t *);
 } vfs_storage_dev_t;
 
 // Represents some filesystem
@@ -34,23 +34,23 @@ typedef struct vfs_filesystem_t {
 
 // Contains pointers to some filesystems methods
 typedef struct vfs_filesystem_handles_t {
-    uint32_t (*read) (const char *fn, int, int, vfs_filesystem_t*, void*);
-    uint32_t (*write) (const char *fn, int, int, vfs_filesystem_t*, void*);
+    uint32_t (*read)(const char *fn, int, int, vfs_filesystem_t *, void *);
+    uint32_t (*write)(const char *fn, int, int, vfs_filesystem_t *, void *);
 
-    uint32_t (*readdir) (char*, vfs_filesystem_t*, void*);
+    uint32_t (*readdir)(char *, vfs_filesystem_t *, void *);
 
-    uint32_t (*mkfile) (char *fn, char*, vfs_filesystem_t*, uint16_t);
-    uint32_t (*mkdir) (char *fn, char*, vfs_filesystem_t*, uint16_t);
+    uint32_t (*mkfile)(char *fn, char *, vfs_filesystem_t *, uint16_t);
+    uint32_t (*mkdir)(char *fn, char *, vfs_filesystem_t *, uint16_t);
 
-    uint32_t (*rm) (char *fn, vfs_filesystem_t*);
+    uint32_t (*rm)(char *fn, vfs_filesystem_t *);
 
-    uint32_t (*get_size) (const char *fn, vfs_filesystem_t*);
-    uint32_t (*exists) (const char *fn, vfs_filesystem_t*);
-    uint32_t (*is_dir) (const char *fn, vfs_filesystem_t*);
+    uint32_t (*get_size)(const char *fn, vfs_filesystem_t *);
+    uint32_t (*exists)(const char *fn, vfs_filesystem_t *);
+    uint32_t (*is_dir)(const char *fn, vfs_filesystem_t *);
 } vfs_filesystem_handles_t;
 
 // VFS mount point
-typedef struct vfs_mount_info_t  {
+typedef struct vfs_mount_info_t {
     char *location; // For example /bin
     vfs_filesystem_t *fs;
     vfs_filesystem_handles_t *fs_handles;
