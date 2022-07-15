@@ -1,3 +1,8 @@
+/*
+ * EOS - Experimental Operating System
+ * PE executable files support module
+*/
+
 #include <kernel/fs/vfs.h>
 #include <kernel/io/qemu_log.h>
 #include <kernel/libk/string.h>
@@ -14,7 +19,7 @@
 #define PE_DEBUG(...) qemu_printf("PE_DEBUG: "__VA_ARGS__)
 static const char* pe_libdir = "/apps/";
 
-static const char *pe_error_strs[] = {
+static const char* pe_error_strs[] = {
     "no error",
     "invalid PE file",
     "file not found",
@@ -358,4 +363,3 @@ void pe_status_free(pe_status_t* status) {
     status->err_code = 0;
     kfree(status->file_name);
 }
-

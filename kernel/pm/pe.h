@@ -1,3 +1,8 @@
+/*
+ * EOS - Experimental Operating System
+ * PE executable files support module
+*/
+
 #ifndef _PE_H_
 #define _PE_H_
 
