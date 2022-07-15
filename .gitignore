@@ -2,6 +2,9 @@
 */*.o
 */*/*.o
 */*/*.log
+apps/*/*.lib
+apps/*/*/*.lib
+apps/*/*/*/*.lib
 *.log
 *.iso
 initrd/*
