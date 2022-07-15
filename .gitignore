@@ -5,6 +5,15 @@
 apps/*/*.lib
 apps/*/*/*.lib
 apps/*/*/*/*.lib
+# apps/*/*.bin
+# apps/*/*/*.bin
+# apps/*/*/*/*.bin
+apps/*/*.exe
+apps/*/*/*.exe
+apps/*/*/*/*.exe
+apps/*/*.dll
+apps/*/*/*.dll
+apps/*/*/*/*.dll
 *.log
 *.iso
 initrd/*
