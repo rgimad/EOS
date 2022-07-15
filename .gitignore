@@ -5,9 +5,9 @@
 apps/*/*.lib
 apps/*/*/*.lib
 apps/*/*/*/*.lib
-# apps/*/*.bin
-# apps/*/*/*.bin
-# apps/*/*/*/*.bin
+apps/*/*.bin
+apps/*/*/*.bin
+apps/*/*/*/*.bin
 apps/*/*.exe
 apps/*/*/*.exe
 apps/*/*/*/*.exe
