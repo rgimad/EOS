@@ -9,28 +9,23 @@
 - GDT and IDT setup
 - VESA framebuffer based terminal :D
 - PS/2 keyboard and mouse support
-- Timer support
 - RAM detection and Physical Memory Manager
 - Higher Half Kernel
 
   The kernel starts at virtual address 0xC0100000
 
   0xC0000000-0xC0400000 and 0x00000000-0x00400000 vitual addresses are mapped to one physical range - to 0x00000000-0x00400000
-- Very simple kernel command shell (KSH)
 - Virtual Memory Manager
-- Entry based kernel heap manager
+- Entry based kernel heap manager (kmalloc/kfree/krealloc)
+- Very simple kernel command shell (KSH)
 - VFS
-- InitRD
-- ELF loader (in progress)
-- System calls (in progress)
-- Kernel mode thread seems to work properly
-- ELF running (in progress)
-- GUI (window system) (Console window system in progress)
+- Initrd, uses TarFS
+- MENUET01 and PE executables loaders
+- System call mechanism
 
 ## TODO
-
-- Correct exit from kernel threads (situation not checked yet), usermode processes and threads, user stack, user heap etc..
-- Mutexes and spinlocks for threads synchronization
+- User-mode and multitasking
+- Synchronization (mutex, spinlock)
 - FAT32 driver
 - HDD driver
 - PCI driver
