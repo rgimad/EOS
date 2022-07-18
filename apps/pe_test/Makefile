@@ -3,7 +3,7 @@ LD = lld-link
 
 CCFLAGS =  -target i386-pc-win32 -undef -ffreestanding -fno-builtin -c
 LDFLAGS_EXE = /nodefaultlib /entry:main /subsystem:native
-LDFLAGS_DLL = /nodefaultlib /entry:DllMain /dll /subsystem:native
+LDFLAGS_DLL = /nodefaultlib /noentry /dll /subsystem:native
 
 TARGET_DIR = ../../bin/apps
 

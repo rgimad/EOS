@@ -122,8 +122,3 @@ __dllexport void printf(char *text, ...)
     // Pass print the output handle the format text and the first argument
     print(text, args);
 }
-
-int DllMain(void)
-{
-    return 0;
-}
