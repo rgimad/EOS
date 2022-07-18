@@ -25,12 +25,13 @@ static const char *pe_error_strs[] = {
     "file not found",
     "memory allocation error",
     "export table is missing an importable symbol",
-    "DLL loaded limit reached"
+    "DLL loaded limit reached",
+    "the file is not a DLL"
 };
 
 const char *pe_strerror(pe_error_t err)
 {
-    if (err < 0 || err > PE_ERR_DLL_LIMIT) {
+    if (err < 0 || err >= sizeof(pe_error_strs) / sizeof(char *)) {
         return "Unknown error";
     }
     return pe_error_strs[err];
@@ -293,9 +294,16 @@ static uintptr_t pe_load_dll(const char *name, dll_list_t *dll_list, pe_status_t
 
     pe_pimage_nt_headers32_t nt = pe_get_nt_headers(pe_get_dos_header(pe_file));
 
+    if (!(nt->file_header.characteristics & PE_IMAGE_FILE_DLL)) {
+        status->err_code = PE_ERR_NOT_DLL;
+        kfree((void *)pe_file);
+        return PE_BAD_IMAGE_BASE;
+    }
+
     uintptr_t image_base = (uintptr_t)kmalloc(nt->optional_header.size_of_image);
     if (!image_base) {
         status->err_code = PE_ERR_ALLOC;
+        kfree((void *)pe_file);
         return PE_BAD_IMAGE_BASE;
     }
 

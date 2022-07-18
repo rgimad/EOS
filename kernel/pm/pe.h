@@ -45,6 +45,7 @@ typedef enum PE_ERROR_CODES {
     PE_ERR_ALLOC = 3,
     PE_ERR_RESOLVE_IMP = 4,
     PE_ERR_DLL_LIMIT = 5,
+    PE_ERR_NOT_DLL = 6,
 } pe_error_t;
 
 #pragma pack(push, 2)
