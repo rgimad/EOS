@@ -110,7 +110,8 @@ static bool pe_validate(uintptr_t base, size_t size)
     } else if (nt->optional_header.section_alignment < nt->optional_header.file_alignment)
         return false;
 
-    if (!is_powerof2(nt->optional_header.section_alignment) || !is_powerof2(nt->optional_header.file_alignment))
+    if (!is_powerof2(nt->optional_header.section_alignment)
+        || !is_powerof2(nt->optional_header.file_alignment))
         return false;
 
     if (nt->file_header.number_of_sections > PE_MAX_SECTIONS)
@@ -237,7 +238,8 @@ static uintptr_t pe_get_export_fn_by_name(uintptr_t image_base, char *imp_name)
     return 0;
 }
 
-static pe_error_t pe_resolve_import(uintptr_t image_base, const char *mom_name, dll_list_t *dll_list, const pe_status_t *status)
+static pe_error_t pe_resolve_import(uintptr_t image_base, const char *mom_name,
+                                    dll_list_t *dll_list, const pe_status_t *status)
 {
     pe_pimage_nt_headers32_t nt = pe_get_nt_headers(pe_get_dos_header(image_base));
     pe_pimage_import_descriptor_t import_libs = pe_get_import_descriptor(image_base, nt);
