@@ -25,8 +25,6 @@
 #include <kernel/libk/string.h>
 #include <kernel/libk/assert.h>
 
-#include <kernel/gui/consolewindow.h>
-
 #include <stdint.h>
 
 #define STBI_NO_STDIO            1
@@ -78,8 +76,6 @@ void ksh_main()
             ksh_kheap_test();
         } else if (strcmp(cmd, "draw_demo") == 0) {
             ksh_draw_demo();
-        } else if (strcmp(cmd, "gui_test") == 0) {
-            ksh_gui_test();
         } else if (strcmp(cmd, "syscall_test") == 0) {
             ksh_syscall_test();
         } else if (strcmp(cmd, "pwd") == 0) {
@@ -121,23 +117,6 @@ void ksh_main()
             } else {
                 tty_printf("run: incorrect argument\n");
             }
-        } else if (strcmp(cmd, "cwnd_test") == 0) {
-            consolewindow_t *cwnd1 = consolewindow_create("Test window 1", 450, 200, 7, 45);
-            consolewindow_draw(cwnd1);
-            consolewindow_printf(cwnd1, "Hello world = %d", 1337);
-            consolewindow_backspace(cwnd1);
-            consolewindow_printf(cwnd1, "\nPrivet mir!Privet mir!Privet mir!Privet mir!Privet mir!Privet mir!Privet mir!");
-
-            consolewindow_t *cwnd2 = consolewindow_create("Window 2", 400, 450, 5, 35);
-            consolewindow_draw(cwnd2);
-
-            int a = 0, b = 1, c;
-            for (int i = 0; i < 19; i++) {
-                consolewindow_printf(cwnd2, "%d, ", a);
-                c = a + b;
-                a = b;
-                b = c;
-            }
         } else if (strcmp(cmd, "qemu_log_test") == 0) {
             qemu_printf("Hello world = %x + %s", 0x779, "privet");
         } else if (strcmp(cmd, "reg_modif") == 0) {
@@ -148,10 +127,10 @@ void ksh_main()
             char *tok = strtok(cmd, " ");
             tok = strtok(0, " "); // tok - now is filename
 
-            if (!tok) {
+            if (tok) {
                 ksh_cmd_img(tok);
             } else {
-                tty_printf("img: incorrect argument\n");
+                tty_printf("img: incorrect argument \n");
             }
         } else {
             ksh_cmd_unknown();
@@ -189,6 +168,14 @@ void ksh_kheap_test()
 
 void ksh_draw_demo()
 {
+    int wnd_x = 400, wnd_y = 200, wnd_width = 500, wnd_height = 300, wnd_border = 4, wnd_hdr_height = 30;
+    uint32_t wnd_frame_color = VESA_LIGHT_BLUE, wnd_background_color = VESA_LIGHT_GREY;
+    draw_fill(wnd_x, wnd_y, wnd_width, wnd_height, wnd_frame_color);
+    //draw_square(wnd_x, wnd_y, wnd_width, wnd_height, VESA_WHITE);
+    draw_fill(wnd_x + wnd_border, wnd_y + wnd_hdr_height, wnd_width - 2 * wnd_border, wnd_height - wnd_hdr_height - wnd_border, wnd_background_color);
+    draw_fill(wnd_x + wnd_width - wnd_hdr_height, wnd_y + wnd_border, wnd_hdr_height - 2 * wnd_border, wnd_hdr_height - 2 * wnd_border, VESA_RED);
+    draw_square(wnd_x + wnd_width - wnd_hdr_height, wnd_y + wnd_border, wnd_hdr_height - 2 * wnd_border, wnd_hdr_height - 2 * wnd_border, VESA_WHITE);
+
     draw_fill(0, 500, framebuffer_width, framebuffer_height - 500, 0x0000AA);
 
     int arr[10] = { 0x00AA00, 0x00AAAA, 0xAA0000, 0xAA00AA, 0xAA5500, 0xAAAAAA, 0x555555, 0x5555FF, 0x55FF55, 0x55FFFF };
@@ -201,17 +188,6 @@ void ksh_draw_demo()
     for (chr = 32; chr <= '~'; chr++) {
         draw_vga_character(chr, 500 + ((chr - 32) % 10) * 20, 50 + ((chr - 32) / 10) * 20, 0x00AA00, 0x0000AA, 0);
     }
-}
-
-void ksh_gui_test()
-{
-    int wnd_x = 400, wnd_y = 200, wnd_width = 500, wnd_height = 300, wnd_border = 4, wnd_hdr_height = 30;
-    uint32_t wnd_frame_color = VESA_LIGHT_BLUE, wnd_background_color = VESA_LIGHT_GREY;
-    draw_fill(wnd_x, wnd_y, wnd_width, wnd_height, wnd_frame_color);
-    //draw_square(wnd_x, wnd_y, wnd_width, wnd_height, VESA_WHITE);
-    draw_fill(wnd_x + wnd_border, wnd_y + wnd_hdr_height, wnd_width - 2 * wnd_border, wnd_height - wnd_hdr_height - wnd_border, wnd_background_color);
-    draw_fill(wnd_x + wnd_width - wnd_hdr_height, wnd_y + wnd_border, wnd_hdr_height - 2 * wnd_border, wnd_hdr_height - 2 * wnd_border, VESA_RED);
-    draw_square(wnd_x + wnd_width - wnd_hdr_height, wnd_y + wnd_border, wnd_hdr_height - 2 * wnd_border, wnd_hdr_height - 2 * wnd_border, VESA_WHITE);
 }
 
 void ksh_cmd_pwd()
@@ -363,5 +339,5 @@ void ksh_syscall_test()
 
 void ksh_cmd_help()
 {
-    tty_printf("Available commands:\n cpuid - information about processor\n ticks - get number of ticks\n kheap_test - test kernel heap\n draw_demo - demo super effects\n syscall_test - test system calls work\n ls - list of files and dirs\n cd - set current directory\n pwd - print working directory\n cat - print contents of specified file\n gui_test - draw test window\n kex_info - information about kex file\n img - open graphic image file\n run - run program (for example - run first_program_gas.elf)\n cwnd_test - console window system test\n qemu_log_test\n about - about EOS\n help\n");
+    tty_printf("Available commands:\n cpuid - information about processor\n ticks - get number of ticks\n kheap_test - test kernel heap\n draw_demo - demo super effects\n syscall_test - test system calls work\n ls - list of files and dirs\n cd - set current directory\n pwd - print working directory\n cat - print contents of specified file\n kex_info - information about kex file\n img - open graphic image file\n run - run program (for example - run first_program_gas.elf)\n qemu_log_test\n about - about EOS\n help\n");
 }

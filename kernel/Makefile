@@ -31,8 +31,7 @@ OBJ=	boot.o kernel.o \
 	devices/keyboard.o devices/timer.o devices/mouse.o \
 	mm/phys_memory.o mm/virt_memory.o mm/kheap.o \
 	fs/vfs.o fs/initrd.o \
-	pm/pe.o pm/kex.o \
-	gui/consolewindow.o
+	pm/pe.o pm/kex.o
 
 all: $(TARGET_ELF)
 
@@ -55,5 +54,4 @@ clean:
 	$(BASH) rm -rf fs/*.o
 	$(BASH) rm -rf pm/*.o
 	$(BASH) rm -rf libk/*.o
-	$(BASH) rm -rf gui/*.o
 	$(BASH) rm -rf $(TARGET_DIR)kernel.elf
