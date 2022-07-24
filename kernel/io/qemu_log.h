@@ -6,8 +6,9 @@
 #ifndef _QEMU_LOG_H
 #define _QEMU_LOG_H
 
-#include <stdarg.h>
+#include <kernel/libk/sprintf.h>
+#include <kernel/io/ports.h>
 
-void qemu_printf(char *text, ...);
+void qemu_printf(const char *format, ...);
 
 #endif

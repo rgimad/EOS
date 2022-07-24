@@ -11,7 +11,8 @@
 			"string.h": "c",
 			"kheap.h": "c",
 			"stdint.h": "c",
-			"keyboard.h": "c"
+			"keyboard.h": "c",
+			"stddef.h": "c"
 		}
 	}
 }

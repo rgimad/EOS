@@ -23,7 +23,7 @@ ifeq ($(DEBUG), 1)
 endif
 
 OBJ=	boot.o kernel.o \
-	libk/string.o libk/math.o libk/assert.o\
+	libk/string.o libk/math.o libk/assert.o libk/sprintf.o libk/ctype.o\
 	gdt.o gdt_asm.o idt.o idt_asm.o tss.o tss_asm.o tty.o cpu_detect.o \
 	interrupts.o interrupts_asm.o paging.o syscall.o ksh.o \
 	graphics/vesafb.o graphics/vgafnt.o \

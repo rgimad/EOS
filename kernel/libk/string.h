@@ -20,6 +20,7 @@ long strtol(char *, char **, int);
 char *strtok(char *s, const char *delim);
 
 size_t strlen(const char *);
+size_t strnlen (const char *s, size_t maxlen);
 size_t str_bksp(char *str, char c);
 
 int atoi(const char *);
