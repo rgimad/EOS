@@ -19,10 +19,14 @@ void kex_hdr_info(const kex_hdr_t *hdr)
         tty_printf("incorrect kex header\n");
         return;
     }
-    tty_printf("\n    magic = %c%c%c%c%c%c%c%c\n    version = %x\n"
-               "    entry_point = %x\n    end_image = %x\n"
-               "    memory = %u bytes\n    stack_top = %x\n"
-               "    cmdline = %x\n    file_path = %x\n",
+    tty_printf("\n    magic       = %c%c%c%c%c%c%c%c\n"
+                 "    version     = %#08X\n"
+                 "    entry_point = %#08X\n"
+                 "    end_image   = %#08X\n"
+                 "    memory      = %#08X\n"
+                 "    stack_top   = %#08X\n"
+                 "    cmdline     = %#08X\n"
+                 "    file_path   = %#08X\n",
                hdr->magic[0], hdr->magic[1], hdr->magic[2], hdr->magic[3],
                hdr->magic[4], hdr->magic[5], hdr->magic[6], hdr->magic[7],
                hdr->version, hdr->entry_point, hdr->end_image, hdr->memory,
@@ -36,7 +40,7 @@ void kex_info(const char *fname)
         return;
     }
     size_t fsize = vfs_get_size(fname);
-    tty_printf("file size = %d\n", fsize);
+    tty_printf("file size = %zu\n", fsize);
     void *buf = kmalloc(fsize);
     int res = vfs_read(fname, 0, fsize, buf);
     (void)res;
@@ -51,7 +55,7 @@ void kex_run(const char *fname)
         return;
     }
     size_t fsize = vfs_get_size(fname);
-    tty_printf("file size = %d\n", fsize);
+    tty_printf("file size = %zu\n", fsize);
     kex_hdr_t *kexfile = kmalloc(fsize);
     int res = vfs_read(fname, 0, fsize, kexfile);
     (void)res;

@@ -94,13 +94,16 @@ int kernel_init(struct multiboot_info *mboot_info)
     tty_printf("init_vbe: [c0800000]->%x\n", page_table_entry_is_writable(GET_PTE(0xC0800000)));
     memset(back_framebuffer_addr, 0, framebuffer_size); //causes page fault at c0800000*/
 
-    tty_printf("framebuffer_addr = %x\n", framebuffer_addr);
-    tty_printf("framebuffer_size = %x\n", framebuffer_size);
+    tty_printf("framebuffer_addr = %p\n", framebuffer_addr);
+    tty_printf("framebuffer_size = %#X\n", framebuffer_size);
     //tty_printf("x = %x\n", (framebuffer_pitch * VESA_HEIGHT));
     //tty_printf("VESA_HEIGHT = %d\n", VESA_HEIGHT);
     //tty_printf("\n\n");
 
     //memcpy(framebuffer_addr, back_framebuffer_addr, framebuffer_size);
+
+    // int x = (int)framebuffer_addr/0;
+    // (void)x;
 
     vfs_init();
     initrd_init(initrd_beg, initrd_end);

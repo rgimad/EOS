@@ -28,16 +28,22 @@ bool register_interrupt_handler(uint32_t idt_index, interrupt_handler_t handler)
 
 void fault_handler(struct regs *r)
 {
-    //void *linearAddress;
-    // Retrieve the linear address of the page fault stored in CR2
-    //ASM( "movl %%cr2, %0" : "=r" (linearAddress) );
-    //asm volatile( "movl %cr2, %eax");
-    //for (;;);
-
-    uint32_t adr;
+    uint32_t cr2_value;
     asm volatile("movl %%cr2, %0"
-                 : "=r"(adr));
-    qemu_printf("System Exception. System Halted! cr2 = %x  r->idt_index = %x eax = %x  ebx = %x  ecx = %x  edx = %x  esp = %x  ebp = %x  eip = %x\n", adr, r->idt_index, r->eax, r->ebx, r->ecx, r->edx, r->esp, r->ebp, r->eip);
+                 : "=r"(cr2_value));
+    qemu_printf("System Exception. System Halted!\n"
+        "    cr2 = %#08X\n"
+        "    r->idt_index = %u\n"
+        "    eax = %#08X\n"
+        "    ebx = %#08X\n"
+        "    ecx = %#08X\n"
+        "    edx = %#08X\n"
+        "    esp = %#08X\n"
+        "    ebp = %#08X\n"
+        "    eip = %#08X\n",
+        cr2_value,
+        r->idt_index,
+        r->eax, r->ebx, r->ecx, r->edx, r->esp, r->ebp, r->eip);
     for (;;)
         ;
 }

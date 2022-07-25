@@ -38,7 +38,7 @@ size_t kheap_increase(size_t size)
     }
 
     // Create the pages
-    // qemu_printf("pages = %u\n", pages);
+    // qemu_printf("pages = %zu\n", pages);
     for (size_t i = 0; i < pages; i++) {
 
         vmm_alloc_page(kheap_end);
@@ -62,7 +62,7 @@ void kheap_merge_free_adjacent(void)
 // Free a previously allocated item from the kernel heap
 void kfree(void *address)
 {
-    qemu_printf("kfree(%x)\n", address);
+    qemu_printf("kfree(%p)\n", address);
     if (address == NULL) {
         return;
     }
@@ -80,7 +80,7 @@ void kfree(void *address)
 // Allocates an arbitrary size of memory
 void *kmalloc(size_t size)
 {
-    qemu_printf("kmalloc(%u)\n", size);
+    qemu_printf("kmalloc(%zu)\n", size);
     if (size == 0) {
         return NULL;
     }
@@ -161,7 +161,7 @@ void kheap_print_stat(void)
 
 void *krealloc(void *p, size_t newsz)
 {
-    qemu_printf("krealloc(%x, %u)\n", p, newsz);
+    qemu_printf("krealloc(%p, %zu)\n", p, newsz);
     void *p2 = kmalloc(newsz);
     memcpy(p2, p, *((uint8_t *)p - 1 - 4));
     kfree(p);
@@ -233,7 +233,7 @@ void kheap_test(void)
     */
 
     tty_printf("(arr4) = %p\n", arr4);
-    tty_printf("(arr4-hdr) = %lx   heap_end = %p\n", (uintptr_t)arr4 - (uintptr_t)sizeof(kheap_item_t), kheap_end);
+    tty_printf("(arr4-hdr) = %p   heap_end = %p\n", (uintptr_t)arr4 - (uintptr_t)sizeof(kheap_item_t), kheap_end);
 
     kheap_print_stat();
     kfree(arr4);

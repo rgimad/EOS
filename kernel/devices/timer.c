@@ -21,15 +21,15 @@ void timer_set_frequency(int hz)
 }
 
 // IRQ Handler for the timer. Called at every clock tick
-void timer_handler(struct regs *r)
-{
-    timer_ticks++;
-    if (1 || timer_ticks % 500 == 0 || r->eax == 13372) {
-        qemu_printf("ticks = %d  ", timer_ticks);
-        qemu_printf("interrupted context eax = %x  ebx = %x  ecx = %x  edx = %x  esp = %x  ebp = %x  eip = %x  \n", r->eax, r->ebx, r->ecx, r->edx, r->esp, r->ebp, r->eip);
-    }
-    // schedule(r);
-}
+// void timer_handler(struct regs *r)
+// {
+//     timer_ticks++;
+//     if (1 || timer_ticks % 500 == 0 || r->eax == 13372) {
+//         qemu_printf("ticks = %d  ", timer_ticks);
+//         qemu_printf("interrupted context eax = %x  ebx = %x  ecx = %x  edx = %x  esp = %x  ebp = %x  eip = %x  \n", r->eax, r->ebx, r->ecx, r->edx, r->esp, r->ebp, r->eip);
+//     }
+//     // schedule(r);
+// }
 
 int timer_get_ticks()
 {

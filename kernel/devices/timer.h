@@ -17,7 +17,7 @@
 #define TICKS_PER_SECOND 20
 
 void timer_set_frequency(int hz);
-void timer_handler(struct regs *r);
+// void timer_handler(struct regs *r);
 
 void timer_install();
 int timer_get_ticks();

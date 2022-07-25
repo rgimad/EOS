@@ -267,7 +267,7 @@ void pmm_test()
 {
     tty_printf("TEST: ");
     void *myptr = pmm_alloc_block();
-    tty_printf("myptr = %x,  ", myptr);
+    tty_printf("myptr = %p,  ", myptr);
 
     char *str = "Hello world!";
     memcpy(myptr, str, 13);
