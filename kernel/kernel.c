@@ -75,8 +75,8 @@ int kernel_init(struct multiboot_info *mboot_info)
     uint32_t initrd_beg = *(uint32_t *)(mboot_info->mods_addr);
     uint32_t initrd_end = *(uint32_t *)(mboot_info->mods_addr + 4);
 
-    //tty_printf("pde0 = %u\n", *(page_dir_entry*)(0xFFFFF000));
-    //tty_printf("pde_%d = %u\n", (0xC0000000 >> 22), *(page_dir_entry*)(0xFFFFF000 + (0xC0000000 >> 22)*4));
+    //tty_printf("pde0 = %u\n", *(page_dir_entry_t*)(0xFFFFF000));
+    //tty_printf("pde_%d = %u\n", (0xC0000000 >> 22), *(page_dir_entry_t*)(0xFFFFF000 + (0xC0000000 >> 22)*4));
 
     //uint32_t x = *(uint32_t*) (0xF0FFF000); //doenst cause page fault if in boot.s was identity mapped all the ram :D
 

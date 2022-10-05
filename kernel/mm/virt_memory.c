@@ -9,7 +9,7 @@
 
 #include <kernel/libk/string.h>
 
-page_directory *kernel_page_dir; // Pointer (physical) to kernel page dircetory structure
+page_directory_t *kernel_page_dir; // Pointer (physical) to kernel page dircetory structure
 
 bool vmm_alloc_page(void *vaddr)
 {
@@ -28,14 +28,14 @@ bool vmm_alloc_page_with_userbit(void *vaddr)
         return false;
     }
     vmm_map_page(paddr, vaddr);
-    page_table_entry *pte = (void *)GET_PTE((uintptr_t)vaddr);
+    page_table_entry_t *pte = (void *)GET_PTE((uintptr_t)vaddr);
     page_table_entry_add_attrib(pte, I86_PTE_USER);
     return true;
 }
 
 void vmm_free_page(void *vaddr)
 {
-    page_table_entry *pte = (void *)GET_PTE((uintptr_t)vaddr);
+    page_table_entry_t *pte = (void *)GET_PTE((uintptr_t)vaddr);
     if (!page_table_entry_is_present(*pte)) {
         tty_printf("oh, you try to delete not present page\n");
         // TODO: panic
@@ -50,18 +50,18 @@ void vmm_free_page(void *vaddr)
 
 void vmm_create_kernel_page_dir()
 {
-    kernel_page_dir = (page_directory *)pmm_alloc_block();
+    kernel_page_dir = (page_directory_t *)pmm_alloc_block();
     if (!kernel_page_dir) {
         tty_printf("Failed to allocate phys memory for kernel page dir\n");
         // TODO: panic
         return;
     }
 
-    page_directory *pd = kernel_page_dir;
-    memset(pd, 0, sizeof(page_directory));
+    page_directory_t *pd = kernel_page_dir;
+    memset(pd, 0, sizeof(page_directory_t));
 
     for (size_t i = 0; i < PAGE_ENTRIES; i++) {
-        page_dir_entry *pde = (page_dir_entry *)&pd->entries[i];
+        page_dir_entry_t *pde = (page_dir_entry_t *)&pd->entries[i];
         page_dir_entry_add_attrib(pde, I86_PTE_WRITABLE);
         page_dir_entry_del_attrib(pde, I86_PTE_PRESENT);
 
@@ -76,7 +76,7 @@ void vmm_create_kernel_page_dir()
 
 void vmm_map_page(void *paddr, void *vaddr)
 {
-    page_dir_entry *pde = (void *)GET_PDE((uintptr_t)vaddr);
+    page_dir_entry_t *pde = (void *)GET_PDE((uintptr_t)vaddr);
     if (!page_dir_entry_is_present(*pde)) { // If page table isnt present, create it
         void *pt_p = pmm_alloc_block();     // It's phys addr!
         if (!pt_p) {
@@ -85,14 +85,14 @@ void vmm_map_page(void *paddr, void *vaddr)
             return;
         }
 
-        page_table *pt_v = (page_table *)vmm_temp_map_page(pt_p); // Because we need to write!
-        memset(pt_v, 0, sizeof(page_table));
+        page_table_t *pt_v = (page_table_t *)vmm_temp_map_page(pt_p); // Because we need to write!
+        memset(pt_v, 0, sizeof(page_table_t));
         page_dir_entry_add_attrib(pde, I86_PDE_PRESENT);
         page_dir_entry_add_attrib(pde, I86_PDE_WRITABLE);
         page_dir_entry_set_frame(pde, pt_p);
     }
 
-    page_table_entry *pte = (void *)GET_PTE((uintptr_t)vaddr);
+    page_table_entry_t *pte = (void *)GET_PTE((uintptr_t)vaddr);
     page_table_entry_set_frame(pte, paddr);
     page_table_entry_add_attrib(pte, I86_PTE_PRESENT);
     page_table_entry_add_attrib(pte, I86_PTE_WRITABLE);
@@ -101,7 +101,7 @@ void vmm_map_page(void *paddr, void *vaddr)
 
 void *vmm_temp_map_page(void *paddr)
 {
-    page_table_entry *pte = (void *)GET_PTE((uintptr_t)TEMP_PAGE_ADDR);
+    page_table_entry_t *pte = (void *)GET_PTE((uintptr_t)TEMP_PAGE_ADDR);
     page_table_entry_set_frame(pte, (void *)PAGE_ALIGN_DOWN((uintptr_t)paddr));
     page_table_entry_add_attrib(pte, I86_PTE_PRESENT);
     page_table_entry_add_attrib(pte, I86_PTE_WRITABLE);
@@ -115,7 +115,7 @@ void *vmm_temp_map_page(void *paddr)
 }
 
 // Switch page directory, reveives physical address
-void vmm_switch_page_directory(page_directory *page_dir_phys_addr)
+void vmm_switch_page_directory(page_directory_t *page_dir_phys_addr)
 {
     asm volatile("mov %0, %%cr3" ::"r"((uint32_t)page_dir_phys_addr));
 }
@@ -126,19 +126,19 @@ void vmm_init()
 
     vmm_create_kernel_page_dir();
 
-    page_table *table1 = (page_table *)pmm_alloc_block();
-    page_table *table2 = (page_table *)pmm_alloc_block();
+    page_table_t *table1 = (page_table_t *)pmm_alloc_block();
+    page_table_t *table2 = (page_table_t *)pmm_alloc_block();
 
     // Clear allocated page tables
-    memset((void *)table1, 0, sizeof(page_table));
-    memset((void *)table2, 0, sizeof(page_table));
+    memset((void *)table1, 0, sizeof(page_table_t));
+    memset((void *)table2, 0, sizeof(page_table_t));
 
     // Maps first MB to 3GB
     uint8_t *frame, *virt;
     for (frame = (uint8_t *)0x0, virt = (uint8_t *)0xC0000000;
          frame < (uint8_t *)0x100000 /*0x100000*/;
          frame += PAGE_SIZE, virt += PAGE_SIZE) {
-        page_table_entry page = 0;
+        page_table_entry_t page = 0;
         page_table_entry_add_attrib(&page, I86_PTE_PRESENT);
         page_table_entry_set_frame(&page, frame);
         table1->entries[PAGE_TABLE_INDEX((uintptr_t)virt)] = page;
@@ -148,18 +148,18 @@ void vmm_init()
     for (frame = (uint8_t *)KERNEL_START_PADDR, virt = (uint8_t *)KERNEL_START_VADDR;
          frame < (uint8_t *)KERNEL_PHYS_MAP_END;
          frame += PAGE_SIZE, virt += PAGE_SIZE) {
-        page_table_entry page = 0;
+        page_table_entry_t page = 0;
         page_table_entry_add_attrib(&page, I86_PTE_PRESENT);
         page_table_entry_set_frame(&page, frame);
         table2->entries[PAGE_TABLE_INDEX((uintptr_t)virt)] = page;
     }
 
-    page_dir_entry *pde1 = &kernel_page_dir->entries[PAGE_DIRECTORY_INDEX(0x00000000)];
+    page_dir_entry_t *pde1 = &kernel_page_dir->entries[PAGE_DIRECTORY_INDEX(0x00000000)];
     page_dir_entry_add_attrib(pde1, I86_PDE_PRESENT);
     page_dir_entry_add_attrib(pde1, I86_PDE_WRITABLE);
     page_dir_entry_set_frame(pde1, table1);
 
-    page_dir_entry *pde2 = &kernel_page_dir->entries[PAGE_DIRECTORY_INDEX(0xC0100000)];
+    page_dir_entry_t *pde2 = &kernel_page_dir->entries[PAGE_DIRECTORY_INDEX(0xC0100000)];
     page_dir_entry_add_attrib(pde2, I86_PDE_PRESENT);
     page_dir_entry_add_attrib(pde2, I86_PDE_WRITABLE);
     page_dir_entry_set_frame(pde2, table2);
@@ -191,35 +191,35 @@ void vmm_test()
 }
 
 // Add attribute to pte
-void page_table_entry_add_attrib(page_table_entry *entry, uint32_t attrib)
+void page_table_entry_add_attrib(page_table_entry_t *entry, uint32_t attrib)
 {
     *entry |= attrib;
 }
 
 // Delete attribute to pte
-void page_table_entry_del_attrib(page_table_entry *entry, uint32_t attrib)
+void page_table_entry_del_attrib(page_table_entry_t *entry, uint32_t attrib)
 {
     *entry &= ~attrib;
 }
 
 // Map pte to physical frame
-void page_table_entry_set_frame(page_table_entry *entry, void *addr)
+void page_table_entry_set_frame(page_table_entry_t *entry, void *addr)
 {
     *entry = (*entry & ~I86_PTE_FRAME) | (uintptr_t)addr;
 }
 
-bool page_table_entry_is_present(page_table_entry entry)
+bool page_table_entry_is_present(page_table_entry_t entry)
 {
     return entry & I86_PTE_PRESENT;
 }
 
-bool page_table_entry_is_writable(page_table_entry entry)
+bool page_table_entry_is_writable(page_table_entry_t entry)
 {
     return entry & I86_PTE_WRITABLE;
 }
 
 // Return the address of physical frame which pte refers to
-void *page_table_entry_frame(page_table_entry entry)
+void *page_table_entry_frame(page_table_entry_t entry)
 {
     return (void *)(entry & I86_PTE_FRAME);
 }
@@ -227,45 +227,45 @@ void *page_table_entry_frame(page_table_entry entry)
 // Functions for Page Directory Entries
 
 // Add attribute to pde
-void page_dir_entry_add_attrib(page_dir_entry *entry, uint32_t attrib)
+void page_dir_entry_add_attrib(page_dir_entry_t *entry, uint32_t attrib)
 {
     *entry |= attrib;
 }
 
 // Delete attribute to pde
-void page_dir_entry_del_attrib(page_dir_entry *entry, uint32_t attrib)
+void page_dir_entry_del_attrib(page_dir_entry_t *entry, uint32_t attrib)
 {
     *entry &= ~attrib; //old: was without ~ !!
 }
 
 // Map pde to physical frame (where the appropriate page table stores)
-void page_dir_entry_set_frame(page_dir_entry *entry, void *addr)
+void page_dir_entry_set_frame(page_dir_entry_t *entry, void *addr)
 {
     *entry = (*entry & ~I86_PDE_FRAME) | (uintptr_t)addr;
 }
 
-bool page_dir_entry_is_present(page_dir_entry entry)
+bool page_dir_entry_is_present(page_dir_entry_t entry)
 {
     return entry & I86_PDE_PRESENT;
 }
 
-bool page_dir_entry_is_user(page_dir_entry entry)
+bool page_dir_entry_is_user(page_dir_entry_t entry)
 {
     return entry & I86_PDE_USER;
 }
 
-bool page_dir_entry_is_4mb(page_dir_entry entry)
+bool page_dir_entry_is_4mb(page_dir_entry_t entry)
 {
     return entry & I86_PDE_4MB;
 }
 
-bool page_dir_entry_is_writable(page_dir_entry entry)
+bool page_dir_entry_is_writable(page_dir_entry_t entry)
 {
     return entry & I86_PDE_WRITABLE;
 }
 
 // Return the address of physical frame which pde refers to
-void *page_dir_entry_frame(page_dir_entry entry)
+void *page_dir_entry_frame(page_dir_entry_t entry)
 {
     return (void *)(entry & I86_PDE_FRAME);
 }

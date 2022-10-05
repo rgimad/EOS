@@ -12,19 +12,19 @@
 #include <stdint.h>
 
 // Page Table Entry points to a single page stored somewhere in memory/disk
-typedef uint32_t page_table_entry;
+typedef uint32_t page_table_entry_t;
 // Page Directory Entry points to a diretory with 1024 PT Entries
-typedef uint32_t page_dir_entry;
+typedef uint32_t page_dir_entry_t;
 
 // Page Directory contains 1024 page directory entries
-typedef struct __attribute__((aligned(4096))) page_directory {
-    page_dir_entry entries[PAGES_PER_DIR];
-} page_directory;
+typedef struct __attribute__((aligned(4096))) page_directory_t {
+    page_dir_entry_t entries[PAGES_PER_DIR];
+} page_directory_t;
 
 // Page Table contains 1024 page table entries
-typedef struct __attribute__((aligned(4096))) page_table {
-    page_table_entry entries[PAGES_PER_TABLE];
-} page_table;
+typedef struct __attribute__((aligned(4096))) page_table_t {
+    page_table_entry_t entries[PAGES_PER_TABLE];
+} page_table_t;
 
 enum PAGE_PTE_FLAGS {
     I86_PTE_PRESENT = 1,
@@ -63,30 +63,30 @@ enum PAGE_PDE_FLAGS {
 #define PAGE_GET_TABLE_ADDRESS(x)    (*x & ~0xFFF) // Read address(20bits) from pde, other 12 bits are flags
 #define PAGE_GET_PHYSICAL_ADDRESS(x) (*x & ~0xFFF) // Read address(20bits) from pte, other 12 bits are flags
 
-#define GET_PDE(v) (page_dir_entry *)(0xFFFFF000 + (v >> 22) * 4) // Get pointer to pde using recursive mapping
-#define GET_PTE(v) (page_table_entry *)(0xFFC00000 + (v >> 12) * 4)
+#define GET_PDE(v) (page_dir_entry_t *)(0xFFFFF000 + (v >> 22) * 4) // Get pointer to pde using recursive mapping
+#define GET_PTE(v) (page_table_entry_t *)(0xFFC00000 + (v >> 12) * 4)
 
-extern page_directory *kernel_page_dir; // Pointer (physical) to kernel page dircetory structure
+extern page_directory_t *kernel_page_dir; // Pointer (physical) to kernel page dircetory structure
 
 // TODO: rewrite all these functions so that they will work using recursive pd techinque
 
 // Functions for Page Table Entries
-void page_table_entry_add_attrib(page_table_entry *entry, uint32_t attrib); // Add attribute to pte
-void page_table_entry_del_attrib(page_table_entry *entry, uint32_t attrib); // Delete attribute to pte
-void page_table_entry_set_frame(page_table_entry *entry, void *addr);       // Map pte to physical frame
-bool page_table_entry_is_present(page_table_entry entry);
-bool page_table_entry_is_writable(page_table_entry entry);
-void *page_table_entry_frame(page_table_entry entry); // Return the address of physical frame which pte refers to
+void page_table_entry_add_attrib(page_table_entry_t *entry, uint32_t attrib); // Add attribute to pte
+void page_table_entry_del_attrib(page_table_entry_t *entry, uint32_t attrib); // Delete attribute to pte
+void page_table_entry_set_frame(page_table_entry_t *entry, void *addr);       // Map pte to physical frame
+bool page_table_entry_is_present(page_table_entry_t entry);
+bool page_table_entry_is_writable(page_table_entry_t entry);
+void *page_table_entry_frame(page_table_entry_t entry); // Return the address of physical frame which pte refers to
 
 // Functions for Page Directory Entries
-void page_dir_entry_add_attrib(page_dir_entry *entry, uint32_t attrib); // Add attribute to pde
-void page_dir_entry_del_attrib(page_dir_entry *entry, uint32_t attrib); // Old: was without ~ !! //delete attribute to pde
-void page_dir_entry_set_frame(page_dir_entry *entry, void *addr);       // Map pde to physical frame (where the appropriate page table stores)
-bool page_dir_entry_is_present(page_dir_entry entry);
-bool page_dir_entry_is_user(page_dir_entry entry);
-bool page_dir_entry_is_4mb(page_dir_entry entry);
-bool page_dir_entry_is_writable(page_dir_entry entry);
-void *page_dir_entry_frame(page_dir_entry entry); // Return the address of physical frame which pde refers to
+void page_dir_entry_add_attrib(page_dir_entry_t *entry, uint32_t attrib); // Add attribute to pde
+void page_dir_entry_del_attrib(page_dir_entry_t *entry, uint32_t attrib); // Old: was without ~ !! //delete attribute to pde
+void page_dir_entry_set_frame(page_dir_entry_t *entry, void *addr);       // Map pde to physical frame (where the appropriate page table stores)
+bool page_dir_entry_is_present(page_dir_entry_t entry);
+bool page_dir_entry_is_user(page_dir_entry_t entry);
+bool page_dir_entry_is_4mb(page_dir_entry_t entry);
+bool page_dir_entry_is_writable(page_dir_entry_t entry);
+void *page_dir_entry_frame(page_dir_entry_t entry); // Return the address of physical frame which pde refers to
 
 void flush_tlb_entry(void *addr);
 
@@ -100,7 +100,7 @@ bool vmm_alloc_page_with_userbit(void *vaddr);
 void vmm_free_page(void *vaddr);
 void vmm_map_page(void *paddr, void *vaddr);
 void *vmm_temp_map_page(void *paddr);
-void vmm_switch_page_directory(page_directory *page_dir_phys_addr);
+void vmm_switch_page_directory(page_directory_t *page_dir_phys_addr);
 
 void vmm_test();
 
