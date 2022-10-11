@@ -8,9 +8,11 @@ LOGFILE=EOS_qemu_serial.log
 ifeq ($(OS),Windows_NT) 
     BASH = wsl
 	STARTCMD = start
+	QEMU_DAEMONIZE =
 else
     BASH =
 	STARTCMD =
+	QEMU_DAEMONIZE = -daemonize
 endif
 
 all: build-iso-run
@@ -37,7 +39,7 @@ clean-logs:
 
 run-iso: clean-logs
 ifeq ($(DEBUG),1)
-	$(STARTCMD) qemu-system-i386 -s -S -m 512 -cdrom $(TARGET_ISO) -monitor stdio -serial file:$(LOGFILE) && gdb -nx -ix ./qemu.gdbinit
+	$(STARTCMD) qemu-system-i386 $(QEMU_DAEMONIZE) -s -S -m 512 -cdrom $(TARGET_ISO) -serial file:$(LOGFILE) & gdb -nx -ix ./qemu.gdbinit
 else
 	qemu-system-i386 -m 2024 -cdrom $(TARGET_ISO) -monitor stdio -serial file:$(LOGFILE)
 endif
