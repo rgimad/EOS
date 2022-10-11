@@ -16,6 +16,7 @@ apps/*/*/*.dll
 apps/*/*/*/*.dll
 *.log
 *.iso
+*.gdbinit
 initrd/*
 bin/*
 isodir/*
