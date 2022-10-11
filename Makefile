@@ -7,8 +7,10 @@ LOGFILE=EOS_qemu_serial.log
 # if we're on Windows use WSL to run bash commands
 ifeq ($(OS),Windows_NT) 
     BASH = wsl
+	STARTCMD = start
 else
     BASH =
+	STARTCMD =
 endif
 
 all: build-iso-run
@@ -35,7 +37,7 @@ clean-logs:
 
 run-iso: clean-logs
 ifeq ($(DEBUG),1)
-	qemu-system-i386 -s -S -m 512 -cdrom $(TARGET_ISO) -monitor stdio -serial file:$(LOGFILE) & gdb $(KERNEL_FILE) -ex "target remote localhost:1234" -tui
+	$(STARTCMD) qemu-system-i386 -s -S -m 512 -cdrom $(TARGET_ISO) -monitor stdio -serial file:$(LOGFILE) && gdb -nx -ix ./qemu.gdbinit
 else
 	qemu-system-i386 -m 2024 -cdrom $(TARGET_ISO) -monitor stdio -serial file:$(LOGFILE)
 endif
