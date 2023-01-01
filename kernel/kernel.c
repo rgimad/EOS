@@ -59,6 +59,10 @@ int kernel_init(struct multiboot_info *mboot_info) {
     //tty_printf("Installing IDT...\n\n");
     idt_install();
 
+    if (fpu_init()) {
+        qemu_printf("FPU installed\n");
+    }
+
     //uint32_t initrd_beg = *(uint32_t*) (mboot_info->mods_addr);
     //uint32_t initrd_end = *(uint32_t*) (mboot_info->mods_addr + 4);
 

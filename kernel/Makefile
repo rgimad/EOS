@@ -23,7 +23,7 @@ endif
 
 OBJ=boot.o kernel.o \
 	libk/string.o libk/math.o libk/assert.o\
-	gdt.o gdt_asm.o idt.o idt_asm.o tss.o tss_asm.o tty.o cpu_detect.o \
+	gdt.o gdt_asm.o idt.o idt_asm.o tss.o tss_asm.o tty.o cpu_detect.o fpu.o \
 	interrupts.o interrupts_asm.o paging.o syscall.o ksh.o \
 	graphics/vesafb.o graphics/vgafnt.o \
 	io/ports.o io/qemu_log.o \
