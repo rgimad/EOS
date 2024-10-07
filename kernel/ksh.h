@@ -8,6 +8,7 @@
 
 void ksh_init();
 void ksh_main();
+void ksh_prepend_workdir(char *fname, char *workdir);
 
 void ksh_cmd_cpuid();
 void ksh_cmd_ticks();

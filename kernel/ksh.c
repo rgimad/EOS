@@ -40,12 +40,12 @@
 #define STBI_FREE(p)           kfree(p)
 #include <kernel/utils/stb_image.h>
 
-char ksh_working_directory[256];
+char ksh_workdir[256];
 
 void ksh_init()
 {
     tty_putstring_color("                  EOS KSH (Kernel SHell):\n\n", VESA_LIGHT_RED);
-    strcpy(ksh_working_directory, "/initrd/");
+    strcpy(ksh_workdir, "/initrd/");
 }
 
 void ksh_main()
@@ -56,7 +56,7 @@ void ksh_main()
         tty_setcolor(VESA_LIGHT_GREEN);
         tty_printf("kernel ");
         tty_setcolor(VESA_LIGHT_BLUE);
-        tty_printf("%s $ ", ksh_working_directory);
+        tty_printf("%s $ ", ksh_workdir);
         tty_setcolor(VESA_LIGHT_CYAN);
 
         keyboard_gets(cmd, 256);
@@ -138,6 +138,16 @@ void ksh_main()
     }
 }
 
+// Function to prepend working directory if filename is relative
+void ksh_prepend_workdir(char *fname, char *workdir) {
+    if (fname[0] != '/') {
+        char temp[256];
+        strcpy(temp, workdir);
+        strcat(temp, fname);
+        strcpy(fname, temp);
+    }
+}
+
 // Command handlers implementation
 
 void ksh_cmd_cpuid()
@@ -192,17 +202,12 @@ void ksh_draw_demo()
 
 void ksh_cmd_pwd()
 {
-    tty_printf("%s\n", ksh_working_directory);
+    tty_printf("%s\n", ksh_workdir);
 }
 
 void ksh_cmd_cat(char *fname)
 {
-    if (fname[0] != '/') { //TODO: make function
-        char temp[256];
-        strcpy(temp, ksh_working_directory);
-        strcat(temp, fname);
-        strcpy(fname, temp);
-    }
+    ksh_prepend_workdir(fname, ksh_workdir);
 
     char *buf = (char *)kmalloc(1000);
 
@@ -222,7 +227,7 @@ void ksh_cmd_cd(char *dname)
 {
     if (dname[0] != '/') {
         char temp[256];
-        strcpy(temp, ksh_working_directory);
+        strcpy(temp, ksh_workdir);
         strcat(temp, dname);
         strcpy(dname, temp);
     }
@@ -232,7 +237,7 @@ void ksh_cmd_cd(char *dname)
     }
 
     if (vfs_exists(dname) && vfs_is_dir(dname)) {
-        strcpy(ksh_working_directory, dname);
+        strcpy(ksh_workdir, dname);
     } else {
         tty_printf("cd: no such directory\n");
     }
@@ -246,12 +251,7 @@ void ksh_cmd_ls()
 
 void ksh_cmd_kex_info(char *fname)
 {
-    if (fname[0] != '/') { // TODO: make function
-        char temp[256];
-        strcpy(temp, ksh_working_directory);
-        strcat(temp, fname);
-        strcpy(fname, temp);
-    }
+    ksh_prepend_workdir(fname, ksh_workdir);
 
     // tty_printf("kex fname = %s\n", fname);
     kex_info(fname);
@@ -259,12 +259,7 @@ void ksh_cmd_kex_info(char *fname)
 
 void ksh_cmd_img(char *fname)
 {
-    if (fname[0] != '/') { //TODO: make function
-        char temp[256];
-        strcpy(temp, ksh_working_directory);
-        strcat(temp, fname);
-        strcpy(fname, temp);
-    }
+    ksh_prepend_workdir(fname, ksh_workdir);
 
     if (!vfs_exists(fname)) {
         tty_printf("img: error file not found\n");
@@ -290,14 +285,9 @@ void ksh_cmd_img(char *fname)
 
 void ksh_cmd_run(char *fname)
 {
-    int status = 0;
+    ksh_prepend_workdir(fname, ksh_workdir);
 
-    if (fname[0] != '/') { // TODO: make function
-        char temp[256];
-        strcpy(temp, ksh_working_directory);
-        strcat(temp, fname);
-        strcpy(fname, temp);
-    }
+    int status = 0;
 
     if (!vfs_exists(fname)) {
         tty_printf("File not found!\n");
