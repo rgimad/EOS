@@ -4,42 +4,31 @@ ISODIR=isodir/
 TARGET_ISO=EOS.iso
 LOGFILE=EOS_qemu_serial.log
 
-# if we're on Windows use WSL to run bash commands
-ifeq ($(OS),Windows_NT) 
-    BASH = wsl
-	STARTCMD = start
-	QEMU_DAEMONIZE =
-else
-    BASH =
-	STARTCMD =
-	QEMU_DAEMONIZE = -daemonize
-endif
-
 all: build-iso-run
 
 check-multiboot: $(KERNEL_FILE)
-	$(BASH) grub-file --is-x86-multiboot $(KERNEL_FILE)
+	grub-file --is-x86-multiboot $(KERNEL_FILE)
 
 compile-kernel:
 	make -C kernel -f Makefile DEBUG=$(DEBUG)
 
 build-iso: compile-kernel check-multiboot
-	$(BASH) rm -rf $(ISODIR)
-	$(BASH) mkdir -p $(ISODIR)boot
+	rm -rf $(ISODIR)
+	mkdir -p $(ISODIR)boot
 	make -C apps -f Makefile
-	$(BASH) cp -r bin/apps initrd/
-	$(BASH) cd initrd; tar -cf ../isodir/boot/initrd.tar *; cd -
-	$(BASH) mkdir -p $(ISODIR)boot/grub
-	$(BASH) cp $(KERNEL_FILE) $(ISODIR)boot/kernel.elf
-	$(BASH) cp grub/grub.cfg $(ISODIR)boot/grub/grub.cfg
-	$(BASH) grub-mkrescue -o $(TARGET_ISO) $(ISODIR)
+	cp -r bin/apps initrd/
+	cd initrd; tar -cf ../isodir/boot/initrd.tar *; cd -
+	mkdir -p $(ISODIR)boot/grub
+	cp $(KERNEL_FILE) $(ISODIR)boot/kernel.elf
+	cp grub/grub.cfg $(ISODIR)boot/grub/grub.cfg
+	grub-mkrescue -o $(TARGET_ISO) $(ISODIR)
 
 clean-logs:
-	$(BASH) rm -rf $(LOGFILE)
+	rm -rf $(LOGFILE)
 
 run-iso: clean-logs
 ifeq ($(DEBUG),1)
-	$(STARTCMD) qemu-system-i386 $(QEMU_DAEMONIZE) -s -S -m 512 -cdrom $(TARGET_ISO) -serial file:$(LOGFILE) & gdb -nx -ix ./qemu.gdbinit
+	qemu-system-i386 -daemonize -s -S -m 512 -cdrom $(TARGET_ISO) -serial file:$(LOGFILE) & gdb -nx -ix ./qemu.gdbinit
 else
 	qemu-system-i386 -m 2024 -cdrom $(TARGET_ISO) -monitor stdio -serial file:$(LOGFILE)
 endif
@@ -47,12 +36,12 @@ endif
 build-iso-run: build-iso run-iso
 
 clean:
-	$(BASH) rm -rf $(ISODIR)
-	$(BASH) rm -rf $(TARGET_ISO)
-	$(BASH) rm -rf $(LOGFILE)
+	rm -rf $(ISODIR)
+	rm -rf $(TARGET_ISO)
+	rm -rf $(LOGFILE)
 	make -C kernel -f Makefile clean
 	make -C apps -f Makefile clean
-	$(BASH) rm -rf initrd/apps/*
+	rm -rf initrd/apps/*
 
 
 
