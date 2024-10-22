@@ -1,4 +1,5 @@
 # Makefile for building EOS kernel
+
 TARGET_ELF=kernel.elf
 TARGET_DIR=../bin/kernel/
 
@@ -11,40 +12,41 @@ TARGET_ARCH = -target i386-pc-none-elf
 CCFLAGS= $(TARGET_ARCH) -Wall -Wextra -mno-sse -mno-avx -std=gnu99 -ffreestanding -I $(INCLUDE_DIR)
 LDFLAGS=-T linker.ld -nostdlib
 
+# Enable debugging symbols (optional)
 ifeq ($(DEBUG), 1)
 	CCFLAGS += -g
 endif
 
-OBJ=	boot.o kernel.o \
-	libk/string.o libk/math.o libk/assert.o libk/sprintf.o libk/ctype.o\
-	gdt.o gdt_asm.o idt.o idt_asm.o tss.o tss_asm.o tty.o cpu_detect.o \
-	interrupts.o interrupts_asm.o paging.o syscall.o ksh.o \
-	graphics/vesafb.o graphics/vgafnt.o \
-	io/ports.o io/qemu_log.o \
-	devices/keyboard.o devices/timer.o devices/mouse.o \
-	mm/phys_memory.o mm/virt_memory.o mm/kheap.o \
-	fs/vfs.o fs/initrd.o \
-	pm/pe.o pm/kex.o
+OBJS_PATH=../bin/kernel
+OBJS= $(patsubst %, $(OBJS_PATH)/%.o, \
+	boot kernel libk/string libk/math libk/assert libk/sprintf libk/ctype \
+	gdt gdt_asm idt idt_asm tss tss_asm tty cpu_detect \
+	interrupts interrupts_asm paging syscall ksh \
+	graphics/vesafb graphics/vgafnt \
+	io/ports io/qemu_log \
+	devices/keyboard devices/timer devices/mouse \
+	mm/phys_memory mm/virt_memory mm/kheap \
+	fs/vfs fs/initrd \
+	pm/pe pm/kex)
 
 all: $(TARGET_ELF)
 
-$(TARGET_ELF): $(OBJ)
+$(TARGET_DIR):
 	mkdir -p $(TARGET_DIR)
-	$(LD) $(LDFLAGS) -o $(TARGET_DIR)$(TARGET_ELF) $(OBJ)
 
-%.o: %.c
+$(TARGET_ELF): $(TARGET_DIR) $(OBJS)
+	$(LD) $(LDFLAGS) -o $(TARGET_DIR)$(TARGET_ELF) $(OBJS)
+
+$(OBJS_PATH)/%.o: %.c
+	@mkdir -p $(dir $@)
 	$(CC) $(CCFLAGS) -c -o $@ $<
 
-%.o: %.s
+$(OBJS_PATH)/%.o: %.s
+	@mkdir -p $(dir $@)
 	$(CC) $(TARGET_ARCH) -c -o $@ $<
 
 clean:
-	rm -rf *.o
-	rm -rf io/*.o
-	rm -rf devices/*.o
-	rm -rf mm/*.o
-	rm -rf graphics/*.o
-	rm -rf fs/*.o
-	rm -rf pm/*.o
-	rm -rf libk/*.o
-	rm -rf $(TARGET_DIR)kernel.elf
+	rm -f $(OBJS)
+	rm -rf $(TARGET_DIR)
+
+.PHONY: all clean
